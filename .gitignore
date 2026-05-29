@@ -1,0 +1,15 @@
+node_modules
+dist
+.env
+coverage
+.DS_Store
+*.log
+
+frontend-ac/node_modules
+frontend-ac/dist
+frontend-ac/.env
+
+backend-ac/node_modules
+backend-ac/dist
+backend-ac/.env
+backend-ac/coverage

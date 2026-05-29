@@ -1,0 +1,9 @@
+{
+  "room_id": "R101",
+  "people_count": 8,
+  "recommendation": {
+    "temperature": 23,
+    "fan_speed": 2,
+    "mode": "cool"
+  }
+}
