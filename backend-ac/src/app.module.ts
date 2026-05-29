@@ -26,6 +26,12 @@ import { SchedulerService } from './scheduler/scheduler.service';
       username: process.env.DATABASE_USER || process.env.MYSQLUSER || 'root',
       password: process.env.DATABASE_PASSWORD || process.env.MYSQLPASSWORD || '',
       database: process.env.DATABASE_NAME || process.env.MYSQLDATABASE || 'ac',
+      ssl:
+        process.env.DATABASE_SSL === 'true'
+          ? {
+              rejectUnauthorized: false,
+            }
+          : undefined,
       entities: [User, Schedule],
       synchronize: false,
     }),
