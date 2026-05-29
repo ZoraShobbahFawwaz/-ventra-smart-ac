@@ -10,7 +10,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import MainLayout from "../components/MainLayout";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 function AuditLogs() {
   const navigate = useNavigate();
@@ -27,9 +27,9 @@ function AuditLogs() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(apiUrl("/audit-logs"), {
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
 
       setLogs(Array.isArray(res.data) ? res.data : []);
@@ -58,9 +58,9 @@ function AuditLogs() {
 
       await fetch(apiUrl("/auth/logout"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
     } catch (err) {
       console.error("Gagal mencatat logout:", err);

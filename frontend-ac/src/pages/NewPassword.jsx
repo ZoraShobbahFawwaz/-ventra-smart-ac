@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 function NewPassword() {
   const [password, setPassword] = useState("");
@@ -34,9 +34,9 @@ function NewPassword() {
     try {
       const res = await fetch(apiUrl("/auth/reset-password"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify({
           token,
           password,

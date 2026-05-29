@@ -5,13 +5,20 @@ export function apiUrl(path) {
   return `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+export function apiHeaders(headers = {}) {
+  return {
+    "ngrok-skip-browser-warning": "true",
+    ...headers,
+  };
+}
+
 // ================= LOGIN =================
 export async function login(email, password) {
   const res = await fetch(apiUrl("/auth/login"), {
     method: "POST",
-    headers: {
+    headers: apiHeaders({
       "Content-Type": "application/json",
-    },
+    }),
     body: JSON.stringify({ email, password }),
   });
 
@@ -30,9 +37,9 @@ export async function login(email, password) {
 export async function register(name, email, password) {
   const res = await fetch(apiUrl("/auth/register"), {
     method: "POST",
-    headers: {
+    headers: apiHeaders({
       "Content-Type": "application/json",
-    },
+    }),
     body: JSON.stringify({
       name,
       email,
@@ -79,9 +86,9 @@ export function logout() {
 export async function sendYolo(data) {
   const res = await fetch(apiUrl("/detection"), {
     method: "POST",
-    headers: {
+    headers: apiHeaders({
       "Content-Type": "application/json",
-    },
+    }),
     body: JSON.stringify(data),
   });
 

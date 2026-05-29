@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // 🔥 TAMBAH INI
 import AuthLayout from "../components/AuthLayout";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -16,9 +16,9 @@ function ResetPassword() {
     try {
       const res = await fetch(apiUrl("/auth/request-reset"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify({ email }),
       });
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 function Register() {
   const [name, setName] = useState("");
@@ -23,9 +23,9 @@ function Register() {
     try {
       await fetch(apiUrl("/auth/register"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify({
           name,
           email,

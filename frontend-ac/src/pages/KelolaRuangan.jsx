@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 export default function KelolaRuangan() {
   const navigate = useNavigate();
@@ -68,9 +68,9 @@ export default function KelolaRuangan() {
         const token = localStorage.getItem("token");
 
         const res = await fetch(apiUrl("/rooms/status"), {
-          headers: {
+          headers: apiHeaders({
             Authorization: `Bearer ${token}`,
-          },
+          }),
         });
 
         if (!res.ok) {
@@ -98,7 +98,9 @@ export default function KelolaRuangan() {
   useEffect(() => {
     const fetchYoloData = async () => {
       try {
-        const res = await fetch(apiUrl("/detection/latest"));
+        const res = await fetch(apiUrl("/detection/latest"), {
+          headers: apiHeaders(),
+        });
 
         if (!res.ok) {
           console.error("Gagal ambil data YOLO:", res.status);
@@ -125,7 +127,9 @@ export default function KelolaRuangan() {
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
-        const res = await fetch(apiUrl("/mqtt/sensor/latest"));
+        const res = await fetch(apiUrl("/mqtt/sensor/latest"), {
+          headers: apiHeaders(),
+        });
 
         if (!res.ok) {
           console.error("Gagal ambil data sensor IoT:", res.status);
@@ -257,9 +261,9 @@ export default function KelolaRuangan() {
 
       await fetch(apiUrl("/auth/logout"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
     } catch (err) {
       console.error("Gagal mencatat logout:", err);
@@ -310,10 +314,10 @@ export default function KelolaRuangan() {
 
       const res = await fetch(apiUrl("/rooms/control"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-        },
+        }),
         body: JSON.stringify({
           room_name: selectedRoom.name,
           command: pendingCommand,

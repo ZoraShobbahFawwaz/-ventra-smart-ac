@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -101,9 +101,9 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(apiUrl("/rooms/status"), {
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
 
       if (!res.ok) {
@@ -123,7 +123,9 @@ function Dashboard() {
   // =========================
   const fetchYoloData = async () => {
     try {
-      const res = await fetch(apiUrl("/detection/latest"));
+      const res = await fetch(apiUrl("/detection/latest"), {
+        headers: apiHeaders(),
+      });
 
       if (!res.ok) {
         console.error("Gagal ambil data YOLO:", res.status);
@@ -142,7 +144,9 @@ function Dashboard() {
   // =========================
   const fetchSensorData = async () => {
     try {
-      const res = await fetch(apiUrl("/mqtt/sensor/latest"));
+      const res = await fetch(apiUrl("/mqtt/sensor/latest"), {
+        headers: apiHeaders(),
+      });
 
       if (!res.ok) {
         console.error("Gagal ambil data sensor IoT:", res.status);
@@ -240,9 +244,9 @@ function Dashboard() {
 
       await fetch(apiUrl("/auth/logout"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
     } catch (err) {
       console.error("Gagal mencatat logout:", err);

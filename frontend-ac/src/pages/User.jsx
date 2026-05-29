@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
-import { apiUrl } from "../services/api";
+import { apiHeaders, apiUrl } from "../services/api";
 
 function User() {
   const navigate = useNavigate();
@@ -26,9 +26,9 @@ function User() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(apiUrl("/users"), {
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
 
       if (res.status === 401) {
@@ -63,9 +63,9 @@ function User() {
 
       const res = await fetch(apiUrl(`/users/${id}`), {
         method: "DELETE",
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
 
       if (res.status === 401) {
@@ -96,9 +96,9 @@ function User() {
 
       await fetch(apiUrl("/auth/logout"), {
         method: "POST",
-        headers: {
+        headers: apiHeaders({
           Authorization: `Bearer ${token}`,
-        },
+        }),
       });
     } catch (err) {
       console.error("Gagal mencatat logout:", err);
