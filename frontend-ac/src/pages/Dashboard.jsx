@@ -259,9 +259,9 @@ function Dashboard() {
   };
 
   return (
-    <div style={layoutStyle}>
+    <div className="app-shell" style={layoutStyle}>
       {/* SIDEBAR */}
-      <div style={sidebarStyle}>
+      <div className="app-sidebar" style={sidebarStyle}>
         <div style={sidebarInner}>
           <div>
             <h2 style={brandStyle}>Ventra</h2>
@@ -314,7 +314,7 @@ function Dashboard() {
         title="Dashboard Ventra"
         subtitle="Kelola ruang dan status AC secara real-time"
       >
-        <div style={cardWrapper}>
+        <div className="stat-grid" style={cardWrapper}>
           <Card
             title="TOTAL RUANGAN"
             value={rooms.length}
@@ -327,7 +327,7 @@ function Dashboard() {
           />
         </div>
 
-        <div style={searchWrapper}>
+        <div className="toolbar-row" style={searchWrapper}>
           <div style={searchStyle}>
             <FaSearch style={{ color: "var(--text-muted)" }} />
             <input
@@ -343,8 +343,8 @@ function Dashboard() {
           </button>
         </div>
 
-        <div style={tableContainer}>
-          <div style={tableHeader}>
+        <div className="table-scroll" style={tableContainer}>
+          <div className="table-grid dashboard-table-grid table-header-row" style={tableHeader}>
             <div>Room</div>
             <div>Temperature</div>
             <div>Humidity</div>
@@ -369,7 +369,7 @@ function Dashboard() {
             const occupancy = formatOccupancy(latestYolo?.occupancy, r.occ);
 
             return (
-              <div key={r.id} style={tableRow}>
+              <div key={r.id} className="table-grid dashboard-table-grid table-data-row" style={tableRow}>
                 <div>{r.name}</div>
                 <div>{temperature}</div>
                 <div>{humidity}</div>

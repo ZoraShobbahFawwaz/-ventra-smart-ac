@@ -438,9 +438,9 @@ export default function KelolaRuangan() {
   };
 
   return (
-    <div style={layout}>
+    <div className="app-shell" style={layout}>
       {/* SIDEBAR */}
-      <div style={sidebar}>
+      <div className="app-sidebar" style={sidebar}>
         <div style={sidebarInner}>
           <div>
             <h2 style={brand}>Ventra</h2>
@@ -493,7 +493,7 @@ export default function KelolaRuangan() {
         title="Kelola Ruangan"
         subtitle="Kelola ruang dan status AC secara real-time"
       >
-        <div style={container}>
+        <div className="room-map-container" style={container}>
           <div style={titleBar}>Room Mapping</div>
 
           <div style={{ padding: 20 }}>
@@ -501,7 +501,7 @@ export default function KelolaRuangan() {
               <div key={i} style={{ marginBottom: 25 }}>
                 <h3 style={floorTitle}>{floor.lantai}</h3>
 
-                <div style={grid}>
+                <div className="room-grid" style={grid}>
                   {floor.rooms.map((room, idx) => (
                     <RoomCard key={idx} room={room} />
                   ))}
@@ -515,14 +515,14 @@ export default function KelolaRuangan() {
       {/* MODAL */}
       {selectedRoom && (
         <div style={overlay}>
-          <div style={modal}>
+          <div className="room-modal responsive-modal" style={modal}>
             {/* CLOSE BUTTON */}
             <button style={closeBtn} onClick={() => setSelectedRoom(null)}>
               ×
             </button>
 
             {/* MODAL HEADER */}
-            <div style={modalTop}>
+            <div className="modal-top" style={modalTop}>
               <div>
                 <h2 style={modalTitle}>{selectedRoom.name}</h2>
                 <p style={modalSubtitle}>
@@ -552,7 +552,7 @@ export default function KelolaRuangan() {
             </div>
 
             {/* DATA SECTION */}
-            <div style={modalGrid}>
+            <div className="modal-grid" style={modalGrid}>
               <div style={infoCard}>
                 <div style={sectionTitle}>Data Aktual</div>
 
@@ -605,7 +605,7 @@ export default function KelolaRuangan() {
             </div>
 
             {/* ENERGY SECTION */}
-            <div style={modalGrid}>
+            <div className="modal-grid" style={modalGrid}>
               <div style={energyCard}>
                 <div style={energyCardHeader}>
                   <div style={energyTitleWrap}>
@@ -722,7 +722,7 @@ export default function KelolaRuangan() {
             </div>
 
             {/* CONTROL SECTION */}
-            <div style={controlCard}>
+            <div className="control-card" style={controlCard}>
               <div>
                 <div style={sectionTitle}>Manual Control</div>
                 <p style={controlText}>

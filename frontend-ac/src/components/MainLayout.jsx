@@ -50,14 +50,14 @@ export default function MainLayout({ children, title, subtitle }) {
   }, [darkMode]);
 
   return (
-    <div style={layout}>
-      <div style={header}>
+    <div className="main-layout" style={layout}>
+      <div className="main-header" style={header}>
         <div>
           <h2 style={titleStyle}>{title}</h2>
           <p style={subtitleStyle}>{subtitle}</p>
         </div>
 
-        <div style={headerRight}>
+        <div className="main-header-actions" style={headerRight}>
           <span onClick={() => setDarkMode(!darkMode)} style={iconStyle}>
             {darkMode ? <FaSun /> : <FaMoon />}
           </span>

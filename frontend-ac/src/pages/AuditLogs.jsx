@@ -229,9 +229,9 @@ function AuditLogs() {
   ).length;
 
   return (
-    <div style={layoutStyle}>
+    <div className="app-shell" style={layoutStyle}>
       {/* SIDEBAR */}
-      <div style={sidebarStyle}>
+      <div className="app-sidebar" style={sidebarStyle}>
         <div style={sidebarInner}>
           <div>
             <h2 style={brandStyle}>Ventra</h2>
@@ -284,7 +284,7 @@ function AuditLogs() {
         title="Audit Logs"
         subtitle="Pantau riwayat aktivitas pengguna dalam sistem"
       >
-        <div style={cardWrapper}>
+        <div className="stat-grid" style={cardWrapper}>
           <Card
             title="TOTAL LOGS"
             value={logs.length}
@@ -303,7 +303,7 @@ function AuditLogs() {
         </div>
 
         {/* SEARCH */}
-        <div style={searchWrapper}>
+        <div className="toolbar-row" style={searchWrapper}>
           <div style={searchStyle}>
             <FaSearch style={{ color: "var(--text-muted, #666)" }} />
             <input
@@ -320,8 +320,8 @@ function AuditLogs() {
         </div>
 
         {/* TABLE */}
-        <div style={tableContainer}>
-          <div style={tableHeader}>
+        <div className="table-scroll" style={tableContainer}>
+          <div className="table-grid audit-table-grid table-header-row" style={tableHeader}>
             <div>User</div>
             <div>Action</div>
             <div>Module</div>
@@ -336,7 +336,7 @@ function AuditLogs() {
             const reason = getReasonFromLog(log);
 
             return (
-              <div key={log.id} style={tableRow}>
+              <div key={log.id} className="table-grid audit-table-grid table-data-row" style={tableRow}>
                 <div>{log.user_name || "-"}</div>
 
                 <div
@@ -383,7 +383,7 @@ function AuditLogs() {
       {/* MODAL */}
       {selectedLog && (
         <div style={overlay}>
-          <div style={modal}>
+          <div className="responsive-modal" style={modal}>
             <div style={modalHeader}>Audit Log Detail</div>
 
             <div style={modalBody}>

@@ -62,7 +62,7 @@ function NewPassword() {
 
   return (
     <AuthLayout>
-      <div style={containerStyle}>
+      <div className="auth-form" style={containerStyle}>
         <h1 style={titleStyle}>Create New Password</h1>
 
         <p style={subtitleStyle}>

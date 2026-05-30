@@ -1,6 +1,7 @@
 function AuthLayout({ children }) {
   return (
     <div
+      className="auth-layout"
       style={{
         display: "flex",
         height: "100vh",
@@ -9,6 +10,7 @@ function AuthLayout({ children }) {
     >
       {/* LEFT IMAGE */}
       <div
+        className="auth-visual"
         style={{
           flex: 1,
           backgroundImage: "url('/astro.png')",
@@ -19,6 +21,7 @@ function AuthLayout({ children }) {
 
       {/* RIGHT CONTENT */}
       <div
+        className="auth-panel"
         style={{
           flex: 1,
           display: "flex",

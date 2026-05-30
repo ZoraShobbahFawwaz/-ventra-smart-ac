@@ -122,9 +122,9 @@ function User() {
   const totalLaboran = users.filter((u) => u.role === "laboran").length;
 
   return (
-    <div style={layoutStyle}>
+    <div className="app-shell" style={layoutStyle}>
       {/* SIDEBAR */}
-      <div style={sidebarStyle}>
+      <div className="app-sidebar" style={sidebarStyle}>
         <div style={sidebarInner}>
           <div>
             <h2 style={brandStyle}>Ventra</h2>
@@ -178,7 +178,7 @@ function User() {
         subtitle="Kelola user dan akses sistem"
       >
         {/* CARDS */}
-        <div style={cardWrapper}>
+        <div className="stat-grid" style={cardWrapper}>
           <Card
             title="TOTAL USER"
             value={totalUser}
@@ -197,7 +197,7 @@ function User() {
         </div>
 
         {/* SEARCH */}
-        <div style={searchWrapper}>
+        <div className="toolbar-row" style={searchWrapper}>
           <div style={searchStyle}>
             <FaSearch style={{ color: "var(--text-muted, #666)" }} />
             <input
@@ -210,8 +210,8 @@ function User() {
         </div>
 
         {/* TABLE */}
-        <div style={tableContainer}>
-          <div style={tableHeader}>
+        <div className="table-scroll" style={tableContainer}>
+          <div className="table-grid user-table-grid table-header-row" style={tableHeader}>
             <div>Nama</div>
             <div>Email</div>
             <div>Role</div>
@@ -219,7 +219,7 @@ function User() {
           </div>
 
           {filteredUsers.map((u) => (
-            <div key={u.id} style={tableRow}>
+            <div key={u.id} className="table-grid user-table-grid table-data-row" style={tableRow}>
               <div>{u.name}</div>
               <div>{u.email}</div>
               <div>{u.role}</div>

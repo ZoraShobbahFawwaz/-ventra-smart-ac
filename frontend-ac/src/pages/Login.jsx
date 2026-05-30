@@ -35,7 +35,7 @@ function Login() {
 
   return (
     <AuthLayout>
-      <div style={{ width: 380 }}>
+      <div className="auth-form" style={{ width: 380 }}>
         <h1
           style={{
             fontSize: 33,

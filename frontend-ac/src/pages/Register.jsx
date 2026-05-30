@@ -43,7 +43,7 @@ function Register() {
 
   return (
     <AuthLayout>
-      <div style={containerStyle}>
+      <div className="auth-form" style={containerStyle}>
         {/* TITLE */}
         <h1 style={titleStyle}>Register</h1>
 
