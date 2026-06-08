@@ -192,10 +192,16 @@ function Dashboard() {
     return `${numberValue.toFixed(1)}%`;
   };
 
+  const toTitleCase = (value) => {
+    return String(value)
+      .toLowerCase()
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
   const formatFanSpeed = (value) => {
     if (!value) return "-";
 
-    return value;
+    return toTitleCase(value);
   };
 
   const formatAppliedFanSpeed = (value, isOn) => {
