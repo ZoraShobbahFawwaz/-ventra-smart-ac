@@ -300,7 +300,7 @@ function Dashboard() {
                       fontWeight: 600,
                     }}
                   >
-                    Status: {isOn ? "ON" : "OFF"}
+                    {isOn ? "ON" : "OFF"}
                   </span>
                 </div>
               </div>
