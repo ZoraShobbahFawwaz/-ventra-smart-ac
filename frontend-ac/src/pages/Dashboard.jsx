@@ -10,6 +10,7 @@ function Dashboard() {
   const [roomStatus, setRoomStatus] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
+  const DATA_FRESH_MS = 30 * 1000;
 
   const getRoomsData = async () => {
     const data = [
@@ -216,6 +217,16 @@ function Dashboard() {
     return `${value} People`;
   };
 
+  const isFreshData = (data) => {
+    if (!data?.updated_at) return false;
+
+    const updatedAt = new Date(data.updated_at).getTime();
+
+    if (isNaN(updatedAt)) return false;
+
+    return Date.now() - updatedAt <= DATA_FRESH_MS;
+  };
+
   const filteredRooms = rooms.filter((r) =>
     r.name.toLowerCase().includes(search.toLowerCase()),
   );
@@ -283,14 +294,22 @@ function Dashboard() {
 
             const latestYolo = yoloData?.[r.name];
             const latestSensor = sensorData?.[r.name];
+            const hasFreshSensorData = isOn && isFreshData(latestSensor);
+            const hasFreshYoloData = isOn && isFreshData(latestYolo);
 
-            const temperature = formatTemperature(latestSensor?.temperature);
-            const humidity = formatHumidity(latestSensor?.humidity);
+            const temperature = hasFreshSensorData
+              ? formatTemperature(latestSensor?.temperature)
+              : "-";
+            const humidity = hasFreshSensorData
+              ? formatHumidity(latestSensor?.humidity)
+              : "-";
             const fanSpeed = formatAppliedFanSpeed(
-              latestYolo?.applied_fan_speed || r.fan,
-              isOn,
+              hasFreshYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
+              isOn && hasFreshYoloData,
             );
-            const occupancy = formatOccupancy(latestYolo?.occupancy, r.occ);
+            const occupancy = hasFreshYoloData
+              ? formatOccupancy(latestYolo?.occupancy, r.occ)
+              : "-";
 
             return (
               <div key={r.id} className="table-grid dashboard-table-grid table-data-row" style={tableRow}>

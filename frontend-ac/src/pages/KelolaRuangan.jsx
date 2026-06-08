@@ -28,6 +28,17 @@ export default function KelolaRuangan() {
   const selectedRoomIsOn = selectedRoom
     ? roomStatus[selectedRoom.name] === "ON"
     : false;
+  const DATA_FRESH_MS = 30 * 1000;
+
+  const isFreshData = (data) => {
+    if (!data?.updated_at) return false;
+
+    const updatedAt = new Date(data.updated_at).getTime();
+
+    if (isNaN(updatedAt)) return false;
+
+    return Date.now() - updatedAt <= DATA_FRESH_MS;
+  };
 
   // =========================
   // REALTIME DATE
@@ -197,25 +208,28 @@ export default function KelolaRuangan() {
     return formatFanSpeed(value);
   };
 
-  const actualTemperatureDisplay = selectedRoomIsOn
+  const hasFreshSensorData = selectedRoomIsOn && isFreshData(selectedSensorData);
+  const hasFreshYoloData = selectedRoomIsOn && isFreshData(selectedYoloData);
+
+  const actualTemperatureDisplay = hasFreshSensorData
     ? formatActualTemperature(selectedSensorData?.temperature)
     : "-";
-  const actualHumidityDisplay = selectedRoomIsOn
+  const actualHumidityDisplay = hasFreshSensorData
     ? formatHumidity(selectedSensorData?.humidity)
     : "-";
-  const actualOccupancyDisplay = selectedRoomIsOn
+  const actualOccupancyDisplay = hasFreshYoloData
     ? formatOccupancy(selectedYoloData?.occupancy)
     : "-";
-  const actualFanSpeedDisplay = selectedRoomIsOn
+  const actualFanSpeedDisplay = hasFreshYoloData
     ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
     : "-";
-  const yoloTemperatureDisplay = selectedRoomIsOn
+  const yoloTemperatureDisplay = hasFreshYoloData
     ? formatTemperature(selectedYoloData?.temperature)
     : "-";
-  const yoloOccupancyDisplay = selectedRoomIsOn
+  const yoloOccupancyDisplay = hasFreshYoloData
     ? formatOccupancy(selectedYoloData?.occupancy)
     : "-";
-  const yoloFanSpeedDisplay = selectedRoomIsOn
+  const yoloFanSpeedDisplay = hasFreshYoloData
     ? formatFanSpeed(selectedYoloData?.fan_speed)
     : "-";
 
