@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
-  FaHome,
-  FaDoorOpen,
-  FaClipboardList,
-  FaUsers,
-  FaSignOutAlt,
   FaBolt,
   FaCalendarAlt,
   FaChartLine,
 } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
+import Sidebar from "../components/Sidebar";
 import { apiHeaders, apiUrl } from "../services/api";
 
 export default function KelolaRuangan() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [activeTab, setActiveTab] = useState("hari");
   const [roomStatus, setRoomStatus] = useState({});
@@ -28,8 +20,6 @@ export default function KelolaRuangan() {
   const [reasonModalOpen, setReasonModalOpen] = useState(false);
   const [pendingCommand, setPendingCommand] = useState("");
   const [controlReason, setControlReason] = useState("");
-
-  const roleUser = localStorage.getItem("role");
 
   const selectedYoloData = selectedRoom ? yoloData[selectedRoom.name] : null;
   const selectedSensorData = selectedRoom
@@ -253,29 +243,6 @@ export default function KelolaRuangan() {
   ];
 
   // =========================
-  // LOGOUT + AUDIT LOG
-  // =========================
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      await fetch(apiUrl("/auth/logout"), {
-        method: "POST",
-        headers: apiHeaders({
-          Authorization: `Bearer ${token}`,
-        }),
-      });
-    } catch (err) {
-      console.error("Gagal mencatat logout:", err);
-    } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("user");
-      navigate("/");
-    }
-  };
-
-  // =========================
   // OPEN REASON MODAL
   // =========================
   const openReasonModal = (command) => {
@@ -360,32 +327,6 @@ export default function KelolaRuangan() {
   };
 
   // =========================
-  // COMPONENT MENU
-  // =========================
-  const Menu = ({ icon, label, active, onClick }) => (
-    <div
-      onClick={onClick}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: 12,
-        borderRadius: 10,
-        cursor: "pointer",
-        marginBottom: 10,
-        background: active
-          ? "linear-gradient(90deg, #2d8cff, #1a6ed8)"
-          : "transparent",
-        color: active ? "#fff" : "var(--text-main, #111)",
-        transition: "0.2s ease",
-      }}
-    >
-      {icon}
-      {label}
-    </div>
-  );
-
-  // =========================
   // COMPONENT ROOM CARD
   // =========================
   const RoomCard = ({ room }) => {
@@ -439,54 +380,7 @@ export default function KelolaRuangan() {
 
   return (
     <div className="app-shell" style={layout}>
-      {/* SIDEBAR */}
-      <div className="app-sidebar" style={sidebar}>
-        <div style={sidebarInner}>
-          <div>
-            <h2 style={brand}>Ventra</h2>
-
-            <Menu
-              icon={<FaHome />}
-              label="Dashboard"
-              active={location.pathname === "/dashboard"}
-              onClick={() => navigate("/dashboard")}
-            />
-
-            <Menu
-              icon={<FaDoorOpen />}
-              label="Kelola Ruangan"
-              active={location.pathname === "/kelola-ruangan"}
-              onClick={() => navigate("/kelola-ruangan")}
-            />
-
-            {roleUser === "Admin" && (
-              <>
-                <Menu
-                  icon={<FaClipboardList />}
-                  label="Audit Logs"
-                  active={location.pathname === "/audit-logs"}
-                  onClick={() => navigate("/audit-logs")}
-                />
-
-                <Menu
-                  icon={<FaUsers />}
-                  label="User"
-                  active={location.pathname === "/user"}
-                  onClick={() => navigate("/user")}
-                />
-              </>
-            )}
-          </div>
-
-          <div style={{ marginTop: "auto", paddingBottom: 20 }}>
-            <Menu
-              icon={<FaSignOutAlt />}
-              label="Log Out"
-              onClick={handleLogout}
-            />
-          </div>
-        </div>
-      </div>
+      <Sidebar />
 
       {/* MAIN */}
       <MainLayout
@@ -547,7 +441,8 @@ export default function KelolaRuangan() {
                       : "1px solid rgba(226, 232, 240, 0.35)",
                 }}
               >
-                ● {roomStatus[selectedRoom.name] === "ON" ? "AC ON" : "AC OFF"}
+                Status:{" "}
+                {roomStatus[selectedRoom.name] === "ON" ? "AC ON" : "AC OFF"}
               </div>
             </div>
 
@@ -724,11 +619,11 @@ export default function KelolaRuangan() {
             {/* CONTROL SECTION */}
             <div className="control-card" style={controlCard}>
               <div>
-                <div style={sectionTitle}>Manual Control</div>
+                <div style={sectionTitle}>Kontrol Manual</div>
                 <p style={controlText}>
-                  Tombol ON akan membuka form alasan, lalu mengirim perintah set
-                  suhu AC ke 24°C. Tombol OFF akan membuka form alasan, lalu
-                  mengirim perintah mematikan AC.
+                  Gunakan kontrol manual hanya saat ada kebutuhan di luar
+                  jadwal. Semua tindakan wajib menyertakan alasan dan akan
+                  tercatat di audit log.
                 </p>
               </div>
 
@@ -763,11 +658,19 @@ export default function KelolaRuangan() {
             {reasonModalOpen && (
               <div style={reasonOverlay}>
                 <div style={reasonBox}>
-                  <h3 style={reasonTitle}>Alasan AC di-{pendingCommand}</h3>
+                  <h3 style={reasonTitle}>
+                    Konfirmasi AC {pendingCommand}
+                  </h3>
 
                   <p style={reasonSubtitle}>
                     Ruangan: <b>{selectedRoom?.name}</b>
                   </p>
+
+                  <div style={reasonWarningBox}>
+                    {pendingCommand === "ON"
+                      ? "Anda akan menyalakan AC ke 24°C dan YOLO akan langsung aktif untuk ruangan ini."
+                      : "Anda akan mematikan AC dan YOLO akan dinonaktifkan sampai ada jadwal berikutnya atau perintah manual ON."}
+                  </div>
 
                   <textarea
                     style={reasonTextarea}
@@ -818,28 +721,6 @@ const layout = {
   background: "var(--bg-main, #f5f6f8)",
   fontFamily: "sans-serif",
   transition: "0.2s ease",
-};
-
-const sidebar = {
-  width: 220,
-  background: "var(--bg-sidebar, #fff)",
-  padding: "20px 20px 0 20px",
-  display: "flex",
-  flexDirection: "column",
-  borderRight: "1px solid var(--border-color, #eee)",
-  minHeight: "100vh",
-  transition: "0.2s ease",
-};
-
-const sidebarInner = {
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-};
-
-const brand = {
-  marginBottom: 30,
-  color: "var(--text-main, #111)",
 };
 
 const container = {
@@ -1183,6 +1064,17 @@ const reasonSubtitle = {
   margin: "0 0 14px",
   fontSize: 13,
   color: "var(--text-muted, #666)",
+};
+
+const reasonWarningBox = {
+  background: "rgba(245, 158, 11, 0.12)",
+  border: "1px solid rgba(245, 158, 11, 0.35)",
+  color: "var(--text-main, #111)",
+  borderRadius: 12,
+  padding: 12,
+  fontSize: 13,
+  lineHeight: 1.5,
+  marginBottom: 14,
 };
 
 const reasonTextarea = {
