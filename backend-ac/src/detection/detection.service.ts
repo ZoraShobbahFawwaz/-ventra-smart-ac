@@ -95,37 +95,49 @@ export class DetectionService {
       };
     }
 
-    if (occupancy < 10) {
-      const runtimeState = this.roomRuntimeService.getRoomState(roomName);
-
-      console.log(
-        `YOLO DISIMPAN TANPA CONTROL: ${roomName} occupancy ${occupancy} < 10`,
-      );
-
-      return {
-        message:
-          'Data YOLO tersimpan. Occupancy kurang dari 10, tidak ada command AC yang dikirim ke ESP32',
-        yolo_used: false,
-        control_sent: false,
-        runtime_state: runtimeState,
-        latest: this.latestData[roomName],
-        original: data,
-      };
-    }
-
     if (temperature === 'OFF' || fanSpeed === 'OFF') {
+      const command = {
+        power: 'off' as const,
+      };
       const runtimeState = this.roomRuntimeService.getRoomState(roomName);
 
-      console.log(
-        `REKOMENDASI OFF YOLO DIABAIKAN: ${roomName} occupancy ${occupancy}`,
-      );
+      if (!this.roomRuntimeService.shouldSendCommand(roomName, command)) {
+        console.log(`SKIP YOLO OFF DUPLICATE: ${roomName} sudah OFF`);
+
+        return {
+          message:
+            'Command OFF yang sama sudah pernah dikirim, tidak dikirim ulang ke ESP32',
+          yolo_used: false,
+          control_sent: false,
+          skipped_duplicate: true,
+          forwarded: {
+            power: 'off',
+          },
+          runtime_state: runtimeState,
+          latest: this.latestData[roomName],
+          original: data,
+        };
+      }
+
+      const payload = {
+        room: roomName,
+        power: 'off',
+        source: 'yolo',
+      };
+
+      console.log('KIRIM OFF VIA MQTT:', payload);
+
+      this.mqttService.publish('ac/control', payload);
+      this.roomRuntimeService.recordCommandSent(roomName, command, 'yolo');
 
       return {
-        message:
-          'Rekomendasi OFF dari YOLO diabaikan. Backend hanya mengirim ON/rekomendasi saat occupancy minimal 10',
-        yolo_used: false,
-        control_sent: false,
-        runtime_state: runtimeState,
+        message: 'Rekomendasi OFF dari YOLO berhasil dikirim via MQTT',
+        yolo_used: true,
+        control_sent: true,
+        forwarded: {
+          power: 'off',
+        },
+        runtime_state: this.roomRuntimeService.getRoomState(roomName),
         latest: this.latestData[roomName],
         original: data,
       };
