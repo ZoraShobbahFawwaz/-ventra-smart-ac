@@ -197,6 +197,28 @@ export default function KelolaRuangan() {
     return formatFanSpeed(value);
   };
 
+  const actualTemperatureDisplay = selectedRoomIsOn
+    ? formatActualTemperature(selectedSensorData?.temperature)
+    : "-";
+  const actualHumidityDisplay = selectedRoomIsOn
+    ? formatHumidity(selectedSensorData?.humidity)
+    : "-";
+  const actualOccupancyDisplay = selectedRoomIsOn
+    ? formatOccupancy(selectedYoloData?.occupancy)
+    : "-";
+  const actualFanSpeedDisplay = selectedRoomIsOn
+    ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
+    : "-";
+  const yoloTemperatureDisplay = selectedRoomIsOn
+    ? formatTemperature(selectedYoloData?.temperature)
+    : "-";
+  const yoloOccupancyDisplay = selectedRoomIsOn
+    ? formatOccupancy(selectedYoloData?.occupancy)
+    : "-";
+  const yoloFanSpeedDisplay = selectedRoomIsOn
+    ? formatFanSpeed(selectedYoloData?.fan_speed)
+    : "-";
+
   // =========================
   // DATA RUANGAN STATIC
   // =========================
@@ -459,29 +481,22 @@ export default function KelolaRuangan() {
 
                 <div style={dataRow}>
                   <span>Temperature</span>
-                  <b>
-                    {formatActualTemperature(selectedSensorData?.temperature)}
-                  </b>
+                  <b>{actualTemperatureDisplay}</b>
                 </div>
 
                 <div style={dataRow}>
                   <span>Humidity</span>
-                  <b>{formatHumidity(selectedSensorData?.humidity)}</b>
+                  <b>{actualHumidityDisplay}</b>
                 </div>
 
                 <div style={dataRow}>
                   <span>Occupancy</span>
-                  <b>{formatOccupancy(selectedYoloData?.occupancy)}</b>
+                  <b>{actualOccupancyDisplay}</b>
                 </div>
 
                 <div style={{ ...dataRow, borderBottom: "none" }}>
                   <span>Fan Speed</span>
-                  <b>
-                    {formatAppliedFanSpeed(
-                      selectedYoloData?.applied_fan_speed,
-                      selectedRoomIsOn,
-                    )}
-                  </b>
+                  <b>{actualFanSpeedDisplay}</b>
                 </div>
               </div>
 
@@ -490,17 +505,17 @@ export default function KelolaRuangan() {
 
                 <div style={dataRow}>
                   <span>Temperature</span>
-                  <b>{formatTemperature(selectedYoloData?.temperature)}</b>
+                  <b>{yoloTemperatureDisplay}</b>
                 </div>
 
                 <div style={dataRow}>
                   <span>Occupancy</span>
-                  <b>{formatOccupancy(selectedYoloData?.occupancy)}</b>
+                  <b>{yoloOccupancyDisplay}</b>
                 </div>
 
                 <div style={{ ...dataRow, borderBottom: "none" }}>
                   <span>Fan Speed</span>
-                  <b>{formatFanSpeed(selectedYoloData?.fan_speed)}</b>
+                  <b>{yoloFanSpeedDisplay}</b>
                 </div>
               </div>
             </div>
