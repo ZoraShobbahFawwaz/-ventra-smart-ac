@@ -186,7 +186,7 @@ export default function KelolaRuangan() {
   };
 
   const formatAppliedFanSpeed = (value, isOn) => {
-    if (!isOn) return "OFF";
+    if (!isOn) return "-";
 
     return formatFanSpeed(value);
   };
