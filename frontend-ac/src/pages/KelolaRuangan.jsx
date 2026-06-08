@@ -179,10 +179,16 @@ export default function KelolaRuangan() {
     return `${value} Orang`;
   };
 
+  const toTitleCase = (value) => {
+    return String(value)
+      .toLowerCase()
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
   const formatFanSpeed = (value) => {
     if (!value) return "-";
 
-    return value;
+    return toTitleCase(value);
   };
 
   const formatAppliedFanSpeed = (value, isOn) => {
