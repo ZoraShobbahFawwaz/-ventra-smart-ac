@@ -12,6 +12,8 @@ type LatestDetectionData = {
 };
 
 type LatestDetectionResponse = LatestDetectionData & {
+  raw_occupancy: number;
+  occupancy_samples: number;
   ac_status: string;
   yolo_enabled: boolean;
   runtime_source: string | null;
@@ -22,7 +24,9 @@ type LatestDetectionResponse = LatestDetectionData & {
 
 @Injectable()
 export class DetectionService {
+  private readonly occupancyWindowSize = 10;
   private latestData: Record<string, LatestDetectionData> = {};
+  private occupancyHistory: Record<string, number[]> = {};
 
   constructor(
     private readonly roomRuntimeService: RoomRuntimeService,
@@ -66,6 +70,8 @@ export class DetectionService {
         original: data,
       };
     }
+
+    this.recordOccupancy(roomName, occupancy);
 
     this.latestData[roomName] = {
       room_name: roomName,
@@ -260,13 +266,41 @@ export class DetectionService {
       Record<string, LatestDetectionResponse>
     >((result, [roomName, data]) => {
       const appliedState = this.roomRuntimeService.getAppliedAcState(roomName);
+      const occupancyAverage = this.getAverageOccupancy(roomName);
 
       result[roomName] = {
         ...data,
+        raw_occupancy: data.occupancy,
+        occupancy: occupancyAverage,
+        occupancy_samples: this.occupancyHistory[roomName]?.length ?? 0,
         ...appliedState,
       };
 
       return result;
     }, {});
+  }
+
+  private recordOccupancy(roomName: string, occupancy: number) {
+    const history = this.occupancyHistory[roomName] ?? [];
+
+    history.push(occupancy);
+
+    if (history.length > this.occupancyWindowSize) {
+      history.shift();
+    }
+
+    this.occupancyHistory[roomName] = history;
+  }
+
+  private getAverageOccupancy(roomName: string): number {
+    const history = this.occupancyHistory[roomName] ?? [];
+
+    if (history.length === 0) {
+      return 0;
+    }
+
+    const total = history.reduce((sum, value) => sum + value, 0);
+
+    return Math.round(total / history.length);
   }
 }
