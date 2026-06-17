@@ -25,9 +25,6 @@ export default function KelolaRuangan() {
   const selectedSensorData = selectedRoom
     ? sensorData[selectedRoom.name]
     : null;
-  const selectedRoomIsOn = selectedRoom
-    ? roomStatus[selectedRoom.name] === "ON"
-    : false;
   const DATA_FRESH_MS = 30 * 1000;
 
   const isFreshData = (data) => {
@@ -39,6 +36,20 @@ export default function KelolaRuangan() {
 
     return Date.now() - updatedAt <= DATA_FRESH_MS;
   };
+
+  function getEffectiveRoomStatus(roomName) {
+    const latestYolo = yoloData?.[roomName];
+
+    if (isFreshData(latestYolo) && latestYolo?.ac_status) {
+      return latestYolo.ac_status;
+    }
+
+    return roomStatus[roomName];
+  }
+
+  const selectedRoomIsOn = selectedRoom
+    ? getEffectiveRoomStatus(selectedRoom.name) === "ON"
+    : false;
 
   // =========================
   // REALTIME DATE
@@ -372,7 +383,7 @@ export default function KelolaRuangan() {
   // COMPONENT ROOM CARD
   // =========================
   const RoomCard = ({ room }) => {
-    const isOn = roomStatus[room.name] === "ON";
+    const isOn = getEffectiveRoomStatus(room.name) === "ON";
 
     return (
       <div
@@ -470,21 +481,23 @@ export default function KelolaRuangan() {
                 style={{
                   ...statusBadge,
                   background:
-                    roomStatus[selectedRoom.name] === "ON"
+                    getEffectiveRoomStatus(selectedRoom.name) === "ON"
                       ? "rgba(34, 197, 94, 0.15)"
                       : "rgba(148, 163, 184, 0.15)",
                   color:
-                    roomStatus[selectedRoom.name] === "ON"
+                    getEffectiveRoomStatus(selectedRoom.name) === "ON"
                       ? "#22c55e"
                       : "#e2e8f0",
                   border:
-                    roomStatus[selectedRoom.name] === "ON"
+                    getEffectiveRoomStatus(selectedRoom.name) === "ON"
                       ? "1px solid #22c55e"
                       : "1px solid rgba(226, 232, 240, 0.35)",
                 }}
               >
                 Status:{" "}
-                {roomStatus[selectedRoom.name] === "ON" ? "AC ON" : "AC OFF"}
+                {getEffectiveRoomStatus(selectedRoom.name) === "ON"
+                  ? "AC ON"
+                  : "AC OFF"}
               </div>
             </div>
 

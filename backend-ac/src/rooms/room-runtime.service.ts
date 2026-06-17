@@ -213,9 +213,7 @@ export class RoomRuntimeService {
     const normalizedCommand = this.normalizeCommand(command);
 
     this.roomStates[roomName] = {
-      ac_status:
-        previousState?.ac_status ??
-        (normalizedCommand.power === 'on' ? 'ON' : 'OFF'),
+      ac_status: normalizedCommand.power === 'on' ? 'ON' : 'OFF',
       yolo_enabled: previousState?.yolo_enabled ?? false,
       source: previousState?.source,
       updated_at: now,

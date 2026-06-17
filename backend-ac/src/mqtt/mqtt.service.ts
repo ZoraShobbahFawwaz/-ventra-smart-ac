@@ -86,7 +86,14 @@ export class MqttService implements OnModuleInit {
       return;
     }
 
-    const payload = JSON.stringify(data);
+    const normalizedData =
+      topic === 'ac/control' &&
+      data?.temperature !== undefined &&
+      data?.temp === undefined
+        ? { ...data, temp: data.temperature }
+        : data;
+
+    const payload = JSON.stringify(normalizedData);
 
     this.client.publish(topic, payload, { qos: 0 }, (err) => {
       if (err) {

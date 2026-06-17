@@ -98,6 +98,12 @@ export class RoomsService {
     return this.roomStatus;
   }
 
+  syncYoloRoomStatus(roomName: string, status: 'ON' | 'OFF') {
+    this.roomStatus[roomName] = status;
+
+    console.log(`STATUS UPDATE: ${roomName} -> ${status} | source: yolo`);
+  }
+
   getRoomRuntimeStatus() {
     return this.roomRuntimeService.getAllStates();
   }

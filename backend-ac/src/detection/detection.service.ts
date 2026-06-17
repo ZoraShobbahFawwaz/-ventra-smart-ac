@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDetectionDto } from './dto/create-detection.dto';
 import { RoomRuntimeService } from '../rooms/room-runtime.service';
 import { MqttService } from '../mqtt/mqtt.service';
+import { RoomsService } from '../rooms/rooms.service';
 
 type LatestDetectionData = {
   room_name: string;
@@ -31,6 +32,7 @@ export class DetectionService {
   constructor(
     private readonly roomRuntimeService: RoomRuntimeService,
     private readonly mqttService: MqttService,
+    private readonly roomsService: RoomsService,
   ) {}
 
   async create(data: CreateDetectionDto) {
@@ -108,6 +110,8 @@ export class DetectionService {
       const runtimeState = this.roomRuntimeService.getRoomState(roomName);
 
       if (!this.roomRuntimeService.shouldSendCommand(roomName, command)) {
+        this.roomsService.syncYoloRoomStatus(roomName, 'OFF');
+
         console.log(`SKIP YOLO OFF DUPLICATE: ${roomName} sudah OFF`);
 
         return {
@@ -135,6 +139,7 @@ export class DetectionService {
 
       this.mqttService.publish('ac/control', payload);
       this.roomRuntimeService.recordCommandSent(roomName, command, 'yolo');
+      this.roomsService.syncYoloRoomStatus(roomName, 'OFF');
 
       return {
         message: 'Rekomendasi OFF dari YOLO berhasil dikirim via MQTT',
@@ -184,6 +189,8 @@ export class DetectionService {
     if (!this.roomRuntimeService.shouldSendCommand(roomName, command)) {
       const runtimeState = this.roomRuntimeService.getRoomState(roomName);
 
+      this.roomsService.syncYoloRoomStatus(roomName, 'ON');
+
       console.log(
         `SKIP YOLO ON DUPLICATE: ${roomName} sudah ON ${temp}C ${fan}`,
       );
@@ -220,6 +227,7 @@ export class DetectionService {
       this.mqttService.publish('ac/control', payload);
 
       this.roomRuntimeService.recordCommandSent(roomName, command, 'yolo');
+      this.roomsService.syncYoloRoomStatus(roomName, 'ON');
 
       const runtimeState = this.roomRuntimeService.getRoomState(roomName);
 

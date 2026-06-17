@@ -108,6 +108,12 @@ export class RoomsController {
       result[roomName] = manualStatus[roomName];
     });
 
+    const runtimeStatus = this.roomsService.getRoomRuntimeStatus();
+
+    Object.entries(runtimeStatus).forEach(([roomName, state]) => {
+      result[roomName] = state.ac_status;
+    });
+
     return result;
   }
 

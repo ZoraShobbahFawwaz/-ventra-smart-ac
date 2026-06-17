@@ -1,0 +1,762 @@
+METODE DETEKSI TITIK PENDARATAN YANG 
+AMAN BAGI DRONE DENGAN PENDEKATAN 
+POINT CLOUD PERCEPTION 
+A SAFE LANDIND POINT DETECTION METHOD FOR 
+DRONES WITH POINT CLOUD PERCEPTION 
+APPROACH 
+ 
+TUGAS AKHIR  
+Diajukan untuk memenuhi salah satu syarat memperoleh gelar sarjana 
+Dari Program Studi S1 Teknik Komputer 
+Direktorat Kampus Surabaya 
+Universitas Telkom 
+ 
+Disusun oleh: 
+AGUNG FIRMANSYAH DJALIL 
+1102220020 
+ 
+ 
+ 
+PROGRAM STUDI SARJANA TEKNIK KOMPUTER 
+DIREKTORAT KAMPUS SURABAYA 
+UNIVERSITAS TELKOM 
+SURABAYA 
+	2025/2026 	 
+LEMBAR PENGESAHAN 
+TUGAS AKHIR 
+ 
+METODE DETEKSI TITIK PENDARATAN YANG AMAN BAGI DRONE DENGAN PENDEKATAN POINT CLOUD PERCEPTION 
+ 
+Telah disetujui dan disahkan untuk memenuhi sebagian syarat memperoleh gelar 
+Sarjana pada Program Studi Teknik Komputer 
+Direktorat Kampus Surabaya Universitas Telkom 
+ 
+Disusun oleh: 
+AGUNG FIRMANSYAH DJALIL 
+1102220020 
+ 
+Surabaya, 5 Januari 2026 Menyetujui, 
+ 
+1. Dr. Helmy Widyantara, S.Kom., M.Eng. 	                          (Pembimbing I)  NIP. 19790001 
+2. Mohammad Yani, S.ST., M.Phil., Ph.D. 	                          (Pembimbing II) NIP. 17910092 
+3. Dr. Susijianto Tri Rasmana, S.Kom., M.T. 	                          (Penguji I)  NIP. 22730002 
+4. Eka Sari Oktarina, S.Kom., M.Eng. 	                          (Penguji II) NIP. 23910008 
+ 	 	 
+ 
+Kaprodi Teknik Komputer, 
+ 
+ 
+ 
+ 
+Dr. Susijianto Tri Rasmana, S.Kom., M.T. 
+NIP. 22730002 
+                                    ii  
+      
+LEMBAR PERNYATAAN ORISINALITAS 
+	Nama 	: Agung Firmansyah Djalil 
+	NIM 	: 1102220020 
+Alamat 	: Jl. Kebonsari Tengah Sejati No 16 Kec Jambangan Surabaya 
+	No. Telp 	: 089617379031 
+	Email 	: agungfirmansyahdjalil@gmail.com 
+ 
+ 
+Menyatakan bahwa Tugas Akhir ini merupakan karya orisinal saya sendiri. Atas pernyataan ini, saya siap menanggung risiko atau sanksi yang dijatuhkan kepada saya apabila kemudian ditemukan adanya pelanggaran terhadap kejujuran akademik atau etika keilmuan dalam karya ini, atau ditemukan bukti yang menunjukkan ketidakaslian karya ini.  
+ 
+Surabaya, 5 Januari 2026 
+ 
+ 
+ 
+Agung Firmansyah Djalil 
+ 
+ 
+ 
+ 	 
+ABSTRAK 
+      Penggunaan drone terus meningkat pada berbagai opeasiseperti pencarian dan penyelamatan, pengiriman, pemantauan wilayah dan misi otonom lainnya. Seiring bertambahnyajumlahdronedi ruang udara, kemampuan untuk melakukan pendaratan darurat secaraaman menjadiaspek penting, terutama jika wahana tidak dapat kembali ke titik semua atau mengalami kegagalan di tenah misi. Untuk mengatasi tantangan tersebut, penelitian ini mengembangkan sebuah metode deteksi titik pendaratan yang aman berbasis persepsi point cloud untuk platform drone. Sistem mengambil point cloud mentah dari depth kamera yang diproyeksikan ke koordinat drone dan kemudian dilakukan proses downsampling menggunakan algoritma RANSAC untuk memisahkan bidang datar dari objeklain di lingkungan. Setiap titik pada bidang dipetakan ke dalam grid 2D, kemudian dihitung kemiringan dan densitasnya untuk mengidentifikasi area yangmemnuhi kriteria datar, luas,serta bebas dari hambatan. Kandidat area pendaratan selanjutnya dievaluasi menggunakan dua parameter utama, yaitu tingkat kepadatan titik pada setiap sel grid dan jaraknya terhadap hambatan di sekitar lokasi tersebut. Pertama, sistem menghitung jumlah titik point cloud yang jatuh ke dalam setiap kotak grid untuk mematstikan bahwa areatersebut benar-benar berada pada bidang atar hasil segmentasi RANSAC dan memiliki permukaan yang cukup penuh. Kedua, titiktitik tersebut dianalisis berdsarkan jaraknya dari obstacle, dimana area yang berada pada jarak paling jauh dari objek penghalang dianggap lebih aman untuk proses pendaratan. Dari hasil evaluasi tersebut, sistem memilih dengan kepadatan tertinggi dan jarak terbesar sebagai lokasi pendaratan yang paling aman. 
+Kata Kunci: RANSAC Plane Segmentation, Unamnned Aerial Vehicle, Grid-
+Based Density Analysis, Obstacle Avoidance, Safe Landing Zone 
+ABSTRACT 
+      The use of drones continues to increase in various operations such as searchand rescue delivery, surveillance, and other autonomous missions. As the number of drones in the airspace increases, the ability to perform a safe emergency landing becomes crucial, especially if the vehicle cannot return to its starting point or experiences a failure mid-mission. To address these challenges, this research develops a point cloud perception-based safety landing zone detection method for drone platforms. The system takes the raw point cloud from the depth camera, projects it onto the drone's coordinates, and then downsamples it using a voxel grid to reduce density while preserving surface structure. Afterward, planes are extracted using the RANSAC algorithm to separate planes from other objects in the environment. Each point on theplaneis mapped  onto 2D grid, then its slope and density of points in each grid cell and their distance from obstacles around the location. First, the system counts the number of point cloud points falling into each grid box to ensure that the areais truly on the plane segmented by RANSAC and has a sufficiently "full" surface. Second, the points are analyzed based on their distance from obstacles, with the area furthest from the obstacle being considered safer for the landing process. Based on the resultsof these two evaluations, the system selects the point with the highest density and the greatest distance as the safest landing location. 
+Keywords: RANSAC Plane Segmentation, Unmanned Aerial Vehicle, Grid-
+Based Density Analysis, Obstacle Avoidance, Safe Landing Zone 
+ 
+KATA PENGANTAR 
+      Puji dan syukur penulis panjatkan ke hadirat Allah SWT karena atas rahmat dan karunia-Nya, penulis dapat menyelesaikan laporan tugas akhir yang berjudul "Metode Deteksi Titik Pendaratan Yang Aman Bagi Drone Dengan Pendekatan Point Cloud Perception" dengan baik. Laporan ini disusun sebagai salah satu syarat untuk menyelesaikan studi jenjang Sarjana di Program Studi Teknik Komputer, Telkom University Surabaya.Tugas akhir ini berfokus pada perancangan dan pengembangan metode deteksi titik pendaratan aman bagi drone VTOL berdasarkan analisis data point cloud secara real time. Sistem yang dibangun melakukan pemrosesan point cloud dari kamera stereo untuk mengekstraksi bidang datar menggunakan algoritma RANSAC, memetakan permukaan ke dalam grid dua dimensi, serta mengevaluasi kepadatan titik dan jarak terhadap hambatan guna menentukan area yang paling aman untuk pendaratan. Hasil penelitian ini diharapkan dapat menjadi kontribusi awal dalam pengembangan teknologi persepsi 3D dan sistem pendaratan otonom pada UAV di Indonesia, khususnya pada aplikasi misi otonom dan keselamatan penerbangan. 
+      Penulis menyadari bahwa laporan ini tidak akan tersusun tanpa bantuan, bimbingan, dan dukungan dari berbagai pihak. Oleh karena itu, penulis ingin menyampaikan ucapan terima kasih kepada: 
+1. Ibu tercinta atas segala doa, dukungan moral, dan semangat yang tiada henti,  
+2. Dr. Helmy Widyantara, S.Kom., M.Eng., selaku dosen pembimbing utama, atas bimbingan, masukan, dan arahannya selama proses pengerjaan tugas akhir ini,  
+3. Mohamad Yani S.ST., M.Phil., Ph.D, selaku dosen pembimbing kedua, yang telah memberikan banyak saran dan koreksi yang sangat berarti dalam penyempurnaan laporan ini. 
+      Penulis menyadari bahwa laporan ini masih memiliki kekurangan dan keterbatasan. Oleh karena itu, penulis terbuka terhadap kritik dan saran yang membangun. Semoga laporan tugas akhir ini dapat memberikan manfaat bagi pembaca serta menjadi kontribusi awal dalam pengembangan drone di masa mendatang. 
+ 
+ 	 
+DAFTAR ISI 
+ 
+LEMBAR PENGESAHAN	ii 
+LEMBAR PERNYATAAN ORISINALITAS	iii 
+ABSTRAK	iv 
+ABSTRACT	v 
+KATA PENGANTAR	vi 
+DAFTAR ISI	vii 
+DAFTAR TABEL	x 
+DAFTAR GAMBAR	xi 
+BAB I PENDAHULUAN	1 
+1.1.  Latar Belakang	1 
+1.2.  Rumusan Masalah	2 
+1.3.  Tujuan Penelitian	3 
+1.4.  Batasan dan Asumsi Penelitian	3 
+1.5.  Manfaat Penelitian	3 
+BAB II LANDASAN TEORI	5 
+2.1.  Kajian Penelitian Terkait	5 
+2.2.  Dasar Teori	8 
+2.2.1  Drone Hexacopter	8 
+2.2.1.1  Prinsip Kerja	9 
+2.2.1.2  Orientasi Rotasi dan Translasi Pada Drone	10 
+2.2.1.3  Sistem Kendali	12 
+2.2.2  Point Cloud	14 
+2.2.3  Normal Vector	15 
+2.2.4  Robot Operating System	17 
+BAB III METODOLOGI PENELITIAN	19 
+3.1.  Sistematika Penyelesaian Masalah	19 
+3.2.  Desain Sistem	21 
+3.2.1  Perangkat Keras	22 
+3.2.2  Perangkat Lunak	24 
+3.3  Transformasi Frame Koordinat	26 
+3.4  Downsampling Point Cloud	27 
+3.5  Ekstraksi Bidang Datar	28 
+3.5.1  Data Struktur dan Mencari Titik Tetangga	29 
+3.5.2  Deteksi Bidang Datar	30 
+3.6  Deteksi dan Evaluasi Zona Pendaratan	32 
+BAB IV PENGUMPULAN DAN PENGOLAHAN DATA	36 
+4.1.  Implementasi Perangkat Keras	36 
+4.2.  Implementasi Reference Frame	37 
+4.3  Implementasi Node Pemrosesan Point Cloud	39 
+4.4  Pengujian Pada Lingkungan1	42 
+4.4.1  Perbandingan RANSAC dan GNG	43 
+4.4.2  Deteksi Titik Pendaratan	46 
+4.4.3  Waktu Komputasi Tanpa Downsampling	47 
+4.4.4  Waktu Komputasi Dengan Downsampling	48 
+4.5  Pengujian Lingkungan II	50 
+4.5.1  Perbandingan GNG dan RANSAC	50 
+4.5.2  Deteksi Titik Pendaratan	53 
+4.5.3  Waktu Komputasi Tanpa Downsampling	54 
+4.5.4  Waktu Komputasi Dengan Downsampling	56 
+4.6  Pengujian Lingkungan 3	58 
+4.6.1  Perbandingan RANSAC dan GNG	59 
+4.6.2  Deteksi Titik Pendaratan	62 
+4.6.3  Pengujian Tanpa Downsampling	63 
+4.6.4  Pengujian Dengan Downsampling	64 
+BAB V ANALISIS DAN PEMBAHASAN	67 
+5.1.  Verifikasi dan Validasi	67 
+5.1.1.  Validasi Deteksi Bidang Datar	67 
+5.1.2  Validasi Deteksi Titik Pendaratan	68 
+5.1.3  Verifikasi Waktu Komputasi	68 
+5.2.  Analisis Hasil	71 
+5.2.1.  Analisa Hasil Segmentasi Bidang Datar	71 
+5.2.2.  Analisa Waktu Komputasi RANSAC dan GNG	72 
+5.2.3.  Analisa Hasil Deteksi Titik Pendaratan Aman	72 
+5.2.4  Analisa Waktu Komputasi Sistem	72 
+BAB VI KESIMPULAN DAN SARAN	74 
+6.1.  Kesimpulan	74 
+6.2.  Saran	74 
+DAFTAR PUSTAKA	75 
+LAMPIRAN	77 
+      
+ 
+ 	 
+
+DAFTAR TABEL 
+Tabel 5. 1 Tabel Data Perbandingan RANSAC dan GNG ............................................... 68 
+Tabel 5. 2 Tabel Waktu Komputasi Pipeline Tanpa Downsampling ................................ 69 
+Tabel 5. 3 Tabel Waktu Komputasi Pipeline Dengan Downsampling .............................. 70 
+ 
+ 	 
+
+DAFTAR GAMBAR 
+Gambar 2. 1 Drone Hexacopter .......................................................................................... 8 
+Gambar 2. 2 Konfigurasi Propeller Hexacopter ................................................................. 9 
+Gambar 2. 3 Desain Propeller Drone ............................................................................... 10 
+Gambar 2. 4 Frame Drone ................................................................................................ 11 
+Gambar 2. 5 Alur Kontrol PID ......................................................................................... 13 
+Gambar 2. 6 Alur Point Cloud Dihasilkan ....................................................................... 14 
+Gambar 2. 7 Normal Vektor ............................................................................................. 16 Gambar 2. 8 Arsitektur ROS 2 Humble Hawksbill .......................................................... 18 
+Gambar 3. 1 Alur Sistematika Penyelsaian Masalah ........................................................ 19 
+Gambar 3. 2 Integrasi Sistem ........................................................................................... 21 
+Gambar 3. 3 Alur Pencarian Titik Pendaratan Aman ....................................................... 22 
+Gambar 3. 4 Komponen Drone ........................................................................................ 23 
+Gambar 3. 5 Posisi Kamera di Drone ............................................................................... 23 
+Gambar 3. 6 Alur Pengolahan Point Cloud ...................................................................... 24 
+Gambar 3. 7 Reference Frame Tree ................................................................................. 26 
+Gambar 3. 8 Voxel Grid Downsampling .......................................................................... 28 
+Gambar 3. 9 KD-tree ........................................................................................................ 29 
+Gambar 3. 10 Konsep RANSAC ...................................................................................... 31 
+Gambar 3. 11 Pembagian Titik Dengan Grid ................................................................... 33 Gambar 3. 12 Pencarian Titik Pendaratan Yang Aman .................................................... 34 
+Gambar 4. 1 Desain Drone ............................................................................................... 36 
+Gambar 4. 2 Tampak Atas Drone ..................................................................................... 37 
+Gambar 4. 3 Reference Frame Sistem .............................................................................. 38 
+Gambar 4. 4 Raw Point Cloud Dari Zed2i Camera .......................................................... 39 
+Gambar 4. 5 Diameter Kandidat Landing ........................................................................ 40 
+Gambar 4. 6 Hasil Segmentasi Bidang Datar Dengan RANSAC ..................................... 41 
+Gambar 4. 7 Titik Pendaratan Aman ................................................................................ 42 Gambar 4. 8 Lingkungan Pengujian 1 .............................................................................. 43 
+Gambar 4. 9 Hasil Segmentasi RANSAC di Lingkungan 1 ............................................. 44 
+Gambar 4. 10 Hasil Clustering GNG Pada Lingkungan 1 ................................................ 45 
+Gambar 4. 11 Grafik perbandingan GNG dan RANSAC Pada Lingkungan 1 ................. 46 
+Gambar 4. 12 Hasil Deteksi Titik Pendaratan Pada Lingkungan 1 ................................... 47 
+Gambar 4. 13  Grafik RANSAC dan Pencarian Titik Aman Tanpa Downsampling Pada 
+Lingkungan 1 ................................................................................................................... 48 
+Gambar 4. 14 Grafik RANSAC dan Pencarian Titik Aman Dengan Downsampling Pada 
+Lingkungan 1 ................................................................................................................... 49 
+Gambar 4. 15 Grafik Downsampling Pada Lingkungan 1 ................................................ 49 Gambar 4. 16 Lingkungan Pengujian II ........................................................................... 50 
+Gambar 4. 17 Hasil Segmentasi RANSAC Pada Lingkungan II ...................................... 51 Gambar 4. 18 Hasil Clustering GNG Pada Lingkungan II ............................................... 52 
+Gambar 4. 19 Grafik Perbandingan RANSAC dan GNG Pada Lingkungan II ................ 53 
+Gambar 4. 20 Hasil Deteksi Titik Pendaratan Yang Aman Pada Lingkungan II .............. 54 
+Gambar 4. 21 Grafik RANSAC tanpa Downsampling Pada Lingkungan II ..................... 55 
+Gambar 4. 22 Grafik Pencarian Titik Aman Tanpa Downsampling Pada Lingkungan II . 56 Gambar 4. 23 Grafik RANSAC Dengan Downsampling Pada Lingkungan II ................. 57 
+Gambar 4. 24 Grafik Pencarian Titik Aman dan Downsampling Pada Lingkungan II ..... 58 
+Gambar 4. 25 Lingkungan Pengujian III .......................................................................... 59 
+Gambar 4. 26 Hasil Segmentasi RANSAC Pada Lingkungan III ..................................... 60 Gambar 4. 27 Hasil Clustering GNG Pada Lingkungan III .............................................. 61 
+Gambar 4. 28 Grafik Perbandingan RANSAC dan GNG Pada Lingkungan III ............... 62 
+Gambar 4. 29 Hasil Deteksi Titik Pendaratan Yang Aman Pada Lingkungan III ............. 63 
+Gambar 4. 30 Grafik RANSAC Tanpa Downsampling Pada Lingkunan III .................... 63 
+Gambar 4. 31 Grafik Pencarian Titik Aman Tanpa Downsampling Pada Lingkungan III64 
+Gambar 4. 32 Grafik RANSAC Dengan Downsampling Pada Lingkungan III ................ 65 
+Gambar 4. 33 Grafik Pencarian Titik Aman dan Downsampling Pada Lingkungan III.... 66 
+ 
+ 	 
+      
+BAB I PENDAHULUAN 
+1.1. 	Latar Belakang 
+      Unmanned Aerial Vehicle (UAV) atau pesawat tanpa awak merupakanwahana terbangyang dikendalikan  menggunakan sistem radio jarak jauh maupun perangkat otonom Berbasis computer. Denganstruktur yang relative sederhana,ringan, serta fleksibilitas operasional yang tinggi, Unmanned Aerial Vehicle atau bisa disebut drone menjadi teknologi yang semakin populer di berbagai sektor karena efisiensi biaya  dan kemudahan penggunaannya. Dalam perkembangannya, UAV telah berperan penting dalam berbagai bidang, mulai dari pengintaian dan pemantuan wilayah, penyiaran, pengawasan lalu lintas, hingga kegiatantransportasidan operasi penyelamatan di wilayah rawan bencara (Lee & Kwon, 2020). Di sektorpertanian, drone digunakanuntuk memperoleh citra uara dan data sensor secara real-time, yang membantu petani alam menganalisis kondisi lahan, kelembapan, serta distribusi nutrisi tanaman. Informasi ini memungkinkan pengambilan keputusan yang lebih tepat dan efisiendalam penggunaan pupuk,air, serta pestisida,sehingga meningkatkan produktivitaspertanian. Di sisi lain, dalam bidang medis dan kemanusiaan, drone berfungsi sebagai alat transportasi udara yang efisien untuk pengiriman pasokanmedis ke daerah terpencil yang sulit dijangkau kendaraan darat akibat medan geografis yang berat. Penggunaaan drone dalam konteks ini tidak hanya mempercepat distribusi bantuan, tetapi juga meningkatkan peluang keselamatan pasien dengan memperpendek waktu respons. Selain itu, di ranah militer, UAV memainkan peran strategis dalam operasi pengawasan, pengintaian dan logistik, sekaligus membuka peluang penggunaan yang lebih etis dan terkendali untuk meminimalkan risiko terhadap nyawa warga sipil. Melalui kemampuanuntuk mengumpulkan data intelijen dengan presisi tinggi dalam sistem pertahanan modern. Dengan kata lain, kemajuan teknologi drone tidak hanya membawa efisiensi dalam berbagai sektor, tetapi juga berkontribusi pada peningkatan keselamatan, efektivitas, dan tanggung jawab etis dalam pemanfaatan teknologi udara (Emimi, Khaleel, & Alkrash,2023). 
+      Dengan semakin luasnya penggunaan drone di berbagai bidang, aspek keselamatan operasional selama fase lepas landas, penerbangan, dan pendaratan menjadi fokus utama dalam penelitian teknologi drone modern. Seiring meningkatnya tingkat otonomi drone, tantangan baru muncul terkait kemampuan sistem untuk mengenali dan menghindari rintangan secara mandiri guna mencegah kecelakaan di udara maupun saat pendaratan. Biasanya, drone mengikuti jalur waypoint yang telah ditentukan sebelumnya dengan bantuan sinyal GPS untuk mencapai lokasi tujuan. Namun, ketika memasuki fase pendaratan, berbagai hambatan tak terduga seperti pepohonan, kabel listrik, atau bangunan tinggi dapat mengancam keselamatan penerbangan. Situasi ini menjadi lebih kompleks di lingkungan perkotaan padat, di mana area pendaratan sering kali sempit, misalnya ruang terbatas di antara struktur bangunan. Dalam kondisi tersebut, margin kesalahan pendaratan menjadi sangat kecil, sehingga sistem navigasi berbasis GPS saja tidak cukup andal karena akurasi posisinya dapat terganggu oleh multipath effect atau interferensi sinyal dari bangunan di sekitarnya. Oleh karena itu, dibutuhkan sistem pendeteksian zona pendaratan aman (Safe Landing Zone 
+Detection) dan penghindaran rintangan berbasis sensor cerdas, seperti kamera RGB-D, LiDAR, yang dipadukan dengan algoritma computer vision dan pembelajaran mesin agar drone mampu mendarat secara aman dan presisi di berbagai kondisi lingkungan. 
+      Dalam penelitian ini, dikembangkan sebuah sistem pendeteksian zona pendaratan aman berbasis point cloud perception yang dirancang khusus untuk drone tipe VTOL (Vertical Take-Off and Landing). Sistem ini memanfaatkan point cloud tiga dimensi (3D point cloud) yang dihasilkan oleh sensor stereo kamera untuk mengenali dan mengekstraksi bidang datar (planar surface) yang sesuai sebagai area pendaratan. Melalui pemrosesan spasial seperti penyaringan voxel (voxel grid filtering), pemangkasan wilayah minat (region of interest cropping), serta segmentasi bidang datar menggunakan algoritma RANSAC, sistem ini mampu mengidentifikasi area yang bebas dari kemiringan ekstrem dan rintangan fisik. Informasi hasil segmentasi kemudian digunakan untuk menentukan koordinat zona pendaratan yang aman secara otomatis.  
+      Pendekatan ini dioptimalkan untuk drone VTOL, yang memiliki karakteristik unik karena mampu lepas landas dan mendarat secara vertikal layaknya multirotor, namun tetap memiliki efisiensi terbang tinggi seperti fixedwing. Oleh sebab itu, akurasi dalam deteksi bidang datar dan kestabilan pendaratan menjadi faktor yang sangat krusial, terutama saat transisi antara mode terbang horizontal dan vertikal. Dengan mengintegrasikan persepsi berbasis point cloud dan algoritma segmentasi adaptif, sistem ini diharapkan mampu meningkatkan keamanan pendaratan otonom pada platform VTOL, terutama dalam skenario darurat seperti kehilangan sinyal, gangguan kontrol, atau kondisi lingkungan yang tidak diketahui sebelumnya. 
+1.2. 	Rumusan Masalah 
+      Berdasarkan latar belakang serta permasalahan yang telah dijelaskan di atas, maka penulis merumuskan permasalahan yang ada sebagai berikut: 
+1. Bagaimana cara mendeteksi bidang datar (planar surface) secara akurat dari point cloud 3D yang dihasilkan sensor depth kamera pada drone tipe VTOL, mengingat bahwa point cloud memiliki ukuran data yang besar, densitas tinggi, dan bersifat sangat komputasional sehingga dibutuhkan strategi khusus agar proses segmentasi bidang dapat dilakukan secara efisien dan tetap berjalan secara real-time selama penerbangan 
+2. Bagaimana mengidentifikasi dan menentukan zona pendaratan yang aman berdasarkan hasil segmentasi bidang datar tersebut, sehingga drone dapat melakukan pendaratan otonom dengan aman di berbagai kondisi lingkungan 
+1.3. 	Tujuan Penelitian 
+      Tujuan dari penelitian ini adalah untuk mengintegrasikan dan mengembangkan sistem autonomous landing pada drone yang mampu memilih dan menentukan zona pendaratan secara mandiri berdasarkan hasil persepsi lingkungan tiga dimensi, sehingga dapat meningkatkan tingkat keselamatan dan efisiensi proses pendaratan. Sistem ini dirancang agar drone, khususnya jenis VTOL (Vertical Take-Off and Landing), dapat menganalisis kondisi permukaan di area pendaratan dengan akurat, mengenali bidang datar yang stabil, serta menghindari rintangan di sekitarnya secara otomatis tanpa intervensi operator. 
+1.4. 	Batasan dan Asumsi Penelitian 
+      Sebagai penulis, saya harus membatasi penelitian ini karena ini adalah penelitian yang terarah, fokus, dan menghindari membahas hasilnya secara luas. Batasan yang saya buat adalah sebagai berikut: 
+1. Penelitian ini hanya berfokus pada prosed deteksi bidang datar dan identifikasi zona pendaratan aman menggunakan point cloud tiga demensi yang diperoleh dari sensor kamera stereo. 
+2. Sistem yang dikembangkan ditujukan untuk drone tipe VTOL yang mampu lepas landas dan mendarat secara vertikal, bukan untuk drone fixed-wing konvensional. 
+3. Algoritma yang digunakan berfokus pada segmentasi bidang datar (planar segmentation) dan pemilihan zona aman, tanpa melibatkan perencanaan lintasan (path planning) atau sistem penghindaran rintangan dinamis. 
+4. Sistem persepsi ini diintegrasikan secara modular dengan komponen kontrol UAV, namun optimasi parameter penerbangan (flight dynamics tuning) tidak menjadi fokus utama penelitian ini. 
+1.5. 	Manfaat Penelitian  
+Manfaat dari penelitian ini adalah 
+1. Memberikan kontribusi ilmiah dalam pengembangan metode deteksi zona pendaratan aman berbasis point cloud perception, khususnya untuk drone tipe VTOL. 
+2. Menjadi referensi akademik bagi penelitian selanjutnya dalam bidang persepsi lingkungan, terutama dalam penerapan algoritma segmentasi datar menggunakan RANSAC. 
+3. Memperkuat dasar pengetahuan mengenai integrasi sistem persepsi 3D dan sistem kendali otonom dalam konteks pendaratan drone yang aman dan adaptif terhadap kondisi lingkungan. 
+4. Menghasilkan sistem pendeteksi pendaratan aman yang dapat diimplementasikan pada platform UAV VTOL untuk meningkatkan kemanan dan efisiensi operasi drone, terutama dalam skenario darurat seperti kehilangan sinyal, kehabisan daya, atau gangguan lingkungan.
+
+BAB II LANDASAN TEORI 
+2.1. 	Kajian Penelitian Terkait 
+      Penelitian yang dilakukan oleh Loureiro et al. (2021) yang berjudul "Emergency Landing Spot Detection Algorithm for Unmanned Aerial Vehicles" membahas pengembangan algoritma yang mampu mendeteksi titik pendaratan darurat secara otomatis untuk kendaraan udara nirawak (UAV). Latar belakang penelitian ini didasarkan pada meningkatnya penggunaan UAV dalam berbagai bidang seperti pemetaan, pengiriman, dan operasi penyelamatan, yang menuntut sistem keamanan otonom ketika terjadi kegagalan selama penerbangan. Dalam situasi seperti kehilangan sinyal GPS, gangguan komunikasi, kerusakan perangkat keras, atau menurunnya daya baterai, UAV harus dapat mencari dan menentukan lokasi pendaratan yang aman tanpa campur tangan manusia. Algoritma yang dikembangkan bekerja dengan memanfaatkan data point cloud dari sensor LiDAR untuk menganalisis kondisi permukaan di sekitar UAV secara real-time. Data tersebut diproses melalui beberapa tahap, mulai dari transformasi koordinat dari sistem referensi LiDAR ke sistem navigasi UAV, downsampling point cloud menggunakan Voxel Grid Filter untuk mengurangi jumlah data tanpa kehilangan informasi penting, hingga deteksi bidang datar menggunakan metode Principal Component Analysis (PCA). Bidang yang terdeteksi kemudian dievaluasi berdasarkan beberapa parameter, yaitu kemiringan (slope), kekasaran permukaan (roughness), jarak terhadap UAV, dan ukuran area yang tersedia. Setiap parameter diberi bobot penilaian sehingga sistem dapat menentukan lokasi terbaik untuk pendaratan yang aman. Penelitian ini diuji melalui dua tahap, yaitu simulasi menggunakan MORSE (Modular Open Robots Simulation Engine) dan uji eksperimental menggunakan UAV STORK dengan sensor LiDAR Velodyne VLP16 di lingkungan nyata di Biara Tibães, Portugal. Hasil pengujian menunjukkan bahwa algoritma mampu bekerja secara real-time, dengan waktu deteksi rata-rata sekitar 38 milidetik, penggunaan memori yang efisien, dan konsumsi daya tambahan hanya sekitar 2,96 watt. Algoritma ini juga berhasil mendeteksi lebih dari seribu area potensial untuk pendaratan dan dapat memperbarui lokasi pendaratan terbaik secara dinamis selama penerbangan berlangsung. Kesimpulannya, penelitian ini berhasil menghasilkan sistem deteksi pendaratan darurat UAV yang andal, efisien, dan dapat dijalankan secara otonom. Pendekatan berbasis LiDAR terbukti lebih tangguh dibanding sistem berbasis kamera, terutama dalam kondisi pencahayaan yang rendah. Peneliti juga menyarankan pengujian lanjutan pada permukaan reflektif seperti air atau salju serta pengembangan lanjutan dengan menambahkan faktor-faktor lingkungan seperti kecepatan angin dan status baterai ke dalam proses penilaian untuk meningkatkan keakuratan sistem. 
+      Penelitian yang dilakukan oleh Isa et al. (2019) berjudul " Point Cloud Data Segmentation Using RANSAC and Localization" membahas metode segmentasi data point cloud 3D yang diperoleh dari Terrestrial Laser Scanner (TLS) menggunakan pendekatan RANSAC untuk mendeteksi bidang tanah serta lokalisasi berbasis radius untuk mengekstraksi bangunan sebagai objek utama. Studi kasusnya adalah bangunan bersejarah Tawau Bell Tower di Sabah, Malaysia. TLS menghasilkan jutaan titik 3D yang sangat detail namun berukuran file besar dan kompleks, sehingga peneliti berfokus pada data reduction, yaitu memproses hanya bagian penting dari point cloud untuk mempercepat waktu komputasi. Langkah pertama adalah memilih region of interest (ROI) dengan membatasi rentang koordinat X dan Y sehingga hanya area sekitar Bell Tower yang dipertahankan. Setelah ROI terbentuk, algoritma RANSAC digunakan untuk mendeteksi ground plane. Titik yang termasuk inlier dianggap bagian dari tanah, sedangkan outlier merupakan non-ground objects, termasuk bangunan dan vegetasi. RANSAC dipilih karena lebih cepat dan lebih robust dibanding metode lain seperti Hough Transform yang sensitif terhadap parameter dan membutuhkan waktu komputasi besar. Tahap berikutnya adalah mengelompokkan objek non-ground dengan pendekatan localization-based nearest neighbour. Peneliti menentukan titik referensi (sensor location) di pusat Bell Tower dan menggunakan dua radius berbeda: satu untuk memetakan area rintangan (misalnya pepohonan) dan satu lagi untuk area objek utama (bangunan). Proses pencarian tetangga dekat ini dilakukan menggunakan struktur data kd-tree, lalu hasilnya dibungkus dengan bounding box untuk memvisualisasikan bentuk Bell Tower. Eksperimen dilakukan pada 10 dataset point cloud hasil pemindaian indoor dan outdoor. Hasilnya menunjukkan bahwa metode ini mampu mengekstraksi tanah, bangunan, serta rintangan seperti pohon dengan cukup akurat. Variasi radius dan titik referensi sangat memengaruhi kualitas segmentasi: radius yang terlalu besar menimbulkan over-segmentation (pohon ikut terambil sebagai bangunan), sedangkan radius terlalu kecil menghasilkan under-segmentation (bagian bangunan hilang). Peneliti mengukur performa menggunakan Mean Square Error (MSE) dan menemukan bahwa data outdoor memiliki error lebih tinggi karena variasi ketinggian tanah dan banyaknya interferensi lingkungan. Secara keseluruhan, jurnal ini menunjukkan bahwa kombinasi RANSAC plane fitting dan localization radius-based segmentation dapat mengurangi ukuran data point cloud secara signifikan sekaligus mempertahankan objek utama untuk keperluan dokumentasi bangunan bersejarah. Metode ini efektif untuk memisahkan tanah dan bangunan, namun masih menghadapi tantangan pada area dengan objek tumpang tindih, seperti pohon yang menutupi atap bangunan. Penulis menyarankan perbaikan dengan menambahkan batasan geometris lain atau struktur data yang lebih efisien untuk mempercepat pemrosesan. 
+Penelitian yang dilakukan oleh Lee et al. (2020) berjudul " Safe Landing of 
+Drone Using AI-based Obstacle Avoidance" membahas pengembangan sistem pendaratan aman bagi drone menggunakan teknik kecerdasan buatan (AI) untuk mendeteksi rintangan dan menghindarinya secara otonom selama fase pendaratan. Masalah utama yang diangkat adalah bahwa drone umumnya mengandalkan GPS dan waypoint yang telah diprogram sebelumnya, namun saat mendekati area pendaratan, terutama di lingkungan urban yang sempit atau tidak terprediksi, sering muncul hambatan yang tidak terdeteksi oleh GPS, seperti benda asing di helipad, objek yang bergerak, atau akurasi GPS yang menurun di antara gedung tinggi. Untuk mengatasi masalah tersebut, peneliti mengusulkan integrasi kamera, algoritma pengenalan objek berbasis AI (YOLOv3), dan komputer pendamping (companion computer) untuk memungkinkan drone "melihat" lingkungan sekitarnya dan menyesuaikan manuver pendaratannya secara cerdas. Pada tahap awal, penelitian ini menguji penggunaan Raspberry Pi dan kamera murah untuk sistem deteksi objek berbasis OpenCV, namun performanya kurang memadai untuk pemrosesan AI yang berat. Karena itu, sistem ditingkatkan dengan menggunakan Jetson TX2 dan kamera ZED yang mampu menjalankan YOLOv3 secara real-time. Algoritma YOLOv3 dilatih menggunakan lebih dari 1000 gambar helipad dan 1000 gambar rintangan sehingga drone dapat mengenali dua objek utama: landing platform (biru) dan obstacle (merah). Setelah objek dikenali, citra dibagi menjadi 9 zona koordinat, dan drone mengambil keputusan gerakan berdasarkan posisi objek di dalam zona tersebut. Misalnya, jika helipad berada di zona tertentu (misalnya zona 9), drone akan bergerak backward rightward hingga helipad berada di zona tengah (zona 5), lalu drone menurunkan ketinggian untuk melakukan pendaratan. Penelitian ini juga menghubungkan komputer pendamping dengan flight control computer (FCC/Pixhawk) menggunakan protokol MAVLink agar perintah gerakan dari algoritma AI dapat dieksekusi langsung oleh drone. Pengujian dilakukan menggunakan drone multicopter dengan enam motor, Jetson TX2, dan kamera stereo. Hasil uji penerbangan menunjukkan bahwa drone berhasil mendeteksi helipad, menghindari rintangan, dan menyesuaikan lintasan terbang secara otomatis menggunakan data kamera saja. Visualisasi jalur terbang menunjukkan bahwa drone mengikuti helipad secara akurat dan melakukan manuver penghindaran saat objek merah terdeteksi. Kesimpulannya, jurnal ini berhasil membuktikan bahwa teknik AI khususnya YOLOv3 dapat meningkatkan keamanan pendaratan drone dengan memungkinkan deteksi rintangan secara real-time tanpa mengandalkan perangkat mahal seperti LiDAR. Tantangan utama yang dicatat adalah kecepatan pemrosesan AI on-board, sehingga penulis menyarankan potensi pemanfaatan komputasi berbasis 5G edge/cloud untuk meningkatkan performa di masa depan. Sistem ini dinilai memiliki potensi besar untuk meningkatkan keselamatan UAV, terutama pada misi transportasi, penyelamatan, atau operasi di area kompleks. 
+2.2. 	Dasar Teori 
+2.2.1 	Drone Hexacopter 
+      Istilah drone berasal dari dunia fiksi ilmiah dan kini dikenal sebagai Unmanned Aerial Vehicle (UAV). Pada dasarnya, drone adalah pesawat tanpa pilot yang dapat dikendalikan dari jarak jauh dan berfungsi sebagai robot terbang. Teknologi ini berada pada persimpangan kedirgantaraan, robotika, dan mekatronika, sehingga banyak digunakan dalam pembuatan film, operasi militer, pemantauan wilayah, hingga aktivitas rekreasi. Drone telah menjadi bagian penting dalam industri dan lembaga pemerintah karena kemampuannya melakukan pengiriman cepat, menjangkau area sulit, serta beroperasi di lingkungan berbahaya bagi manusia. Salah satu jenis drone yang banyak digunakan adalah multi-rotor, misalnya quadcopter yang memiliki empat rotor. Secara umum, pada drone komersial berlaku aturan bahwa semakin banyak rotor yang digunakan, semakin besar stabilitas yang diperoleh, namun waktu terbang menjadi lebih singkat karena konsumsi daya meningkat. Walaupun stabilitasnya tinggi, multi-rotor pada umumnya hanya mampu terbang sekitar setengah jam karena keterbatasan kapasitas baterai. 
+ 
+Gambar 2. 1 Drone Hexacopter 
+      Salah satu dari platform multi-rotor adalah hexarotor, yaitu drone yang menggunakan enam buah motor dan baling-baling yang tersusun secara simetris pada rangka berbentuk heksagonal seperti pada gambar 2.1. Konfigurasi enam rotor ini memberikan stabilitas yang lebih tinggi dibangdingkan quadcopter karena gaya angkat terdistribusi lebih merata pada setiap lengan. Selain itu, hexacopter memiliki kapasistas angkut beban yang lebih besar, sehingga mampu membawa sensor kamera, maupun komputer terbang dengan bobot yang tidak dapat diakomodasi oleh quadcopter biasa. Kelebihan lainnya adalah adanya redudansi sistem, dimana drone masih dapat dipertahankan dalam penerbangan darurat meskipun slaah satu motor mengalami kegagalan. Karakteristik ini menjadikan hexacopter sangat cocok digunakan untuk misis yang  membutuhkan kestabilan tinggi, seperti pemetaan udara, inspeksi industri, operasi penyelematan, hingga penelitian berbasis persepsi lingkungan. 
+2.2.1.1 Prinsip Kerja 
+      Konfigurasi drone hexacopter terdiri dari enam motor dengan arah putaran berbeda, yaitu CW (Clockwise) dan CCW (Counter Clockwise). Setiap rotor menghasilkan gaya angkat keatas ketika baling-baling berputar, dan arah putarannya menentukan arah torsi yang ditimbulkan, pada hexacopter, konfigurasi tiga pasang CW dan CCW seperti yang terlihat pada gambar 2.2 diperlukan untuk menjaga keseimbangan torsi, sehingga drone tidak berputar secara tidak terkendali. 
+ 
+Gambar 2. 2 Konfigurasi Propeller Hexacopter 
+      Pada gambar 2.2, rotor nomor 1,3, dan 6 berputar searah jarum jam (CW), sedangkan rotor 2, 4 dan 5 berputar berlawanan arah jarum jam (CCW). Pasangan ini menghasilkan torsi yang saling meniadakan sehingga drone dapat mempertahankan posisi tanpa rotasi yaw yang tidak diiginkan. Ketika semua rotor berputar dengan kecepatan sama, total gaya angkat yang dihasilkan membuat drone dapat terbang naik atau hover diudara. 
+      Terdapat dua tipe baling-baling yang digunakan pada drone multi-rotor, yaitu CW-Reverse (Pusher) dan CCW-Normal (Tractor). Kedua jenis propeller ini memiliki desain sudut yang berbedakarena masing-masing dirangcang untuk berputar pada arah yang berlawanan. Propeller CCW-Normal memiliki pitch dan bentuk bilah mengarahkan aliran udara ke bawah ketika berputar berlawanan arah jarum jam. Desain ini berfungsi sebagai tractor, yaitu menarik udara dari bagian atas menuju bagian bawah propeller untuk menghasilkan gaya angkat utama. Propeller jenis ini biasanya dipasang pada motor yang diprogram untuk berputar CCW. Sementara itu, propeller CW-Reverse (pusher) memiliki orientasi sudut yang berkebalikan dari CCW-Normal. Ketika propeller ini berputar dari propeller CCW. Desainnya disebut pusher karena sudut tampak mendorong udara, bukan menarik seperti pada tipe tractor. Meskipun kedua propeller menghasilkan gaya angkat keatas, arah torsi yang ditimbulkan oleh masing-masing berbeda sehingga keduanya harus digunakan berpasangan. 
+ 
+Gambar 2. 3 Desain Propeller Drone 
+      Pada drone multi-rotor seperti hexacopter, pemasangan propeller CW dan CCW bukan sekadar preferensi desain tetapi merupakan keharusan agar drone dapat terbang stabil. Jika semua motor menggunakan propeller dengan arah putaran yang sama, maka gaya torsi yang dihasilkan akan membuat drone berputar terusmenerus pada sumbu yaw dan tidak pernah mencapai kestabilan. Dengan menggunakan kombinasi propeller CW dan CCW seperti pada gambar 2.3, torsi dari rotor yang berputar searah jarum jam akan dinetralkan oleh rotor yang berputar berlawanan arah jaru jam. Hasilnya adalah keseimbangan torsi total ang memunkinkan drone mempertahankan orientasi tanpa rotasi yang tidak di inginkan 
+2.2.1.2 Orientasi Rotasi dan Translasi Pada Drone 
+      Orientasi dan rotas pada drone merupakan aspek fundamental dalam sistem navigasi, kendali dan persepsi lingkungan. Roll, pitch dan yaw berfungsi untuk menentukan arah hadap drone mengatur pergerakanyake segala arah, dan memastikan kestabilannya selama penerbangan. Tanpa informasi orientasi yang akurat, drone tidak mampu mempertahankan posisi, merespons gangguan seperti hembusan angin, maupun melakukan manuver secara presisi. Orientasi drone dalam ruang tiga dimensi dijelaskan melalui perubahan rotasi terhadap tiga sumbu utama, yaitu sumbu X, Y, dan Z. Ketiga rotasi ini dikenal sebagai Euler Angles, yang terdiri dari roll, pitch, dan yaw, dan digunakan secara luas untuk merepresentasikan sikap serta arah orientasi drone terhadap lingkungan sekitar. Euler Angles sendiri merupakan metode untuk menggambarkan rotasi suatu benda dalam suatu kerangka koordinat melalui tiga rotasi berurutan pada masing-masing sumbu utama. Rotasi tersebut biasa dinotasikan sebagai ?? (??h??) untuk rotasi terhadap sumbu X, Ø (??h??????) untuk rotasi terhadap sumbu Y, dan ? (??????) untukrotasi terhadap sumbu Z. Pada gambar 2.4 kombinasi ketiga sudut ini memungkinkan setiap orientasi dalam ruang 3D dapat digambarkan secara lengkap. 
+ 
+Gambar 2. 4 Frame Drone 
+      Untuk dapat merepresentasikan perubahan orientasi tersebut secara komputasional, diperlukan pendekatan matematis yangmampu menggambarkan bagaimana rotasi terjadi pada setiap sumbu. Euler Angles tidak hanya digunakn sebagai konsep deskriptif mengeani arah putar drone, tetapi juga dituangkan dalam bentuk matriks rotasi sebagai berikut: 
+	??'	????????	????????	0	??	??
+	[??'] = [-????????	????????	0] [??] = ???? [??]  
+	??'	0	0	1	??	??
+	??''	????????	0	-????????	??'	??'
+	[??''] = [	0	1	0	] [??'] = ???? [??'] 
+	??''	????????	0	????????	??'	??'
+	??	1	0	0	??''	??''
+	[??] = [0	????????	????????][??''] = ???? [??''] 
+	??	0	-????????	????????	??''	??''
+Dan digabung untuk mendapatkan: 
+	??	??
+[??] = ???????????? [??] 
+	??	??	???????? ????????	???????? ????????
+= [-???????? ???????? + ???????? ???????? ????????	?????????? + ???????? ????????
+	???????? ???????? + ???????? ???????? ????????	-???????? ???????? + ???????? ???????? ????????-?????????????????? ????????][??] ???????? ???????? ??      Selain digunakan untuk menggambarkan orientasi, formulasi matematis tersebut juga menjadi dasar dalam menghitung besaran gerak pada drone, khususnya linear velocity dan angular velocity. Kedua besaran inipenting karena drone tidak hanya mengalami perubahan posisi, tetapi juga perubahan orientasi selama terbang. Linear velocity menggambarkan seberapa cepat drone berpindah posisi dalam ruang 3D. Sedangkan angular velocity menyatakan seberapa cepat drone berputar terhadap sumbu roll, pitch dan yaw. Perhitungan kedua besaran ini dilakukandengan melihat perubahan posisi maupun sudut orientasi terhadap waktu. 
+Dengan mengetahui kecepatan linier serta kecepatansudut secara akurat, sistem kontrol drone dapat menyesuaikan respon motor untuk menjaga kestabilan, melakukan navigasi, serta mengatur manuver secara presisi. Secara matematis, linear velocity dihitung berdasarkan perubahan posisi drone dalam selang waktu tertentu, jika posisi drone pada waktu ??1 adalah (??1, ??1, ??1) dan pada waktu ??2 berubah menjadi (??2, ??2, ??2), maka kecepatan linier dapat dinyatakan sebagai: 
+??2 - ??1
+[??2 - ??1]
+	??? =	??2 - ??1 
+??2 - ??1
+Persamaan ini menunjukkan bahwa linear velocity merupakan turunan pertama dari posisi terhadap waktu, sehingga sangat terkait dengan pergerakan translasi drone. 
+Sedangkan angular velocity diperoleh dari perubahan orientasi drone, yang direpresentasikan melalui perubaahn sudut Euler terhadap waktu. Jika sudut roll, pitch, dan yaw masing-masing berubah dari Ø1,??1, ??1 menjadi Ø2, ??2, ??2 maka kecepatan sudut dapat dihitung menggunakan: 
+Ø2 - Ø1
+[ ??2 - ??1 ]
+	????? =	??2 - ??1 
+??2 - ??1
+Besaran ini biasanya diukur langsung oleh gyroscpe pada IMU dalm satuan radian per detik (rad/s). Angular velocity sangat penting karena memberikan informasi kepada flight controller mengenai seberapa cepat drone mengalami rotasi, sehingga sistem dapat melakukan koreksi terhadap perubahan orientasi yang tidak diinginkan. Dengan demikian, perhitungan linear dan angular velocity yang memanfaatkan model matematika dari orientasi dan posisi drone memungkinkan sistem navigasi dan kontrol drone bekerja secara stabil dan responsif terhadap perubahan lingkungan. 
+2.2.1.3 Sistem Kendali 
+       Pada dasarnya, sistem kendali bertugas untuk mengatur bagaimana drone merespons perubahan lingkungan maupun masukan dari pilot atau komputer, seperti perubahan orientasi, posisi, kecepatan, maupun gaya eksternal seperti gangguan angin. Sistem ini memastikan bahwa drone dapat mempertahankan kondisi terbang yang stabil, mengikuti perintah navigasi secara presisi, serta mampu melakukan penyesuaian otomatis ketika terjadi perubahan kondisi tidak terduga selama penerbangan. Untuk mengendalikan keseluruhan dinamika tersebut, drone modern seperti yang menggunakan fligh controller PX4 menerapkan closed-loop control atau sistem kontrol umpan balik, dimana setiap pergerakan drone selalui dipantau oleh sensor, kemudian dibandingkan dengan nilai referensi untuk menghasilkan sinyal koreksi. Dalam sistem closed-loop ini, flight 
+controller tidak hanya mengandalkan satu lapisan Dalam sistem closed-loop ini, flight controller tidak hanya mengandalkan satu lapisan kontrol, tetapi menggunakan struktur kendali berlapis (multi-layer control) yang bekerja mulai dari tingkat terendah seperti kendali kecepatan rotasi rotor (rate control), hingga tingkat tertinggi seperti kendali posisi dan lintasan (position control). Setiap lapisan menerima input dari sensor-sensor seperti IMU, GPS, magnetometer, barometer, maupun visual odometry, lalu menghasilkan perintah yang lebih spesifik ke lapisan di bawahnya. Fondasi dari keseluruhan proses tersebut adalah algoritma PID (Proportional- Integral-Derivative), yang mampu memberikan respon cepat terhadap error, menghilangkan error residual yang tersisa, serta menstabilkan pergerakan agar tidak menimbulkan osilasi berlebih. 
+Pengendali PID secara matematis dinyatakan melalui persamaan berikut: 
+????
+??(??) = ??????(??) + ???? ? ??(??)???? + ????  
+????
+yang menunjukkan bahwa sinyal kendali ??(??)dibentuk dari kombinasi tiga komponen utama: proporsional, integral, dan derivatif. Komponen proporsional menghasilkan respons berdasarkan besar error saat ini, komponen integral menjumlahkan error dari waktu ke waktu untuk menghilangkan error sisa yang tidak dapat diperbaiki oleh proporsional saja, dan komponen derivatif memperhitungkan laju perubahan error sehingga sistem dapat mendeteksi kecenderungan perubahan dan memberikan efek peredaman untuk mencegah osilasi atau overshoot. Ketiga komponen ini bekerja secara bersamaan untuk memastikan bahwa sistem dapat mencapai nilai yang diinginkan secara cepat, akurat, dan stabil. 
+ 
+Gambar 2. 5 Alur Kontrol PID 
+      Struktur matematis ini divisualisasikan lebih jelas dalam diagram blok PID. Pada gambar 2.5, sinyal referensi ??(??)dibandingkan dengan output aktual ??(??)sehingga menghasilkan error ??(??). Error ini kemudian masuk ke tiga jalur pemrosesan berbeda yang masing-masing merepresentasikan bagian P, I, dan D. Jalur pertama mengalikan error dengan konstanta proporsional ????, jalur kedua mengintegrasikan error dan mengalikannya dengan ????, sedangkan jalur ketiga menghitung turunan error dan mengalikannya dengan ????. Ketiga jalur ini kemudian dijumlahkan pada blok penjumlah untuk menghasilkan sinyal kontrol ??(??), yang selanjutnya diberikan kepada plant atau sistem yang dikendalikan. Plant kemudian menghasilkan output ??(??), yang kembali diukur oleh sensor dan dikirim kembali sebagai umpan balik ke blok pembanding untuk menghitung error baru. Dengan demikian, diagram blok tersebut menggambarkan mekanisme closed-loop control, di mana sistem PID terus-menerus memonitor kondisi aktual dan memberikan koreksi secara dinamis untuk mencapai kestabilan operasi. 
+2.2.2 	Point Cloud 
+      Point cloud merupakan representasi digital dari dunia nyata dalam bentuk sekumpulan titik tiga dimensi yang memiliki koordinat x, y, z dimana setiap titik menggambarkan posisi spasial suatu bagian permukaan objeck atau lingkungan. Data ini dihasilkan oleh sensor depth camera, stereo camera, dan LiDAR yang mampu menangkap informasi kedalaman dan jarak secara langsung. Menurut Fang et al. (2024), perkembangan teknologi sensor kedalaman telah meningkatkan kualitas, resolusi dan kepadatan point cloud seara signifikan sehingga penggunaannya semakin meluan dalam berbagai bidang, termasuk robotika, kendaraan otonom, pemetaan 3D, konstruksi, dan augmented reality. Dengan Kemapuan memberikan gambaran geometris lingkungan secara akurat, point cloud menjadi fondasi penting dalam berbagai proses analisisspasial seperti rekonstruksi 3D, pemodelan permukaan, deteksi objek, serta segmentasi bidang 
+ 
+Gambar 2. 6 Alur Point Cloud Dihasilkan 
+      Pada gambar 2.6 bagian (a) diperlihatkan prinsip dasar bagaimana sebuah sensor 3D memperoleh informasi jarak dari suatu titik pada permukaan objek. Sensor mengukur jarak melalui mekanisme tertentu, seperti pemantulan pulsa laser pada LiDAR atau perbedaan posisi piksel pada sistem stereo. Proses ini kemudian diperluas pada gambar 2.6 bagian (b), dimana sensor tidak hanya mengukur satu titik saja, tetapi melakukan pengukuran secara simultan atau berurutan pada banyak arah pengamatan. Misalnya, LiDAR memancarkan ratusan berkas laser ke berbagai sudut, sementara kamera Stereo memproses ribuan piksel untuk menghitung nilai kedalaman. Dengan demikian, setiap arah pengukuran menghasilkan satu titik 3D pada permukaan objek, dan semakin banyak arahyang diproses, semakin rapat dan lengkap representasi bentuk objek yang diperoleh. Gambar 2.6 memperlihatkan bagaimana beberapa objek seperti silinder dan kubus dipindai melalui banyak sinar pengukuran sehingga menghasilkan sekumpulan besar titik dengan distribusi spasial yang mengikuti kontur objek. Pada gambar 2.6 bagian (c), seluruh titik hasil pengukuran tersebut digabungkan, membentuk apa yang dikenal sebagai point cloud, yaitu representasi 3D berupa kumpulan titik yang tersebar mengikuti permukaan objek. Meskipun tidak membentuk permukaan padat, penyebaran titiktitik tersebut cukup untuk menggambarkan struktur geometris objek secara detail, seperti lekukan silinder dan tepi-tepi kubus. Point cloud ini kemudian dapat digunakan untuk berbagai keperluan analisis, seperti pemetaan lingkungan, deteksi bentuk permukaan 
+      Namun, sekalipun sangat informatif, pengolahan point cloud bukan tanpa tantangan. Jurnal tersebut menekankan bahwa point cloud modern memiliki jumlah titik yang sangat besar, distribusi yang tidak terstuktur, serta retntan terhadap noise dan ketidakkonsistenan data, sehingga membuat proses segmentasi dan analisis menjadi kompleks. Banyak metode tradisional gagal menangani struktur point cloud yang padat atau objek yang saling berdekatan karena besarnyavariasi kelaman dan kepadatan titik. Untuk itu, Fang et al. Mengusulkan pendekatan yang memanfaatkan kedalaman sebagai fitur utama untuk membedakan objek berdasarkan perubahan nilai jarak yang signifikan, karena perubahan kedalaman biasanya menandai batas alami antar objek. Selain itu, point cloud sering melalui serangkaian praproses seperti perhitungan jarak Euclidean antar titik untuk membentuk distance matrix, normalisasi skala untuk mengurangi bias densitas, serta penggunaan voxelization untuk menyederhanakan data dengan mengelompokkan titik-titik berdekatan ke dalam unit kubus kecil (voxel). Teknik voxelization sangat penting dalam mengatasi ukuran point cloud yang besar karena dapat mempertahankan struktur global sambil menurunkan kompleksitas komputasi secara drastis. Secara keseluruhan, point cloud bukan hanya kumpulan titik 3D, tetapi sebuah representasi kompleks yang membutuhkan pemrosesan cermat melalui ekstrasi kedalaman, analisis jarak, voxelization,dan segmentasi berbasis fitur geometris untuk dapat dimanfaatkan secara optimal dalam aplikasi dunia nyata, termasuk navigasi,persepsi drone, dan deteksi zona pendaratan aman. 
+2.2.3 	Normal Vector 
+      Normal vector adalah sebuah vektor yang tegak lurus terhadap suatu permukaan pada titik tertentu seperti pada gambar 2.7. Dalam konteks representasi 3D seperti point cloud, normal vector digunakan untuk menggambarkan arah orientasi lokal suatu permukaan. Setiap titik pada point cloud dapat dianalisis lingkungan sekitarnya untuk menentukan arah permukaan tempat titik tersebut berada, sehingga menghasilkan sebuah vektor normal n = (????, ????, ????) yang menunjukkan orientasi permukaan tersebut. Vektor normal ini sangat penting dalam berbagai proses analisis geometri 3D, seperti segmentasi, rekonstruksi, perhitungan kemiringan, dan deteksi bidang datar. 
+ 
+Gambar 2. 7 Normal Vektor 
+      Gambar 2.7 bagian (a) memperlihatkan contoh point cloud yang berada pada dua permukaan berbeda, yaitu permukaan ??1dan ??2. Titik-titik berwarna hijau berada pada permukaan ??1, sedangkan titik berwarna biru berada pada permukaan ??2. Titik merah menggambarkan sebuah titik yang posisinya berada di batas atau pertemuan antara dua permukaan tersebut. Pada wilayah seperti ini, penentuan normal vector menjadi lebih menantang karena tetangga terdekat titik merah berasal dari dua bidang dengan orientasi yang berbeda. Hal ini mengilustrasikan bahwa kualitas normal yang dihasilkan sangat bergantung pada distribusi titik di sekitar titik pusat. Jika titik-titik tetangga berada pada satu permukaan yang relatif datar dan konsisten, normal vector yang diperoleh akan stabil; sebaliknya, jika titik berada di tepi, sudut, atau pertemuan dua bidang, normal yang dihitung bisa menjadi ambigu dan kurang dapat diandalkan. 
+      Gambar 2.6 bagian (b) menggambarkan bagaimana normal vector terorientasi pada masing-masing permukaan. Titik-titik pada permukaan ??1(warna hijau) memiliki normal yang mengarah relatif seragam sesuai kemiringan permukaan tersebut, sementara titik-titik pada permukaan ??2(warna biru) memiliki normal yang konsisten terhadap bidang ??2. Normal pada titik merah di perbatasan tampak menyimpang dari pola kedua kelompok tersebut karena dipengaruhi oleh campuran tetangga dari ??1dan ??2. Fenomena ini menunjukkan bahwa normal vector dapat digunakan bukan hanya untuk mengetahui orientasi permukaan, tetapi juga untuk mendeteksi struktur geometris tertentu seperti edge, corner, atau batas antar bidang, yang sering muncul pada objek nyata dan lingkungan kompleks. 
+      Untuk bisa mendapatkan normal vektor pada suatu permukaan, diperlukan informasi geometri dari titik-titik yang membentuk permukaan tersebut. Secara paling dasar, normal vektor dapat ditentukan menggunakan tiga titik yang tidak segaris dan berada pada bidang yang sama. Misalkan diberikan tiga titik 
+??1(??1, ??1, ??1), ??2(??2, ??2, ??2), dan ??3(??3, ??3, ??3). 
+Dari ketiga titik tersebut dibentuk dua vektor yang terletak pada bidang, yaitu: 
+???1 = ??2 - ??1 = (??2 - ??1,  ??2 - ??1,  ??2 - ??1) 
+???2 = ??3 - ??1 = (??3 - ??1,  ??3 - ??1,  ??3 - ??1) 
+Kedua vektor ini merepresentasikan dua arah berbeda pada permukaan bidang. Selanjutnya, vektor normal diperoleh dengan menghitung perkalian silang (cross product) antara kedua vektor tersebut, yang menghasilkan vektor yang tegak lurus terhadap bidang: 
+???= (??1??2?? - ??1????2??,  ??1????2?? - ??1????2??,  ??1????2?? - ??1????2??) 
+Vektor ????yang diperoleh dari proses ini memiliki arah yang tegak lurus terhadap bidang, namun panjang (magnitudo) vektor tersebut masih bergantung pada skala vektor pembentuknya. Oleh karena itu, diperlukan proses normalisasi agar vektor normal hanya merepresentasikan arah orientasi permukaan. 
+Normalisasi dilakukan dengan membagi vektor normal dengan panjangnya, yang dihitung menggunakan norma Euclidean: 
+
+||???|| = v????2 + ????2 + ????2 
+Sehingga vektor normal ter-normalisasi dapat dinyatakan sebagai: 
+?
+	?	??	 
+?? ???????? || ? ||
+??
+Vektor normal hasil normalisasi ini memiliki panjang satu satuan dan digunakan sebagai representasi orientasi lokal permukaan. Dengan menggunakan vektor normal ter-normalisasi, perbandingan orientasi antar permukaan dapat dilakukan secara konsisten, serta memungkinkan pendeteksian perubahan orientasi yang signifikan pada batas antar bidang, seperti edge dan corner, sebagaimana ditunjukkan pada Gambar 2.7 bagian (b). 
+2.2.4 	Robot Operating System 
+      Robot operating system 2 (ROS 2) merupakan kerangka kerja (framework) perangkat lunak bersifat open-source yang dirancang untuk memfasilitasi pengembangan sistem robotika modern yang modular, terdistribuse dan real-time. ROS 2 dikembangkan sebagai penerus ROS 1 untuk menjawab berbagai kebutuhan industri dan riset robotika yang menuntut reliabilitas tinggi, kemanan, serta kemampuan komunikasi yang lebih stabil. Secara konsep, ROS 2 tidak berfungsi sebagai sistem operasi fisik, melainkan sebuah middleware yang menyediakan kumpulan pustaka, tools, dan standar komunikasi agar berbagai komponen robot seperti sensor, aktuator, controller, dan algoritma dapat saling beinterksi secara tersuktur. ROS 2 dibangun di atas arsitektur Data Distribution Service (DDS), sebuah protocol Komunikasi publish subcribe yang memungkinkan pertukaran data antar node secara real-time, reliable dan scalable dalam lingkungan terdistribusi. Kebedaradan DDS menjadikan ROS 2 mampu mendukung sistem multirobot, perangkat IoT, hingga penggunaan di industri yang membutuhkan determinisme tinggi. 
+ 
+Gambar 2. 8 Arsitektur ROS 2 Humble Hawksbill 
+      Arsitektur ROS 2 disusun dalam bentuk node, topic, service, action dan parameter, sehingga setiap fungsi robot dapat dipisahkan menjadi komponen kecil yang dapat dijalankan, diuji dan dikembangkan secara independen. Dengan dukungan multi-platform (linux, Windows, dan macOS), serta kompatibilitas terhadap perangkat embedded seperti Raspberry Pi, Jetson dan microcontroller berbasis micro-ROS,ROS 2 menjadi pilihan utama dalam penelitian robot otonom, kendaraan tanpa awak, drone, navigasi SLAM dan sistem persepsi berbasis sensor 3D. Selain itu, ROS 2 menyediakan tools utama seperti Rviz untuk visualisasi, Gazebo dan ignition untuk simulasi, serta rclcpp dan rclpy sebagi API pemrograman berbasis c++ dan python. Dibandingkan ROS 1, ROS 2 menawarkan peningkatan signifikan pada keamanan pada keamanan (security), dukunganrealtime, kualitas manajemen memori, serta kemampuan komunikasi natar proses yang lebih handal, sehingga sangat sesuai untuk aplikasi robot modern baik di tingkat industri maupun akademik. Secara keseluruhan, ROS 2 berperan sebagai fondasi penting dalam pengembangan sistem robot yang kompleks, fleksibel dan dapat dikembangkan secara bertahap. 
+ 
+ 	 
+BAB III METODOLOGI PENELITIAN 
+3.1. 	Sistematika Penyelesaian Masalah 
+      Penyelesaian masalah dalam penelitian ini dilakukan melalui tahapan yang terstruktur dan sistematis agar dapat mencapai tujuan penelitian, yaitu mengembangkan dan mengevaluasi sistem keamanan pendaratan otonom. Proses ini mencakup pengembangan algoritma SLZ, integrasi dengan sistem drone, serta pengujian dan analisis terhadap kinerja sistem. Adapun langkah-langkah sistematis yang ditempuh dalam penelitian ini adalah sebagai berikut: 
+ 
+Gambar 3. 1 Alur Sistematika Penyelsaian Masalah 
+1. Identifikasi Masalah dan Kebutuhan Sistem 
+      Pada tahap ini, dilakukan pemahaman mendalam mengenai permasalahan utama, yaitu kebutuhan drone untuk mendeteksi dan memilih zona pendaratan yang aman secara otonom. Selain itu, dilakukan identifikasi terhadap kebutuhan fungsionalitas dan non-fungsional yang harus dipenuhi oleh sistem, termasuk jenis sensor yang digunakn, platform komputasi, integrasi perangkat lunak, serta batasan lingkungan operasi. Hasil identifikasi ini menjadi landasan konsptual untuk tahap perancangan berikutnya. 
+2. Perancangan Algoritma Safe Landing Zone 
+      Berdasarkan hasil identifikasi kebutuhan, ditentukan alur pemrosesan point cloud yang akan digunakan untuk mendeteksi permukaan datar sebagai zona pendaratan. Perancangan mencakup pemilihan metode segmentasi, perancangan algoritma ekstraksi bidang, perhitungan kemiringan, deteksi rintangan, serta penentuan kriteria kelayakan zona pendaratan. Selain itu, arsitektur sistem dirancang menggunakan ROS 2 untuk memastikan proses dapat berjalan secara modular, realtime dan terintegrasi dengan komponen drone. 
+3. Pengujian Algoritma 
+      Setelah itu algoritma diuji secara terpisah menggunakan rosbag untuk memastikan bahwa proses segmentasi dari deteksi zona pendaratan berjalan sesuai teori. Pengujian dilakukan untuk mengevaluasi akurasi ektraksi bidang, kestabilan estimasi orientasi, waktu komputasi, serta respons algoritma terdadap berbagai variasi data. Tahap ini berfungsi sebagi validasi awal sebelum algoritma diimplementasikan pada sistem drone. Jika hasilnya belum sesuai, maka algoritma kembali diperbaiki dan diui ulang hingga memenuhi standarperforma. Proses iteratif ini memastikan bahwa algoirtma yang dikembangkan benar-benar siap untuk diintegrasikan ke lingkungan operasional drone. 
+4. Integrasi Dengan Sistem Drone 
+      Pada tahap ini, algoritma yang telah diuji secara offline diimplementasikan pada perangkat keras drone, seperti jetson Orin Nano, dan di integrasikan denganflight controller PX4. Integrasi meliputi sinkronisasi TF frame, konfigurasi komunikasi ROS2 PX4 melaui uXRCEDDS, serta pengaturan publikasi dan penerimaan data sensor. Ini memastikan bahwa algoritma dapat dijalankan pada sistem drone sesungguhnya. 
+5. Pengujian Sistem selanjutnya, dilakukan pengujian sistem untuk menguji performa algoirtma secara langsung dalam pengoperasian drone. Pengujian melalui simulasi maupun uji terbang sebenarnya untuk menilai apakah sistem dapat bekerja secara real-time dan stabil dalam kondisi dunia nyata. Pada tahap ini, pengamatan respons drone terhadap hasil deteksi, ketahanan algoritma terhadap noise, dan kemampuan sistem untuk memberikan keputusan pendaratan yang amn. 
+6. Evaluasi Kesesuaian Sistem 
+      Setelahnya dilakukan peniliaian apakah sistem yang telah terintegrasi menghasilkan performa yang memuaskan dan sesuai dengan tujuan penelitian. Evaluasi dilakukan berdasarkan hasil uji terbang, kestabilan sistem, akurasi deteksi selama penerbangan, serta keberhasilan pendaratan. Jika sistem dinilai belum sesuai, dilakukan perbaikan integrasi dan penjian kembali hingga hasilnya optimal. 
+7. Pengumulan Data dan Analisis Data 
+      Seluruh data dari pengujian dan uji terbang dikumpulkan, termasuk data point cloud, data log drone, hasil segmentasi, metrik akurasi, waktu pemrosesan dan kondisi lingkungan. Data tersebut dianalisis untuk mengevaluasi kinerja sistem secara komprehensif, mengukur tingkat keberhasilan dan mengidentifikasi faktor-faktor yang mempengaruhi akurasi deteksi zona pendaratan aman. 
+8. Evaluasi dan Penarikan Kesimpulan 
+      Terakhir ditarik kesimpulan berdasarkan hasil analisis data mengenai efektivitas algoritma dan sistem yang telah dikembangkan. Kesimpulan ini mencakup pencapaian tujuan penelitian, kelebihan dan kelemahan sistem, serta rekomendasi pengembangan lebih lanjut. Tahap ini mengakhiri proses penelitian secara menyeluruh sebelum sistem dinyatakan selesai. 
+3.2. 	Desain Sistem 
+      Bagian ini menjelaskan arsitektur perangkat keras dan perangkat lunak yang digunakan dalam proses implementasi algoritma yang diusulkan. Algoritma pendeteksian lokasi pendaratan dikembangkan menggunakan framework Robot Operating System (ROS), karena framework ini menyediakan struktur modular yang memudahkan integrasi paket-paket ROS dengan modul perangkat lunak lain yang telah tersedia pada UAV. 
+ 
+Gambar 3. 2 Integrasi Sistem 
+      Alur utama sistem pendaratan otonom yang dikembangkan pada penelitian ini Dimulai dari proses akuisisi data oleh kamera stereo ZED hingga eksekusi kendali oleh autopilot PX4 seperti pada gambar 3.2. Kamera ZED menghasilkan point cloud dan informasi yang kemudian diproses dalam lingkunganROS 2 melalui serangkaian node persepsi. Dalam ROS2, data ini ditransformasikan ke berbagai frame koordinat menggunakan TF2 sehingga setiap titik pada point cloud dapat direlasikan dengan posisi drone diruang 3D. Transformasi antar-frame tersebut memastikan bahwa hasil persepsi seperti bidang datar dan titik pendaratan aman dihitung, posisi tersebut dikirmkan ke PX4 menggunakan jalur komunikasi uXRCE-DDS sebagai target kendali (offboard setpoint). PX4 kemudian mengonversi perintah ini menjadi aksi kontrol melalui modul kendali internal untuk menggerakkan motor, menjaga stabilitas,serta mengarahkan drone menuju titik pendaratan tersebut. 
+ 
+Gambar 3. 3 Alur Pencarian Titik Pendaratan Aman 
+      Proses dimulai dengan akuisisi point cloud dari lingkungan menggunakan sensor depth kamera, yang kemudian ditampilkan bersamaan dengan citra visual untuk mempermudah validasi hasil seperti pada gambar 3.3. Data point cloud tersebut selanjutnya diproses melalui tahap segmentasi, ditandai dengan area berwarna kuning yang merepresentasikan hasil pemisahan permukaan datar dari lingkungan sekitarnya. Setelah segmentasi, dilakukan analisis lebih lanjut untuk menentukan kandidat zona pendaratan aman, dimana titik-titik berwarna hijau menandakan area yang memenuhi kriteria seperti slope rendah, luas area cukup dan bebas dari obstalce. Siklus ini menggambarkan bagaimana pipelinesistem dapat berjalan mulai dari input sensor, preprocessing, segmentasi, hingga evaluasi zona pendaratan, dan seluruh proses ini terintegrasi secara real-time dengan visualisasi ROS/RVIZ. 
+3.2.1 	Perangkat Keras 
+      Beberapa komponen perangkat keras utama yang saling terintegrasi untuk membangun sistem deteksi zona pendaratan aman pada drone adalah Platform berupa NVIDIA Jetson Orin Nano berfungsi sebagai otak pemrosesan data, menjalankan algoritma point cloud dan pengambilan keputusan pendaratan. Jetson terhubung secara langsung dengan kamera stereo ZED 2i yang menyediakan data citra dan point cloud 3D secara real-time untuk keperluan segmentasi bidang datar. Selain itu, sistem Autopilot menggunakan Pixhawk Cube Orange sebagai flight controller, yang menerima perintah dari jetson melalui komunikasi uXRCE-DDS dan MAVLink. Untuk mendukung kemampuan positioning, digunakan modul GPS M8P yang memberikan akurasi lokasi yang lebih tinggi. 
+ 
+Gambar 3. 4 Komponen Drone 
+      Dari gambar 3.4 terlihat bahwa sumber daya utama sistem berasal dari baterai Li-Po 6s yang menyalurkan daya ke seluruh komponen, termasuk ESC dan motor brushless sebagai penggerak utama drone. Komponen kelistrikan tambahan seperti power distribution board (PDB) digunakan untuk menyalurkan tegangan ke flight controllerdan perangkat lain. Sistem juga dilengkapi dengan modul sensor jarak seperti LiDAR atau ultrasonic rangefinder, yang membantu estimasi ketinggian terbang. Untuk memastikan komunikasi jarak jauh, digunakan radio telemetry yang menghubungkan drone dengan ground control station. 
+ 
+Gambar 3. 5 Posisi Kamera di Drone 
+      Posisi kamera ditempatkan menghadap ke bawah seperti pada gambar 3.5 (downward-facing configuration) untuk memungkinkan akuisisi citra dan point cloud permukaan tanah secara langsung selama drone berada pada ketinggian terbang tertentu. Penempatan kamera dibawah badan UAV memberikan sudut pandang tegak lurus terhadap permukaan, sehingga area yang tertangkap berada tepat dibawah lintasan penerbangan drone.konfigurasi ini sangat penting dalam proses deteksi zona pendaratan karena bidang permukaan dapat diamati secara penuh tanpa distorsi perspektif yang berlebihan. Jarak antara lensa kamera dan sensor ditentukan oleh panjang fokus (focal length). Hubungan kedua parameter ini menentukan luas area cakupan kamera serta tingkat ketelitian dalam mengukur kontur atau kemiringan permukaan. Dengan menggunakan kamera yang menghadap ke bawah, sistem mampu memetakan area pendaratan secara lebih akurat dan menghasilkan data yang konsisten untuk proses segmentasi bidang datar dan evaluasi kelayakan zona pendaratan. 
+      Selain konfigurasi kamera, penempatan dan integrasi seluruh perangkat keras pada drone juga dirancang sedemikian rupa agar stabilitas mekanis dan keandalan sensor tetap terjaga selama penerbangan. Setiap komponen dipasang pada posisi yang mempertimbangkan pusat gravitasi drone, getaran motor, dan jalur aliran udara baling-baling. Misalnya Jetson Orin Nano dan Pixhawk Cube Orange ditempatkan pada bagian tengah frame untuk menjaga keseimbangan,sementara sensor-sensor seperti ZED 2i  dan GPS ditempatkan pada titik yang meminimalka interferensi elektromagnetik maupun gangguan getaran. Peredam getran (vibration damping) digunakan pada bagian flight controller untuk memastikan data IMU tetap akurak, sedangkan kamera dan sensoroptik lainya dipasang menggunakn mount yang kokoh agar sudut pandang tetap stabil. Penataan kabel dan distribusi daya juga diperhatikan dengan cermat agar tidak mengganggu aliran udara atau menimbulkan noise listrik yang dapat memegaruhi sensor. Dengan desain fisik yang terorganisir ini keseluruhan sistem perangkat keras dapat bekerja secara optimal, mendukung proses pemrosesan data sensor, navigasi dan pendeteksian zona pendaratan secara real-time. 
+3.2.2 	Perangkat Lunak 
+      Alur kerja lengkap dari sistem deteksi zona pendaratan pada drone dimulai dari proses akuisisi data sensor hingga pemilihan titikyang mencakup proses estimasi keadaan (State Estimation), serta pipeline Landing Spot Detection yang bertugas menganalisis point cloud untuk menemukan lokasi pendaratan yang memenuhi kriteria keselamatan. Kedua bagian ini bekerja secara pararel dan saling berkaitan untuk memastikan bahwa data lingkungan yang diterima drone dapat ditafsirkan secara konsisten dan digunakn sebagai dasar pengambilan keputusan. 
+ 
+Gambar 3. 6 Alur Pengolahan Point Cloud 
+      Pada sisi kiri diagram gambar 3.6, blok bertanda Data Fusion menunjukkan bahwa sistem memanfaatkan beberapa sensor onboard dari pixhawk, seperti GPS, IMU, LiDAR dan barometer. Keempat sensor tersebut berfungsi sebagai sumber informasi utamauntuk memperkirakan keadaan UAV secara real-time. GPS memeberikan informasi posisi Global, sedangkan IMU menyediakan data inersia berupa percepatanlinier dan kecepatan sudut. Sensor LiDAR dapat memberikan koreksi tambahan dalam estimasi jarak dan struktur objek di sekitar drone, sementara barometer digunakan untuk memonitor perubahan tekanan udara untuk menghitung ketinggian relatif. Informasi-informasi ini digabungkanmelalui state estimator menggunakan algoritma sensor fusion yaitu extended kalman filter untuk menghasilkan estimasi posisi dan orientasi UAV yang stabil, akurat, dan tahan terhadap noise sensor. Estimasi state inilahyang nantinya digunakan pada tahap selanjutnya untuk menstransformasikan point cloud ke koordinat yang konsisten. 
+      Pada bagian landing spot detection di diagram. Proses diawali dengan akuisisi point cloud dari kamera stereo atau sensor depth yang dipasang di drone. Point cloud mentah yang dihasilkan biasanya berada dalm frame koordinat kamera, sehingga diperlukan tahap Frame Transformation untuk mengonversi koordinat titik dari frame kamera menuju frame drone atau frame dunia. Proses transformasi ini memanfaatkan informasi pose drone yang telah dihitungoleh state estimator, sehingga point cloud dapat digabungkan dengan data sensor lain dan direpresentasikan dalam kerangka yang seragram. Transformasi ini merupakan komponen penting agar analisis geometri dapat dilakukan dengan konsisten, terutama ketia drone bergerak. 
+      Setelah transformasi frame selesai, point cloud diproses pada tahap Downsampling. Downsampling bertujuan mengurangi jumlah titik tanpa menghilangkan karakteristik utama dari permukaan yang diamati. Dengan jumlah titik yanglebih sedikit, proses komputasi menjadi lebih cepat dan efisien, sehingga sistem tetap dapat bekerja secara real-time. Proses ini sering dilakukan menggunakan teknik voxel grid untuk mengelompokkan titik-titik dalam sel kecil sehingga representasi permukaan tetap terjaga. 
+      Tahap berikutnya adalah Plane Detection, yaitu Langkah penting dalam mengekstraksi permukaan datar yang berpotensi menjadi area pendaratan. Pada tahap ini, sistem menerapkan algoirtma segmentasi bidang yaitu RANSAC. Bidang planar dipilih karena dronehanya dapat mendarat pada area yang datar dan cukup luas. Proses deteksi bidang ini dapat dilakukan beberapa kali untuk menemukan lebih darisatu kandidat area datar dalam point cloud. 
+      Selanjutnya permukaan datar yang berhasil diekstraksi kemudian dianalisis pada tahap Landing Zone Evaluation. Pada proses evaluasi ini, sistem menghitung berbagai parameter yang menentukan kelayakan suatu area sebagai lokasi pendaratan, seperti kemiringan permukaan (slope), tingkat kerataan(roughness), keberadaan objek penghalang, serta luas permukaan yang tersedia. Evaluasi ini memastikan bahwa hanya bidang yang benar-benar aman dan memenuhi syarat yang dipertimbangkan sebagai kandidat zona pendaratan. Sistem kemudian menyusun safety affordance map, yaitu peta yang menunjukkan area mana yang aman dan tidak mana untuk pendaratan. 
+       Tahap terakhir dalam pipeline adalah Safety Point Selection, yaitu proses pemilihan titik terbaik dari kandidat zona pendaratan. Sistem memilih titik pendaratan optiman berdasarkan kombinasi faktor keselamatan, kedekatan lokasi dan parameter kelayakan yang sudah dihitung sebelumnya. Tiitk terpilih ini kemudian dapat dikirm ke flight controller untuk digunakan sebagai referensi dalm melakukan manuver pendaratan otonom. 
+3.3 	Transformasi Frame Koordinat 
+      Transformasi frame koordinat merupakan proses penting dalam sistem persepsi tiga demensi kerana setiap sensor pada drone umumnya bekerja di dalam kerangka koordinatnya masing-masing. Sensor seperti kamera stereo, menghasilkan data titik (point cloud) dalam sensor frame, sedangkan perhitungan lanjutan seperti proyeksi bidang, segmentasi dan penentuan titik pendaratan biasanya dilakukan pada frame lain seperti body frame, map frame atau odom frame. Perbedaan frame seperti pada gambar 3.7 menyebabkan setiap titik perlu ditransformasikan terlebih dahulu agar seluruh data berada dalam kerangka acuan yang sama sehingga dapat dianalisis secara konsisten. 
+ 
+Gambar 3. 7 Reference Frame Tree 
+      Pada sistem ini, transformasi koordinat dilakukan menggunakan transform tree yang disediakan oleh ROS 2 melalui library TF2. Setiap transformasi dinyatakan sebagai hubungan rigid-body dalam bentuk rotasi dan translasi antara dan dua frame, yang diperesenstasikan dalam matriks homogen 4x4. Ketika point cloud diterima, setiap (x,y,z) yang berada pada frame sensor akan dikonversi ke frame analisis misalnya frame bidang atau odom frame dengan menerapkan transformasi: 
+?????????? = ????????????????????????? + ????????????????? 
+      Transformasi diatas menyatakan bahwa posisi suatu titik dalam kerangka kamera, ????????, harus terlebih dahulu diputar oleh matriks rotasi ????????????????? untuk menyesuaikan orientasinya dengan kerangka drone. Rotasi ini merepresentasikan perbedaan arah sumbu kamera terhadap sumbu utama drone. Setelah orientasi titik diselaraskan, vektor translasi ????????????????? ditambahkan untuk menggeser titik sesuai dengan posisi fisik kamera terhadap pusat massa drone. 
+      Selanjutanya agar titik-titik tersebut dapat digunakan dalam perhitungan posisi global, penentuan lokasi pendaratan, atau integrasi dengan sistem navigasi lain, diperlukan transformasi dari kerangka body menuju kerangka dunia. Kerangka dunia merupakan acuan ruang bebas-drift yang digunakan oleh sistem navigasi untuk merepresentasikan posisi drone terhadap lingkungan sekitarnya. Transformasi ini menerapkan prinsip yang sama seperti sebelumnya, yaitu kombinasi dan translasi, sehingga posisi titik dalam koordinat body, ?????????? dibuah menjadi posisi titik dalam koordinat dunia, ?????????? melalui hubungan: 
+???????????? = ??????????????????????????????? + ????????????????????? 
+      Rotasi ????????????????????? menggambarkan orientasi drone terhadap dunia (misalnya yaw, pitch, dan roll drone), sedangkan translasi ????????????????????? menunjukkan posisi pusat drone di ruang dunia. Dengan menerapkan transformasi ini seluruh titik point cloud akhirnya dinyatakan dalam koordinat global yang konsisten, sehingga analisis seperti pemetaan permukaan, evaluasi hambatan dan penentuan titik pendaratan dapat dilakukan tanpa dipengaruhi oleh pergerakan drone. Transformasi berurutan dari kamera ? body ? world memastikan bahwa persepsi lingkungan tetap stabil meskipun drone mengalami rotasi atau translasi selama penerbangan, serta memugkinkan modul perencanaan gerak untuk menggunakan titik tersebut secara langsung dalam perhitungan navigasi global. 
+3.4 	Downsampling Point Cloud 
+      Downsampling point cloud merupakan tahap penting dalam proses pemrosesan data 3D yang bertujuan untuk mengurangi jumlah titik pada point cloud tanpa menghilangkan informasi geometris yang signifikan. Kamera stereo atau sensor depth biasanya menghasilkan point cloud dengan kepadatan titik yang sangat tinggi, sehingga jika diproses secara langsung dapat menyebabkan beban komputasi yang besar dan memperlambat kinerja sistem, khususnya pada Aplikasi yang membutuhkan pengolahan data secara real-time seperti pendeteksian zona pendaratan pada drone. Oleh karena itu, downsampling dilakukan untuk menyederhanakan representasi permukaan dengan tetap mempertahankan struktur dan bentuk utamanya. 
+ 
+Gambar 3. 8 Voxel Grid Downsampling 
+      Metode downsampling yang umum digunakan adalah voxel grid filtering seperti pada gambar 3.8, dimana ruang 3D dibagi menjadi kotak-kotak kecil berukuran tertentu yang disebut voxel. Setiap voxel memiliki ukuran tetap, misalnya 
+???? × ???? × ???? 
+Dimana ???? = ukuran pada sumbu X atau panjang voxel, ???? ukuran pada sumbu Y atau lebar voxel dan ???? ukuran pada sumbu Z atau tinggi voxel, seluruh titik yang berada di dalam voxel yang sama dikelompokkan bersama. Proses downsampling dilakukan dengan menghitung indeks voxel untuk setiap titik melalui operasi pembulatan kebawah seperti berikut 
+	x	y	z
+i = , j = , k =  vx vy vz
+Dan setiap voxel menampung sekumpulan titik vijk = {p1, p2, ... , pn}. Dari setiap voxel hanya dipertahankan satu titik representatif, berupa centroid dari titik-titik yang berada di dalam voxel tersebut 
+	???? = ??1 ?????=1 ????          ????	??	????=1 ????          ???? = ??1 ?????=1 ???? 
+Sehingga dihasilkan titik downsampling untuk voxel tersebut adalah ?? =
+(????, ????, ????). Pendekatan ini menghasilkan point cloud yang lebih ringan, terstruktur dan seragam sehingga memudahkan tahap pemrosesan berikutnya seperti segmentasi bidang datar dan evaluasi zona pendaratan. Selain mengurangi beban komputasi, downsampling juga membantu mengurangi noise pada data dan meningkatkan stabilitas algoritma dalam mendeteksi permukaan. 
+3.5 	Ekstraksi Bidang Datar 
+      Pada proses ini dilakukan beberapa langkah berurutan, yaitu pencarian tetangga menggunakan KD-tree, perhitungan vektor normal tiap titik melalui normal estimation, dan segmentasi bidang menggunakan algoritma RANSAC. Ketiga tahapan ini saling berkaitan dan membentuk pondasi utama untuk memahami struktur permukaan pada lingkungan sekitar drone. 
+3.5.1 	Data Struktur dan Mencari Titik Tetangga 
+      KD-tree berfungsi mempercepat proses pencarian tetangga terdekat (nearest neightbor search) pada point cloud yang memiliki jumlah titik sangat banyak. Alihalih melakukan pencarian secara linear ke seluruh titik yang akan membutuhkan waktu kompoutasi besar, KD-tree mengorganisasikan titik-titik ke dalam struktur pohon yang memungkinkan pencarian dilakukan dalam waktu logaritmik. Pada proses ini, untuk setiap titik dalam point cloud, sistem mencari sejumlah. Informasi tetangga ini akan digunakan untuk menghitung karakter permukan lokal. KD-tree tidak melakukan pengelompokan (clustering), melainkan hanya menyediakan daftar tetangga lokal untuk satu titik secara efisien dan independen. Dengan demikian, KD-tree menjadi langkah awal penting yang menyediakan konteks lokal bagi setiap titik. 
+ 
+Gambar 3. 9 KD-tree 
+      Gambar 3.9 menggambarkan proses pembagian ruang tiga dimensi yang dilakukan oleh KD-tree dan struktur pohon biner terbentuk berdasarkan pembagian tersebut. Pada sisi kiri, ruang 3D dibagi oleh bidang-bidang pemisah ( splitting planes) berdasarkan dimensi X, Y dan Zsecara bergantian pada setiap level. Bidang berwarna merah, hijau dan biru memperlihatkan bagaimana pembagian ruang dimulai dari sumbu X, kemudian Y, lalu Z, sebelum kembali lagi ke X secara rekursif. Setiap pembagian ini memecah ruang point cloud menjadi sub-ruang yang lebih kecil dan lebih teratur, sehingga sistem dapat mempersempit ketika menentukan tetangga terdekat. 
+ Pada sisi kanan gambar 3.9, struktur pohon biner menunjukkan bagaimana KD-tree mereperesentasikan pembagian ruang tersebut ke dalam bentuk hirarki. Node akar menggunakan dimensi X sebagai pemisah, membagi titik-titik menjadi dua subtree berdasarkan apakah nilai X mereka lebih kecil atau lebih besar daripada pivot. Level berikutnya menggunakn dimensi Y, dan level selanjutnya menggunakan dimensi Z.siklus ini diulang terus-menerus hingga seluruh titik ditempatkan dalam strukturpohon yang seimbang. Pemilihan bergantianpada setiap level bertujuan menjaga keseimbangan struktur KD-tree sehingga pencarian dapat dilakukan secara efisien. 
+      Setelah KD-tree membatasi ruang pencarian hanya pada sub-ruang yang berpotensi mengandung titik tetangga terdekat, sistem kemudian menentukan tetangga sebenarnya menggunakan persaman jarak Euclidean. persamaan yang digunakan untuk menghitung jarak antar titik pusat p dan titik kandidat q adalah: 
+??2 = (???? - ????)2 + (???? - ????)2 + (???? - ????)2 
+      Dimana ??(????, ????, ????) yaitu titik yang sedang dicari tetangga terdekatnya, ??(????, ????, ????) titik kandidat tetangga yang dibandingkan terhadap titik pusat, ????, ????, ???? koordinat titik pusat pada sumbu x,y,z lalu ????, ????, ???? adalah koordinat titik kandidat pada sumbu x,y,z terakhir ??2 kuadat jarak euclidean antara titik p dan q. Bentuk kuadrat agar tidak perlu menghitung akar kuadrat, sehingga perhitungan menjadi lebih efisien. Nilai jarak Euclidean inilah yang menentukan apkaah suatu titik kandidat merupakan tetangga terdekat. KD-tree tidak menghitung jarak itu sendiri, tetapi menyediakan daftar titik kandidat paling relevan berdasarkan pembagian ruang, sehingga tidak perlu mengevaluasi seluruh titik dalam point cloud. Setelah kandidat dikumpulkan, rumus Euclidean menghitung kedekatan geometris secara akurat. 
+3.5.2 	Deteksi Bidang Datar 
+      Deteksi bidang datar merupakan komponen inti dalam proses analisis geometris point cloud, khususnya setelah kandidat region berhasil dididentifikasi melalui segmentasi spasial. Tahapan ini bertujuan untuk mengekstraksi struktur bidang datar dari kumpulan titik tiga dimensi sehingga sistem dapat menentukan apakah suatu area memenuhi syarat sebagai permukaan pendaratan yang layak bagi drone. Keberadaaan bidang datar sangat krusial dalam konteks autonomous landing, mengingat stabilitas dan kemanan pendaratan sangat bergantung  pada kualitas permukaan yang dievaluasi. 
+Secara matematis, sebuah bidang tida dimensi dapat direpresentasikan melalui persamaan linear: 
+???? + ???? + ???? + ?? = 0 
+Dengan (a,b,c) sebagai komponen vektor normal n yang mendefinisikan orientasi bidang terhadap sistem koordinat global: 
+??
+?? = [??] 
+??
+      Estimasi parameter bidang tersebut membutuhkan proses yang robust, sehingga diperlukan mekanisme yang mampu memisahkan permukaan sebenarnya dari noise dan outlier. Prinsip kerja RANSAC digambarkan melalui alur pada gambar 3.10, di mana algoritma melakukan iterative model sampling untuk menemukan model bidang yang paling konsisten dengan distribusi titik. 
+ 
+Gambar 3. 10 Konsep RANSAC 
+      Proses dimulai dengan memilih sejumlah titik secara acak dari kumpulan point cloud. Titik-titik sampel ini digunakan untuk membentuk model bidang awal melalui perhitungan parameter geometris yang mencakup normal vector serta konstanta bidang. Setelah model kandidat terbentuk, algoritma menghitung distance error untuk setiap titik di dalam region dengan mengukur jaraknya terhadap bidang tersebut. Perhitungan jarak ini berfungsi untuk menentukan apakah suatu titik dapat diklasifikasikan sebagai inlier, yaitu titik yang secara geometris berada cukup dekat dengan bidang sesuai ambang batas yang telah ditentukan. 
+      Jumlah inlier kemudian dievaluasi untuk menilai kualitas model. Flowchart menunjukkan adanya proses komparasi terhadap jumlah inlier maksimum yang pernah ditemukan pada iterasi sebelumnya. Jika model baru menghasilkan jumlah inlier yang lebih besar, model tersebut disimpan sebagai best model sementara karena dianggap lebih representatif terhadap permukaan datar dalam data. Sebaliknya, jika jumlah inlier yang dihasilkan lebih sedikit, model tersebut diabaikan dan algoritma melanjutkan iterasi berikutnya. 
+      Proses sampling fitting evaluation ini diulang hingga jumlah iterasi mencapai batas yang telah ditetapkan. Ketika seluruh iterasi selesai, model bidang dengan jumlah inlier terbesar dipilih sebagai hasil akhir. Model inilah yang dianggap paling sesuai dengan struktur permukaan di dalam point cloud dan selanjutnya digunakan sebagai dasar untuk analisis lanjutan, seperti estimasi orientasi bidang, evaluasi tingkat kemiringan, dan seleksi kandidat titik pendaratan yang aman. Dengan mekanisme iteratif seperti yang ditampilkan dalam pseudocode dibawah ini, RANSAC akan mempertahankan ketelitian estimasi meskipun data mengandung noise tinggi maupun distribusi titik yang tidak ideal. 
+ 
+ 
+ 
+Algoritma deteksi bidang datar pada point cloud menggunakan RANSAC 
+
+Input: 
+c : input point cloud n : normal vektor dari point cloud threshold : ambang batas jarak ke model 
+axis : normal vektor permukaan untuk estimasi bidang 
+????h : batas maksimal perbedaan sudut antara normal bidang dan acuan 
+M : iterations Output: 
+Inliers: kumpulan titik bidang yang tersegmentasi 
+bestPlane: jumlah inlier terbanyak dan jika sama dicari standar deviasi paling kecil 
+Prosedur: RANSAC (c, n, threshold, axis, ????h, M) Inisialisasi: 
+I ? 0, bestSupport ? 0; bestPlane ? [0, 0, 0, 0], bestStd ? 8; while i <= M do j = ambil 3 titik random dalam c; plane = bangun persamaan bidang(j); diff = sudut(plane, axis); 
+if diff < ????h then dist = jarak_ke_bidang(j); inliers = cari(abs(dist) <= threshold) st = standar_deviasi(inliers); if length(inliers) > bestsupport or (length(inliers) = bestsupport and st 
+< bestStd) then bestsuport = length(inliers); bestplane = pl; bestStd = st; 
+else i=i+1; 
+return bestPlane; 
+
+3.6 	Deteksi dan Evaluasi Zona Pendaratan 
+      Setelah bidang datar terdeteksi, sistem kemudian memastikan apakah area tersebut benar-benar aman untuk pendaratan. Seluruh titik diselaraskan ke kerangka acuan bidang dan memproyeksikannya ke sebuah bidang dua dimensi untuk membentuk representasi grid. 
+ 
+Gambar 3. 11 Pembagian Titik Dengan Grid 
+      Gambar 3.11 menunjukkan bagaimana pembentukan grid, seluruh titik point cloud diproyeksikan terlebih dahulu ke bidang dua dimensi sehingga meimiliki koordinat (????, ????) dalam satu kerangka acuan yang seragam. Dari kumpulan titik tersebut dihitung batas minimum dan maksimum ruang, yaitu ???????? dan ???????? pada sumbu horizontal serta ???????? dan ???????? pada sumbu vertikal, yang masing-masing merepresentasikan titik paling kiri, kanan, bawah dan atas dari persebaran data. Ruang berdimensi (???????? - ????????) dan (???????? - ????????) kemudian dibagi menjadi sel-sel grid dengan ukuran tetap ?, yaitu panjang sisi satu kotak grid dalam satuan meter. Bentuk persamaan yang digunakan: 
+???????? = ?????????-?????????   dan  ???????? = ?????????-????????? 
+	?	?
+      Selanjutnya point cloud dipetakan ke dalam sebuah grid 2D agar dapat dianalisis secara lebih trestruktur. Pada gambar 3.11 bagian kiri, titik-titik merah tersebar bebas dan tidak memiliki struktur, sehingga sulit untuk mengetahui bagian mana dari permukaan yang benar-benar penuh, kosong, atau tidak rata. Untuk itu, bidang dipartisi menjadi kotak-kotak kecil berukukan tetap (grid cell) seperti pada gambar 3.11 bagian kanan. Setiap titik (????, ????) kemudian dimasukkan ke dalam sel grid tertentu berdasarkan koordinatnya. Indeks sel dihitung menggunakan: 
+???? = ?????-?????????? dan ???? = ?????-?????????? 
+Setiap sel pada grid kemudian dianalisis untuk melihat seberapa padat titik yang menempatinya sehingga dapat dikethui bagian mana yang benar-benar membentuk permukan yang utuh. Grid ini selanjutnya diperiksa untuk menutup celah-celah kecil serta mengidentifikasi area yang berpotensi menjadi rintangan, seperti tepi permukaan atau objek yang tidak terdeteksi secara konsisten. Dengan menggunakan pola cakram berukuran tertentu, sistem menilai setiap posisi potensial sebagi pusat zona pendaratan dengan melihat apakah area sekelilingnya cukup penuh, bebas dari rintangan, dan memilki jarak aman terhadap batas permukaan. Dari seluruh kandidat, dipilih pusat yang paling bersih dan paling jauh dari rintangan. 
+ 
+Gambar 3. 12 Pencarian Titik Pendaratan Yang Aman 
+Titik tersebut kemudian divalidasi kembali melalui beberapa frame untuk memastikan ke kestabilannya terhadap gangguan sensor. Jika lokasi tersebut konsisten aman, barulah sistem menetapkannyasebagi titik pendaratan yang sah dan mempublikasikannya sebagai referensi bagi controller drone. 
+Algoritma Deteksi Titik Pendaratan Aman 
+Input 
+P = point cloud baru gm = rasio grid yang terisi dalam lingkaran sm = jumlah minimal titik dalam grid 
+v = minimal jumlah voting titik pendaratan Output 
+p = tetapkan titik pendaratan final Prosedure: 
+While p do 
+     Proyeksikan semua titik ke bidang 2D (u, v) 
+     For setiap titik (u,v) do 
+            Tentukan indeks sel (ix, iy) 
+            Hitung jumlah titik per sel 
+     End for 
+      
+     Hitung radius disk aman r 
+     For setiap sel grid do 
+            If sel terlalu dekat tepi grid then 
+                Continue             End if 
+ 
+            hitung jumlah sel terisi di dalam disk             hitung rasio pengisian 
+ 
+            if rasio >= gm then 
+                tandai sel sebagai kandidat pusat aman             end if       end for 
+
+ 
+      for setiap sel grid do             if jumlah titik < sm then                 tandai sel sebagai obstacle 
+            end if       end for 
+ 
+       for setiap kandiat pusat aman do              if seluruh disk bebas obstacle then                  hitung jarak ke obstacle                  if jarak > jarak_terbaik then                          perbarui pusat terbaik                  else if jarak sama AND lebih dekat ke pusat grid then 
+                         perbarui pusat terbaik 
+                 end if               end if         end for 
+ 
+        if tidak ada pusat aman ditemukan then             lanjut ke frame berikutnya 
+        end if 
+ 
+        Hitung centroid titik dalam disk aman         simpan centroid sebagai kandidat titik pendaratan 
+ 
+        lakukan voting lintas frame 
+        if jumlah voting = v then                 p 
+        end if 
+
+ 
+ 	 
+BAB IV PENGUMPULAN DAN PENGOLAHAN DATA 
+4.1. 	Implementasi Perangkat Keras 
+      Perangkat keras pada sistem ini berupa satu set platform penerbangan berbasis drone hexacopter yang telah di rancang dan dibangun sesuai konsepkonsep dasar drone, yaitu sistem propulsi, sistem kendali, sistem navigasi, sistem persepsi, serta sistem penyedia daya. Hexacopter dipilih karenakonfigaris enam motor yang memberikan stabilitas terbang yang lebih baik, terutama pada manuver vertikal saat proses pendaratan otomatis.setiap bagian perangkat keras diposisikan dan dirakit secara terintegrasi sehingga menghasilkan platform terbang yang siap membawa sistem persepsi point cloud. 
+ 
+Gambar 4. 1 Desain Drone 
+      Susunan perangkat keras yang telah dibangun dapat dilihat pada dokumentasi sistem drone yang ditunjukkan pada gambar 4.1. Setiap komponen telah dipasang sesuai fungsinya dalm satu platform meminimalkan gangguan getaran selama penerbangan dan mempermudah akses pada konektor antarmuka. Dibawahnya terpasang flight controller power distribution board yang berfungsi menyalurkan daya ke ESC serta autopilot. Bagian lengan drone terpasang enam motor brushless DC dengan esc masing-masing yang dikonfigurasi untuk menghasilkan gaya angkat dan kontrol roll-pitch-yaw. Padabagian Tengah drone dipasang computer onboard Jetson Orin Nano sebagai modul pemrosesan utama point clou, sementara stereo camera ZED2i ditempatkan padabagian bawah drone untuk mengamati permukaan area pendaratan secara langsung. Sistem ini juga dilengkapi dengan GPS dan modul Komunikasi telemetri untuk mendukung navigasi global dan monitoring selama pengujian. 
+ 
+Gambar 4. 2 Tampak Atas Drone 
+      Pada gambar 4.2 menunjukkan tampilan keseluruhan platform hexacopter yang telah dirakit sebagai media pengujian sistemdeteksi titik pendaratan aman. Drone memiliki enam lengan propulsi yang masing-masing dilengkapi motor brushless, ESC,dan baling" sehingga mampu menghasilkan gaya angkat yang stabil untukmendukung manuver vertikal maupun proses pendaratan otomatis. Dimensidrone memiliki rentang diagonal sekitar 95cm dariujung propeller keujungpropeller, sehingga platform initermasuk kategori UAV berukuran menengah yang mampumembawa beban tambahan berupa komputer onboard dan sensor tanpa mengurangi stabilitas terbang. Selain rangka propulsi,tampak pula sistem pendukung berupa baterai utama danmodul komputasi yang terpasang dibagian tengah frame untuk menjaga distribusi berat yang seimbang. Strukturperakitan yang terlihat pada gambar 4.2 menegaskan bahwa konfigurasifisik drone telah disesuaikan dengankebutuhan sistem persepsi point cloud, sehingga drone mampu membawa muatan sensorik dan komputasi yang diperlukan selama eksperimen pendeteksi titik pendaratan aman. 
+4.2. 	Implementasi Reference Frame 
+      Sistem visualisasi rekonstruksi spasial berbasis point cloud 3D yang terhubung secara langsung dengan arsitektur koordinat drone melalui transform tree ROS 2 telah berhasil dibuat. Data point cloud diperoleh melalui modul stereo depth sensing dari kamera, untuk menghasilkan representasi geometri lingkungan yang presisi sekaligus stabil terhadap gangguan pencahayaan dan tekstur permukaan. 
+Seluruh proses berjalan secara real-time dan dioptimalkan agar kompatibel dengan kebutuhan perhitungan lanjutan pada subsistem deteksi titik pendaratan aman. 
+ 
+Gambar 4. 3 Reference Frame Sistem 
+      Visualisasi pada gambar 4.3 memperlihatkan bahwa setiap elemen point cloud telah terselaraskan dengan kerangka koordinat global melalui integrasi TF2. Terdapat tiga frame utama yang divisualisasikan, yaitu zed_camera_center, base_link dan odom, yang masing-masing memilikifungsidantanggung jawab komputasi yang berbeda. Frame zed_camera_center merupakan referensisensor tempat point cloud pertama kali dikontruksi alam orientasi kamera. Selanjutnya frame base_link berperansebagai pusat tubuh UAV (body frame) yang menjadi acuan sistem kontrol dan dinamika pergerakan drone. Sementara itu frame odomdigunakan sebagai acuansistem kontrol dan dinamika pergerakan drone. Sementara itu frame odom digunakan sebagai acuan spasial global untuk mempertahankan konsistensi translasi dan rotasidrone terhadap lingkungan dan meminimalkan drift selama proses terbang. 
+      Konfigurasi posisi dan orientasi kamera terhadap drone ditetapkan melalui transformasi statis pada sistem TF2, yang mendefinisikan nilai translasi dan rotas antar frame tubuh (base_link) dan frame kamera. Dalam konfigurasi ini, kamera ditempatkan sekitar 0.20 meter di depan pusat drone, berada sedikit dibawah body frame, dan memiliki orientasi 90 derajat terhadap referensi sumbu dari framework ROS sehinggaarah pandang kamera sesuai kebutuhan akuisisi point cloud. Penetapan transformasi statis ini memastikan bahwa orientasi point cloud selalu konsisten dengan geometri dan arah gerak drone selama operasi. 
+4.3 	Implementasi Node Pemrosesan Point Cloud 
+      Sistem ini terdiri dari serangkaian node ROS 2 yang berfungsi sebagai alur komputasi terpadu untuk menghasilkan titik pendaratan aman dari data point coud tiga dimensi. Seluruh node dirancang untuk bekerja secara berurutan dan saling berkomunikasi melalui topic ROS, sehingga memungkinkan setiap tahapan mulai dari ekstraksi ROI,segmentasi bidang datar, hingga evaluasi area pendaratan dilakukan secara modular, efisien dan real-time. 
+ 
+Gambar 4. 4 Raw Point Cloud Dari Zed2i Camera 
+      Gambar 4.4 menampilkan point cloud 3D yang diperolehdari kamera stereo ZED 2i ketika drone berada pada ketinggian 6 meter di atas permukaan tanah. Pada ketinggian ini, ZED 2i mampu menghasilkan rekonstruksi spasial dengan cakupan area yang luas sekitar 10 meter secara horizontal dan 7 meter secara vertikal sehingga kontur lingkungan seperti rumput, paving block, dan vegetasi dapat tergambar dengan jelas. Meskipun berada di ketinggian menengah, kamera masih mempertahankan kerapatan titik yang cukup tinggi, terutama pada area dengan tekstur yang kontras, sehingga permukaan datar tetap dapat dideteksi dengan baik. Hasil point cloud terlihat stabil dan berwarna, karena setiap titik membawa informasi RGB asli dari kamera. 
+ 
+Gambar 4. 5 Diameter Kandidat Landing 
+      Tahap cylinder crop merupakan proses awal dalam pipeline pemrosesan point cloud yang bertujuan untuk membatasi area analisis hanya pada wilayah yang relvan disekitar drone. Tahap ini, point cloud mentah hasil akuisisi kamera ZED 2i dipangkas menggunakan filter berbasis silinder. Filter ini mendefinisikan sebuah volume berbentuk tabung vertikal dengan pusat berada pada frame base_link, sehingga hanya titik-titik yang berada dalam jarak horizontal tertentu dari drone yang dipertahankan. Pendekatan ini sangat efektif karena drone pada umumnya hanya membutuhkan informasi permukaan yang berada dibawah atau sekitas jalur penerbangannya sebagai kandidat lokasi pendaratan. Dengan demikian, titik-ttik yang berada terlalu jauh atau berada di luar jangkauan optimal sensor dapat diabaikan sejak awal. Proses cylinder crop secara signifikan mengurangi jumlah titik yang harus diproses pada tahap berikutnya, sekaligus meningkatkan efisiensi komputasi keseluruhan tanpa mengurangi informasi yang dibutuhkan untuk mendeteksi bidang datar. Hasil dari tahapan ini ditampilkan sebagaicloud berwarna oranye pada visualisasi, yang menunjukkan area dalam radius 6m dimana sistem melakukan analisis geometri permukaan untuk menentukan kesesuaian area pendaratan. 
+      Selanjutnya node segmentasi bidang datar dengan metode RANSAC bekerja dengan menerima point cloud hasil pemangkasan silinder yang telah difokuskan pada area disekitar drone. Pada tahap pertama, hanya titik-titik yang berada dalam rentang ketinggian tertentu yang dipertahankan, sehingga analisis benar-benar difokuskan pada permukan tanah dan objek rendah yang relevan untuk pendaratan. Setelah itu, jumlah titik yang sangat padat disederhanakan melalui proses dwonsampling menggunakanfilter voxel bentuk global permukaan. Cloud yang telah dirampingkan kemudian dihitung normal permukaannya dengan mencari tetangga terdekat disekitar tiap titik untuk mengetahui arahkecenderungan permukaannya. Informasi ini digunakan oleh algoritma RANSAC untuk menemukan bidang datar dominan. Dalam prosesnya, RANSAC mencoba membangun model bidang secara berulang hingga menemukan bidang dengan jumlah titik pendukung (inlier) terbanyak. Hanya bidang yang memiliki jarak maksimum sekitar 15cm dari model serta memilki orientasi mendekati horizontal yang akan diterima sebagai hasil segmentasi. 
+ 
+Gambar 4. 6 Hasil Segmentasi Bidang Datar Dengan RANSAC 
+      Visualisasi gambar 4.6 adalah hasil segmentasi dari RANSAC, bagian kiri menunjukan cloud yang masih bercampur dengan berbagai jenis permukaan, sedangkan bagian kanan menunjukkan hasil segmentasi RANSAC yang berupa kumpulan titik putihyang seluruhnya terletak pada satu bidang datar yang konsisten. 
+      Terakhir node untuk pencarian titik safety untuk mendarat, sistem mendefinisikan sebuah lingkaran aman dengan diameter tertentu pada gambar 4.7 contoh ditunjukkan sebagai 1,5m. Algoritma lalu menggeser lingkaran ini ke sluruh posisi yang memungkinkan didalam grid dan memerika dua hal, pertam seberapa besar persentase sel di dalam lingkaran yang benar-benar terisi titik, dan apakah didalam linkgaran tersebut tidakterdapat sel yang diidentifikasi sebagai obstacle atau area kosong setelah proses inflasi rintangan. Posisi yang memenuhi syarat kepadatan minimal dan bebasrintanganakan ditandai sebagai kandidat pusat lingkaran aman. Selain itu, jarak lingkaran terhadaprintangan disekitarnya dihitung menggunakan distance transform, sehingga sistem dapat memilih pusat yang memiliki jarak aman terbesar terhadap tepi rintangansambil tetap mempertimbangkan kedekatannya dengan pusat bidang pandang. 
+ 
+Gambar 4. 7 Titik Pendaratan Aman 
+      Setiap kandidat lingkaran yang terpilih menghasilkan sekumpulan titik aman yang di warnai hijau dan divisualisasikan sebagai safety circle pada RVIZ, seperti yang tampak pada gambar 4.7 sebuah disk hijau dengan diamter 1,5m di atas permukaantanah di depan drone. Dari titik-titik hijau ini dihitung satu titik pusat yang mewakili posisi pendarata. Agar keputusantidak mudah berubah karena noise antar-voting spasial. Jika beberapa frame berturut-turut menunjukkan pusat yang saling berdekatan, posisi itu dianggap stabil. Ketika jumlahdukungan sudah cukup, node akn menerbitkan sebuah transformasi statis baru yang mendefinisikan frame safety_point di dalam frame odom. Frame inilah yang kemudian dapat digunakan oleh sistem kendali drone sebagai target koordinat untuk manuver pendaratan otonom di titik yang telah dievaluasi aman. 
+4.4 	Pengujian Pada Lingkungan1 
+      Environment 1 merupakan area terbuka dengan permukaan tanah berlapis rumput yang relatif datar, namun tetap memiliki variasi elevasi kecil akibat kontur alami dan tekstur vegetasi terlihat pada gambar 4.8. Di dalam area ini terdapat beberapa obstacle berukuran kecil hingga sedang, seperti traffic cone, sebuah kotak hitam, serta semak-semak dan ranting tanaman yang meninggalkan bentuk permukaan tidak rata pada titik-titik tertentu. 
+ 
+Gambar 4. 8 Lingkungan Pengujian 1 
+4.4.1 	Perbandingan RANSAC dan GNG 
+      Dilakukan perbandingan untuk mengevaluasi kinerja dari dua metode clustering yaitu GNG dan RANSAC berdasarkan aspek akurasi, ketahanan terhadap noise, serta efisiensi komputasi, sehingga dapat ditentukan metode yang lebih sesuai untuk kebutuhan penelitian ini. Pengujian pada kedua metode mencakup data dengan karakteristik yang sama guna memperoleh hasil yang objektif dan adil. Selain itu, perbandingan dilakukan dengan memperhatikan kemampuan GNG dalam memodelkan struktur data secara adaptif serta kemampuan RANSAC dalam mengekstraksi model geometris secara robust terhadap outlier. 
+      Hasil segmentasi bidang datar menggunakan metode RANSAC pada data point cloud lingkungan 1 ditunjukkan pada gambar 4.9, RANSAC berhasil memisahkan permukaan tanah yang dominan datar dari berbagai obstacle yang berada di sekitarnya. Titik-titik putih yang membentuk lingkaran besar merupakan representasi dari seluruh point cloud yang masuk dalam proses pendeteksian, sementara area kosong pada point cloud merupakan titik-titik yang tersegmentasi sebagai obstacle atau elemen non-plane. 
+ 
+Gambar 4. 9 Hasil Segmentasi RANSAC di Lingkungan 1 
+      Dari hasil segmentasi terlihat bahwa RANSAC mampu mengidentifikasi beberapa objek utama yang berada di permukaan rumput. Area kosong yang berbentuk memanjang di sisi kiri atas berkorelasi dengan semak gundul (ranting tanaman) yang memiliki geometri tidak rata dan ketinggian cukup signifikan sehingga tidak masuk ke dalam model bidang tanah. Demikian pula, area gelap berbentuk bulat di kiri bawah sesuai dengan semak kecil berbentuk bola, yang secara bentuk dan ketinggian berbeda jelas dari permukaan datar. Pada bagian kiri area juga terlihat segmentasi terhadap traffic cone, yang karena bentuknya yang tinggi dan permukaannya tegak, otomatis terdeteksi sebagai outlier dari model tanah. Selain itu, objek kotak hitam yang berada di kanan bawah juga terdeteksi dengan baik sebagai kelompok titik non-plane, menunjukkan bahwa RANSAC mampu menangkap objek berukuran rendah dengan bentuk rigid. 
+ 
+Gambar 4. 10 Hasil Clustering GNG Pada Lingkungan 1 
+      Pada lingkungan pengujian yang sama, hasil pemrosesan menggunakan GNG menunjukkan karakteristik segmentasi yang berbeda sesuai dengan prinsip kerja masing-masing metode. Pada gambar 4.10, titik-titik yang ditandai dengan warna merah merepresentasikan area yang tidak termasuk bidang datar (nonplanar), yaitu objek atau permukaan yang memiliki bentuk kompleks dan tidak memenuhi asumsi planar. Area ini mencakup objek seperti kerucut lalu lintas, semak, batang pohon, serta objek lain dengan struktur geometris tidak beraturan. GNG mampu mengelompokkan titik-titik tersebut karena metode ini bersifat adaptif dan tidak bergantung pada model geometri tertentu, sehingga lebih sensitif terhadap variasi bentuk dan kepadatan data point cloud. Hasil GNG juga terlihat beberapa bidang yang seharusnya datar tetapi tetap terklasifikasi sebagai nonplanar, yang ditunjukkan oleh area yang dilingkari warna kuning pada gambar. Kondisi ini terjadi karena meskipun permukaan tersebut relatif datar, terdapat variasi lokal pada distribusi titik, seperti noise sensor, ketidakteraturan kecil pada permukaan tanah, atau perubahan kepadatan titik akibat sudut pandang dan jarak sensor. Variasi tersebut menyebabkan bidang tidak lagi memenuhi karakteristik keseragaman lokal yang dibutuhkan GNG untuk membentuk satu klaster planar yang stabil. 
+ 
+Gambar 4. 11 Grafik perbandingan GNG dan RANSAC Pada Lingkungan 1 
+      Gambar 4.11 adalah hasil pengukuran waktu pemrosesan algoritma GNG dan RANSAC yang dicatat tepat sebelum proses pemrosesan point cloud dimulai, sedangkan waktu akhir dicatat setelah seluruh tahapan pemrosesan selesai dan hasil siap dipublikasikan. Selisih kedua waktu tersebut merepresentasikan waktu komputasi aktual untuk satu frame point cloud. Dengan demikian, nilai waktu yang direkam mencakup seluruh tahapan internal algoritma, mulai dari prapemrosesan hingga keluaran akhir. 
+      GNG menunjukkan tren meningkat seiring bertambahnya waktu simulasi. Pada awal simulasi, waktu pemrosesan GNG berada pada kisaran 0,2 detik, namun secara bertahap meningkat hingga mencapai lebih dari 1,0 detik di akhir simulasi. Sebaliknya, waktu pemrosesan RANSAC menunjukkan nilai relatif rendah dan stabil sepanjang durasi simulasi. Waktu pemrosesan RANSAC berada pada kisaran 0,15-0,20 detik dengan fluktuasi kecil. Hal ini menunjukkan bahwa pada kondisi lingkungan pengujian ini, jumlah iterasi dan kompleksitas model yang dibutuhkan RANSAC untuk menemukan bidang dominan relatif konstan, sehingga tidak terjadi peningkatan beban komputasi yang signifikan seiring waktu. 
+4.4.2 	Deteksi Titik Pendaratan 	 
+      Gambar 4.12 memperlihatkan hasil deteksi titik pendaratan pada Lingkungan Pengujian 1 berdasarkan data point cloud yang telah melalui tahap segmentasi dan analisis permukaan. Area berwarna hijau merepresentasikan safety circle atau zona aman pendaratan, sedangkan titik-titik putih menunjukkan distribusi point cloud permukaan tanah dan objek di sekitarnya. Garis vertikal kuning menunjukkan proyeksi posisi titik pendaratan terhadap sistem koordinat lingkungan.Pada ketiga visualisasi yang ditampilkan, sistem berhasil mengidentifikasi lokasi pendaratan yang berada pada permukaan relatif datar dan bebas dari hambatan. Area safety circle terbentuk pada region yang memiliki kepadatan titik yang seragam dan minim gangguan, seperti lubang, vegetasi padat, atau perubahan elevasi yang signifikan. Hal ini menunjukkan bahwa kriteria pemilihan titik pendaratan telah mampu menyaring area yang berpotensi membahayakan proses pendaratan. Perbedaan posisi safety circle pada masingmasing tampilan menunjukkan bahwa sistem mampu melakukan evaluasi kandidat titik pendaratan secara spasial di berbagai lokasi dalam satu lingkungan pengujian. Meskipun terdapat area kosong atau tidak terukur (hole) pada point cloud, algoritma tetap dapat menghindari area tersebut dan memilih lokasi pendaratan yang berada pada permukaan kontinu. 
+ 
+Gambar 4. 12 Hasil Deteksi Titik Pendaratan Pada Lingkungan 1 
+4.4.3 	Waktu Komputasi Tanpa Downsampling 
+      Gambar 4.13 menunjukkan data waktu pemrosesan dalam satuan detik terhadap waktu simulasi selama 60 detik. Sumbu horizontal merepresentasikan waktu simulasi (detik), sedangkan sumbu vertikal menunjukkan waktu yang dibutuhkan untuk menyelesaikan satu siklus pemrosesan point cloud. Data pada grafik diperoleh dari pengukuran selisih waktu sebelum dan sesudah eksekusi utama algoritma pada setiap siklus pemrosesan. 
+      Waktu pemrosesan algoritma RANSAC yang dijalankan pada data point cloud tanpa proses downsampling. Terlihat bahwa waktu komputasi RANSAC berada pada kisaran 0,33-0,52 detik, dengan fluktuasi yang cukup signifikan sepanjang waktu simulasi. Fluktuasi ini disebabkan oleh karakteristik RANSAC yang bersifat iteratif dan bergantung pada distribusi data point cloud, di mana jumlah iterasi dan inlier yang ditemukan dapat berbeda pada setiap frame. Sedangkan waktu pemrosesan untuk penentuan titik aman relatif jauh lebih kecil dan stabil, berada pada 0,07-0,10 detik. Hal ini menunjukkan bahwa proses pencarian titik aman memiliki kompleksitas komputasi yang lebih rendah dibandingkan segmentasi bidang menggunakan RANSAC, karena proses ini umumnya hanya melibatkan evaluasi geometris terhadap hasil segmentasi yang telah diperoleh. 
+ 
+Gambar 4. 13  Grafik RANSAC dan Pencarian Titik Aman Tanpa 
+Downsampling Pada Lingkungan 1 
+4.4.4 	Waktu Komputasi Dengan Downsampling 
+      Dengan menggunakan environment yang sama namun menambahkan tahap downsampling pada pipeline pemrosesan point cloud, waktu komputasi algoritma RANSAC mengalami penurunan yang cukup signifikan seperti pada grafik dibawah. Pada kondisi ini, segmentasi bidang menghasilkan waktu eksekusi 0,140,19 detik. Lalu untuk Proses pencarian titik aman menunjukkan waktu komputasi 0,04-0,06 detik sepanjang waktu simulasi. Nilai tersebut menunjukkan bahwa reduksi jumlah titik melalui downsampling mampu meringankan beban komputasi RANSAC sehingga proses estimasi bidang dapat berjalan lebih cepat dan lebih stabil. Dengan jumlah titik yang lebih terkendali, proses pencarian inlier serta perhitungan model bidang menjadi lebih efisien, sehingga segmentasi dapat dilakukan dalam rentang waktu yang lebih sesuai untuk kebutuhan sistem yang responsif. 
+ 
+Gambar 4. 14 Grafik RANSAC dan Pencarian Titik Aman Dengan Downsampling Pada Lingkungan 1 
+      Terakhir waktu downsampling berada pada kisaran 0,020 - 0,025 detik pada sebagian besar waktu simulasi. Pada beberapa siklus pemrosesan tertentu terlihat nilai yang lebih rendah, mendekati 0,018 detik, serta nilai yang lebih tinggi yang mencapai 0,030 - 0,035 detik. Setiap titik pada grafik merepresentasikan waktu yang dibutuhkan untuk melakukan downsampling pada satu frame point cloud. 
+ 
+Gambar 4. 15 Grafik Downsampling Pada Lingkungan 1 
+4.5 	Pengujian Lingkungan II 
+      Lingkungan II dapat dilihat pada gambar 4.16 dikarakterisasikan sebagai area taman perkotaan dengan kepadatan objek sedang hingga tinggi dan struktur yang bersifat semi-unstructured. Area ini didominasi oleh vegetasi dengan variasi ketinggian yang signifikan, mulai dari permukaan rumput yang relatif rendah hingga semak dan pohon yang membentuk objek vertikal tinggi. Berdasarkan point cloud ZED2i, terlihat bahwa sebagian besar permukaan tidak membentuk bidang datar sempurna dengan roughness alami yang cukup tinggi akibat daun, rumput, dan tajuk tanaman. Selain itu, kepadatan vegetasi menyebabkan tingkat occlusion yang tinggi, sehingga tidak semua area tanah terukur secara merata oleh sensor depth. Meskipun terdapat beberapa area rumput yang tampak relatif datar dan berpotensi menjadi kandidat titik pendaratan, kedekatan dengan objek lain serta variasi elevasi di sekitarnya meningkatkan risiko pendaratan. Oleh karena itu, lingkungan ini tergolong menantang untuk pendaratan drone otonom dan menuntut analisis point cloud yang ketat, terutama dalam evaluasi clearance terhadap rintangan, dan tingkat kepercayaan data sensor. 
+ 
+Gambar 4. 16 Lingkungan Pengujian II 
+4.5.1 	Perbandingan GNG dan RANSAC 
+      Dengan karakteristik lingkungan kedua, gambar 4.17 hasil segmentasi point cloud menggunakan metode RANSAC pada gambar dibawah menunjukkan bahwa sebagian besar objek vegetasi, seperti semak dan pohon, tidak dapat dimodelkan sebagai bidang datar dan terklasifikasi sebagai struktur non-planar. Proses ini memungkinkan pemisahan antara permukaan tanah yang relatif mendekati planar dengan objek-objek bertekstur kompleks yang berpotensi menjadi rintangan. Pada visualisasi point cloud, cluster titik yang teridentifikasi sebagai non-ground merepresentasikan pagar tanaman, semak, dan batang pohon yang memiliki kerapatan titik tinggi serta variasi ketinggian yang signifikan. 
+ 
+Gambar 4. 17 Hasil Segmentasi RANSAC Pada Lingkungan II 
+      Berbeda dengan RANSAC, hasil visualisasi GNG pada gambar 4.18 menunjukkan kegagalan GNG dalam mengenali bidang datar. Karena area tersebut berupa rumput dengan tingkat kekasaran alami, GNG cenderung membangun jaringan neuron yang sangat rapat. Variasi ketinggian kecil pada rumput di interprestasikan oleh GNG sebagi fitur struktural penting, sehingga titik-titik tersebut diklasifikasikan sebagai bidang kompleks berwarna merah alih-alih bidang datar. Untuk objek seperti pohon dan pagar tanaman, GNG berhasil memetakan struktur tersebut sebagai bidang kompleks. Hal ini disebabkan oleh sifat GNG yang adaptif dalam membentuk edge dan node mengikuti kontur objek. Namun, karena tidak adanya pemisahan model yang tegas antara lantai dan rintangan, seluruh area (termasuk ground yang kasar) akhirnya terlihat menyatu dalam satu klasifikasi struktur kompleks. 
+ 
+Gambar 4. 18 Hasil Clustering GNG Pada Lingkungan II 
+      Berdasarkan data pada gambar 4.19, perbedaan kuantitatif waktu komputasi antara kedua metode tersebut terlihat sangat jelas selama 60 detik simulasi. Waktu komputasi GNG dimulai dari angka yang cukup rendah, yaitu 0,25 detik, namun terus merangkak naik secara linear hingga melampaui 1,0 detik (sekitar 1,05 detik) pada akhir simulasi. Kenaikan ini menunjukkan bahwa seiring bertambahnya data lingkungan yang diproses, GNG memerlukan waktu yang semakin lama untuk memperbarui jaringan neuronnya. Di sisi lain, RANSAC memiliki profil waktu yang lebih efisien meskipun sangat dinamis. Sebagian besar waktu pemrosesannya berada pada rentang 0,3 - 0,55 detik. Walaupun terdapat beberapa lonjakan tajam yang mencapai angka sekitar 0,7 detik kemungkinan saat algoritma harus melakukan iterasi ekstra untuk menemukan bidang di area vegetasi yang sangat rapat RANSAC tetap mampu kembali ke angka yang lebih rendah secara cepat. Secara keseluruhan, RANSAC berhasil menjaga performanya tetap stabil di bawah rata-rata 0,6 detik, sedangkan GNG terus kehilangan efisiensi waktunya seiring berjalannya simulasi. 
+ 
+Gambar 4. 19 Grafik Perbandingan RANSAC dan GNG Pada Lingkungan II 
+4.5.2 	Deteksi Titik Pendaratan 	 
+      Gambar 4.20 menampilkan hasil deteksi titik pendaratan pada Lingkungan Pengujian 2 berdasarkan data point cloud hasil pemrosesan sistem. Titik-titik putih merepresentasikan sebaran point cloud permukaan dan objek di lingkungan, sedangkan area berwarna hijau menunjukkan zona pendaratan aman (safety circle) yang dihasilkan oleh sistem. Garis kuning menggambarkan proyeksi arah atau referensi posisi titik pendaratan terhadap sistem koordinat.Pada lingkungan ini, distribusi point cloud menunjukkan adanya ketidakrataan permukaan serta area kosong (hole) yang lebih dominan dibandingkan Lingkungan Pengujian 1. Meskipun demikian, sistem tetap mampu mengidentifikasi area pendaratan yang berada pada permukaan yang relatif kontinu dan bebas dari gangguan. Zona pendaratan terdeteksi pada bagian yang memiliki kepadatan titik yang lebih merata dan tidak berdekatan dengan batas lubang atau area yang tidak terukur. 
+ 
+ 
+Gambar 4. 20 Hasil Deteksi Titik Pendaratan Yang Aman Pada Lingkungan II 
+4.5.3 	Waktu Komputasi Tanpa Downsampling 
+      Pada lingkungan kedua, point cloud yang digunakan berasal langsung dari output mentah ZED2i tanpa melalui proses downsampling, sehingga jumlah titik yang masuk ke algoritma segmentasi sangat besar dan memiliki kerumitan yang lebih tinggi dibandingkan lingkungan sebelumnya. Lingkungan ini juga mengandung banyak objek selain bidang datar seperti vegetasi, struktur kecil, maupun bentuk permukaan tidak beraturan yang menyebabkan RANSAC harus melakukan lebih banyak iterasi untuk menemukan model bidang yang sesuai. Berdasarkan grafik tersebut, terlihat bahwa ketika RANSAC memproses seluruh titik data tanpa optimasi, waktu komputasinya meningkat secara signifikan dibandingkan sebelumnya. Pada awal simulasi, waktu komputasi melonjak sangat tinggi hingga mencapai angka ± 1,05 detik. Selama durasi 60 detik simulasi, performa RANSAC tanpa downsampling ini bergerak sangat fluktuatif di rentang 0,6 detik hingga 0,95 detik. 
+ 
+Gambar 4. 21 Grafik RANSAC tanpa Downsampling Pada Lingkungan II 
+      Proses pencarian titik landing pada lingkungan kedua menunjukkan performa komputasi yang cukup stabil meskipun menggunakan data mentah langsung dari kamera ZED2i. Berdasarkan pengujian, waktu komputasi berada pada rentang 0.055 - 0.065 detik. Kestabilan ini mengindikasikan bahwa pencarian titik landing merupakan tahap yang relatif ringan secara komputasi. Hal ini karena prosesnya lebih terfokus pada evaluasi area yang telah didefinisikan sebagai kandidat landing, seperti pemeriksaan kontur lokal, kerapatan titik, kemiringan area, serta jarak aman terhadap objek di sekitarnya. Operasi-operasi ini tidak membutuhkan iterasi berat dan umumnya hanya melibatkan subset titik yang relevan.  
+ 
+Gambar 4. 22 Grafik Pencarian Titik Aman Tanpa Downsampling Pada Lingkungan II 
+4.5.4 	Waktu Komputasi Dengan Downsampling 
+      Penerapan teknik downsampling secara signifikan meningkatkan efisiensi waktu komputasi RANSAC, di mana sebagian besar proses segmentasi bidang datar berhasil diselesaikan dalam rentang operasional yang sangat efisien antara 0,3 hingga 0,55 detik. Pengurangan jumlah titik input ini secara langsung meringankan beban iterasi matematis yang harus dilakukan algoritma dalam menemukan model bidang terbaik di tengah outliers vegetasi. Meskipun performanya jauh lebih cepat dibandingkan tanpa optimasi, grafik tetap menunjukkan fluktuasi dinamis yang menjadi ciri khas RANSAC, dengan beberapa lonjakan waktu yang menyentuh angka 0,65 detik pada area dengan kompleksitas objek yang tinggi. 
+ 
+Gambar 4. 23 Grafik RANSAC Dengan Downsampling Pada Lingkungan II 
+      Proses Pencarian Titik Aman menunjukkan performa yang sangat cepat dengan waktu komputasi yang mayoritas berada di rentang 0,02 detik hingga 0,035 detik. Meskipun terdapat fluktuasi yang cukup tajam di awal simulasi yang menyentuh angka 0,04 detik, beban komputasi ini cenderung stabil dan efisien seiring berjalannya waktu.Sementara itu, proses Downsampling menunjukkan karakteristik waktu yang sedikit berbeda namun tetap sangat rendah. Proses ini beroperasi pada rentang 0,02 detik hingga 0,047 detik. Menariknya, pada paruh kedua simulasi, terlihat adanya tren peningkatan fluktuasi pada waktu downsampling yang mencapai puncaknya di angka 0,047 detik. Hal ini mengindikasikan bahwa jumlah titik mentah yang masuk ke sensor meningkat, sehingga algoritma membutuhkan waktu ekstra untuk menyaring data sebelum diteruskan ke tahap RANSAC. 
+ 
+Gambar 4. 24 Grafik Pencarian Titik Aman dan Downsampling Pada Lingkungan II 
+4.6 	Pengujian Lingkungan 3 
+      Lingkungan Uji Coba 3 pada gambar 4.25 merepresentasikan skenario medan alami bergelombang yang secara visual didominasi oleh permukaan tanah yang ditutupi oleh rumput atau vegetasi penutup tanah yang rendah. Karakteristik utama Point Cloud ini adalah sifatnya yang non-planar dan bergelombang, dengan variasi ketinggian yang terlihat jelas di seluruh area bidang tanah, yang secara kritis menguji ambang batas toleransi kerataan  dari algoritma segmentasi RANSAC. 
+ 
+Gambar 4. 25 Lingkungan Pengujian III 
+4.6.1 	Perbandingan RANSAC dan GNG 
+      Hasil segmentasi pada gambar 4.26 menggunakan RANSAC menunjukkan bahwa algoritma ini mampu mendeteksi bidang datar permukaan tanah secara konsisten. Bidang planar yang dihasilkan merepresentasikan permukaan tanah dengan baik meskipun terdapat area lain yang memiliki kemiringan atau gangguan dari objek di sekitarnya. Hal ini menunjukkan kemampuan RANSAC dalam mengekstraksi model geometris sederhana dari data point cloud yang kompleks. 
+ 
+Gambar 4. 26 Hasil Segmentasi RANSAC Pada Lingkungan III 
+      Pada hasil segmentasi menggunakan Growing Neural Gas (GNG) pada lingkungan yang sama, terlihat pada gambar 4.27 karakteristik yang berbeda dibandingkan RANSAC. GNG mampu mengelompokkan titik-titik yang memiliki kepadatan dan struktur lokal yang serupa, sehingga objek seperti semak-semak berhasil terdeteksi dengan cukup jelas. Hal ini tampak dari kumpulan node dan koneksi yang membentuk struktur padat pada area vegetasi, yang menunjukkan bahwa GNG efektif dalam menangkap pola non-linear dan objek dengan bentuk tidak beraturan. 
+      Namun, pada hasil ini GNG gagal mendeteksi bidang datar maupun bidang miring secara eksplisit. Permukaan tanah yang relatif homogen dan luas tidak membentuk klaster yang jelas bagi GNG, karena perbedaan jarak antar titik dan perubahan lokalnya sangat kecil. Akibatnya, node GNG tersebar merata tanpa membentuk struktur bidang yang dominan, sehingga bidang datar dan bidang miring tidak tersegmentasi sebagai satu entitas yang utuh. 
+ 
+Gambar 4. 27 Hasil Clustering GNG Pada Lingkungan III 
+      Waktu komputasi RANSAC berada pada kisaran yang relatif rendah dan stabil sepanjang simulasi. Nilai terendah RANSAC berada di sekitar 0,15 detik, sedangkan nilai tertingginya mencapai sekitar 0,28-0,30 detik. Fluktuasi yang terjadi bersifat kecil dan tidak menunjukkan tren kenaikan yang signifikan, menandakan bahwa RANSAC memiliki beban komputasi yang konsisten meskipun data terus diperbarui selama simulasi. Sebaliknya, waktu komputasi GNG berada pada rentang yang jauh lebih tinggi dan menunjukkan kecenderungan meningkat. Pada awal simulasi, waktu pemrosesan GNG berada di sekitar 0,20-0,25 detik, namun seiring berjalannya waktu nilainya terus bertambah hingga mencapai sekitar 0,90-0,95 detik pada akhir simulasi. Kenaikan ini mencerminkan bertambahnya kompleksitas jaringan GNG, baik dari sisi jumlah node maupun koneksi yang harus diproses. 
+ 
+Gambar 4. 28 Grafik Perbandingan RANSAC dan GNG Pada Lingkungan III 
+4.6.2 	Deteksi Titik Pendaratan 
+      Gambar 4.29 menunjukkan hasil deteksi titik pendaratan aman pada Lingkungan Pengujian III berdasarkan pemrosesan data point cloud oleh sistem yang dikembangkan. Titik-titik putih merepresentasikan distribusi point cloud permukaan, sedangkan area berwarna hijau menunjukkan zona pendaratan aman (safety circle) yang teridentifikasi. Vektor kecil pada pusat lingkaran menunjukkan orientasi normal permukaan pada titik pendaratan, sementara garis kuning merepresentasikan proyeksi posisi titik pendaratan terhadap sistem koordinat. Pada lingkungan ini, permukaan yang diamati didominasi oleh bidang relatif datar dengan kemiringan ringan, serta beberapa area dengan kepadatan titik yang tidak merata. Meskipun demikian, sistem berhasil menentukan titik pendaratan yang berada pada area dengan kestabilan geometri yang baik, ditandai dengan kepadatan titik yang seragam di dalam zona safety circle dan minim gangguan berupa lubang atau perubahan elevasi yang signifikan. 
+ 
+ 
+Gambar 4. 29 Hasil Deteksi Titik Pendaratan Yang Aman Pada Lingkungan III 
+4.6.3 	Pengujian Tanpa Downsampling 
+      Grafik waktu komputasi pada gambar menunjukkan performa algoritma RANSAC tanpa proses downsampling point cloud selama simulasi berlangsung. Terlihat bahwa waktu komputasi berada pada rentang sekitar 0,5 hingga 0,9 detik per iterasi, dengan fluktuasi yang cukup signifikan sepanjang waktu simulasi. Variasi ini dipengaruhi oleh jumlah titik point cloud yang diproses secara penuh serta kompleksitas struktur lingkungan yang tertangkap oleh sensor, khususnya pada area dengan kepadatan vegetasi tinggi dan variasi elevasi yang besar. 
+ 
+Gambar 4. 30 Grafik RANSAC Tanpa Downsampling Pada Lingkunan III 
+      Untuk waktu komputasi proses pencarian titik pendaratan aman selama simulasi berlangsung. Terlihat bahwa waktu pemrosesan relatif stabil dan berada pada kisaran sekitar 0,035 hingga 0,06 detik per iterasi. Fluktuasi kecil yang terjadi dipengaruhi oleh variasi jumlah kandidat area aman yang dihasilkan dari tahap segmentasi sebelumnya serta distribusi obstacle pada permukaan tanah. 
+ 
+Gambar 4. 31 Grafik Pencarian Titik Aman Tanpa Downsampling Pada 
+Lingkungan III 
+4.6.4 	Pengujian Dengan Downsampling 
+      Grafik pada gambar 4.32 memperlihatkan waktu komputasi algoritma RANSAC dengan penerapan downsampling point cloud pada lingkungan yang sama. Dibandingkan dengan kondisi tanpa downsampling, waktu komputasi menunjukkan penurunan yang signifikan dan berada pada kisaran sekitar 0,16 hingga 0,31 detik per iterasi. Hal ini disebabkan oleh berkurangnya jumlah titik yang harus diproses dalam tahap estimasi bidang, sehingga kompleksitas komputasi 
+RANSAC dapat ditekan secara efektif 
+ 
+Gambar 4. 32 Grafik RANSAC Dengan Downsampling Pada Lingkungan III 
+       Gambar 4.33 pencarian titik aman menunjukkan waktu komputasi yang relatif stabil dan rendah. Nilai waktu yang dihasilkan berada pada kisaran sekitar 0,02 s hingga 0,03 s, dengan fluktuasi kecil sepanjang simulasi. Fluktuasi ini disebabkan oleh variasi distribusi titik hasil segmentasi bidang, namun secara keseluruhan proses pencarian titik aman tetap konsisten dan tidak menunjukkan lonjakan waktu yang signifikan. Hal ini mengindikasikan bahwa algoritma pencarian titik aman memiliki kompleksitas komputasi yang ringan dan tidak terlalu sensitif terhadap perubahan kondisi lingkungan. Sementara itu, proses downsampling memperlihatkan variasi waktu komputasi yang lebih besar dibandingkan pencarian titik aman. Pada beberapa interval waktu, terutama di awal dan pertengahan simulasi, waktu downsampling meningkat hingga mendekati 0,05 s. Peningkatan ini berkaitan dengan jumlah dan kepadatan point cloud yang diproses pada saat tersebut. Ketika jumlah titik yang masuk lebih besar, proses pengelompokan voxel membutuhkan waktu komputasi yang lebih tinggi. Namun, seiring berjalannya simulasi, waktu downsampling cenderung menurun dan stabil di kisaran 0,02 s hingga 0,03 s. 
+ 
+ 
+Gambar 4. 33 Grafik Pencarian Titik Aman dan Downsampling Pada Lingkungan III 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 	 
+BAB V ANALISIS DAN PEMBAHASAN 
+5.1. 	Verifikasi dan Validasi 
+      Verifikasi dan validasi sistem dilakukan melalui studi perbandingan yang dirancang untuk mengevaluasi pengaruh variasi pipeline pemrosesan data, kemampuan deteksi bidang datar, metode segmentasi, serta aspek waktu komputasi. Tahap verifikasi difokuskan pada pemeriksaan kesesuaian antara implementasi algoritma dengan konsep teoritis yang digunakan, dengan memastikan bahwa setiap tahapan dalam pipeline, mulai dari akuisisi data point cloud, penerapan downsampling, hingga proses segmentasi, telah berjalan sesuai dengan perancangan yang direncanakan. Untuk itu, disusun beberapa skenario pengujian dengan dan tanpa penambahan proses downsampling guna mengamati konsistensi perilaku sistem terhadap perubahan jumlah dan kepadatan titik, serta untuk mengukur waktu komputasi yang dihasilkan pada masing-masing skenario. Tahap validasi dilakukan dengan membandingkan kinerja metode segmentasi yang digunakan, yaitu RANSAC dan Growing Neural Gas (GNG), pada lingkungan pengujian yang sama. Perbandingan ini bertujuan untuk menilai kesesuaian keluaran sistem terhadap tujuan penelitian, khususnya dalam mendeteksi dan memisahkan bidang datar dari struktur non-planar, serta untuk mengevaluasi karakteristik waktu komputasi masing-masing metode. Waktu pemrosesan dicatat pada setiap skenario pengujian sebagai indikator efisiensi komputasi, sementara hasil segmentasi dianalisis berdasarkan kesesuaian dengan kondisi geometris lingkungan. Melalui pendekatan ini, proses verifikasi dan validasi tidak hanya memastikan bahwa sistem telah diimplementasikan dengan benar secara teknis, tetapi juga bahwa metode dan pipeline yang digunakan relevan dan layak untuk diaplikasikan sesuai dengan kebutuhan dan batasan sumber daya komputasi. 
+5.1.1. Validasi Deteksi Bidang Datar 
+      Berdasarkan hasil pengujian pada ketiga lingkungan, metode RANSAC menunjukkan kemampuan deteksi bidang planar yang konsisten dan stabil. Pada lingkungan yang didominasi oleh permukaan tanah, RANSAC mampu memodelkan permukaan tersebut sebagai bidang planar meskipun terdapat ketidakrataan lokal dan noise sensor. Pada lingkungan dengan keberadaan objek non-planar yang kompleks, RANSAC berhasil memisahkan permukaan tanah yang mendekati planar dari objek-objek seperti semak dan pohon yang memiliki variasi ketinggian signifikan. Selain itu, pada lingkungan yang memiliki lebih dari satu bidang planar, RANSAC secara konsisten mengekstraksi bidang yang paling dominan secara geometris, sesuai dengan prinsip pemilihan model berdasarkan jumlah inlier dan kesesuaian geometris tertinggi. Sebaliknya, hasil validasi menunjukkan bahwa metode Growing Neural Gas (GNG) pada konfigurasi yang digunakan belum mampu mendeteksi bidang datar secara eksplisit pada ketiga lingkungan pengujian. Permukaan tanah yang secara visual relatif datar cenderung terklasifikasi sebagai struktur non-planar akibat adanya variasi lokal pada distribusi titik, seperti kekasaran alami permukaan, noise sensor, serta perubahan kepadatan titik. Variasi tersebut diinterpretasikan oleh GNG sebagai fitur struktural penting, sehingga jaringan neuron yang terbentuk menjadi sangat rapat dan tidak menghasilkan satu klaster planar yang stabil. Meskipun demikian, GNG menunjukkan kemampuan yang baik dalam merepresentasikan objek non-planar dengan bentuk tidak beraturan, seperti vegetasi, melalui pembentukan node dan koneksi yang mengikuti kontur objek. 
+5.1.2 	Validasi Deteksi Titik Pendaratan 
+      Validasi deteksi titik pendaratan aman dilakukan pada tiga lingkungan pengujian dengan karakteristik permukaan yang berbeda untuk mengevaluasi konsistensi dan keandalan sistem. Pada lingkungan pertama, permukaan relatif datar dengan variasi elevasi yang minimal, sehingga sistem mampu mendeteksi zona pendaratan aman pada area dengan distribusi point cloud yang rapat dan stabil. Pada lingkungan kedua, yang memiliki tingkat kompleksitas permukaan lebih tinggi dan kepadatan titik yang tidak sepenuhnya seragam, sistem tetap berhasil mengidentifikasi titik pendaratan aman pada area dengan perubahan elevasi rendah dan kestabilan geometris yang memadai. Sementara itu, pada lingkungan ketiga yang menunjukkan kombinasi antara bidang datar dan permukaan dengan kemiringan ringan, sistem secara konsisten menentukan zona pendaratan aman yang berada pada area stabil meskipun terdapat variasi kepadatan titik di sekitarnya. Zona safety circle yang dihasilkan pada ketiga lingkungan menunjukkan bahwa titik pendaratan terletak pada permukaan dengan kemiringan rendah dan bebas dari gangguan signifikan, sehingga memenuhi kriteria keselamatan yang telah ditetapkan. Hasil ini membuktikan bahwa sistem deteksi titik pendaratan aman memiliki performa yang konsisten dan andal dalam menghadapi variasi kondisi lingkungan. 
+5.1.3 Verifikasi Waktu Komputasi 
+A. Algoritma RANSAC dan GNG 
+Tabel 5. 1 Tabel Data Perbandingan RANSAC dan GNG 
+Lingkungan Pengujian Algoritma Min (s) Max (s) Average (s) 1 GNG 0.20 1.09 0.62 RANSAC 0.14 0.22 0.16 2 GNG 0.23 1.04 0.64 RANSAC 0.24 0.71 0.43 3 GNG 0.20 0.95 0.50 RANSAC 0.13 0.30 0.20       Verifikasi waktu komputasi dilakukan untuk mengevaluasi efisiensi algoritma RANSAC dan Growing Neural Gas (GNG) pada tiga lingkungan pengujian yang berbeda. Parameter yang dianalisis meliputi waktu minimum, waktu maksimum, dan rata-rata waktu komputasi pada setiap lingkungan. Pengujian ini bertujuan untuk menilai kestabilan serta kelayakan kedua algoritma dalam aplikasi yang menuntut pemrosesan data secara berkelanjutan.  
+      Pada Lingkungan Pengujian 1, algoritma GNG memiliki waktu komputasi minimum sebesar 0,2 s, maksimum 1,09 s, dengan rata-rata 0,62 s. Sementara itu, RANSAC menunjukkan performa yang jauh lebih stabil dengan waktu minimum 0,14 s, maksimum 0,22 s, dan rata-rata 0,16 s. Perbedaan ini menunjukkan bahwa pada lingkungan pertama, RANSAC lebih efisien dan konsisten dibandingkan GNG. Pada Lingkungan Pengujian 2, GNG kembali menunjukkan waktu komputasi yang relatif tinggi dengan nilai minimum 0,23 s, maksimum 1,04 s, dan rata-rata 0,64 s. RANSAC pada lingkungan ini mengalami peningkatan waktu komputasi dibandingkan lingkungan pertama, dengan waktu minimum 0,24 s, maksimum 0,71 s, dan rata-rata 0,43 s. Meskipun demikian, rata-rata waktu komputasi RANSAC masih lebih rendah dibandingkan GNG, menunjukkan bahwa kompleksitas lingkungan memengaruhi kedua algoritma, namun dampaknya lebih signifikan pada GNG. Pada Lingkungan Pengujian 3, GNG memiliki waktu komputasi minimum 0,2 s, maksimum 0,95 s, dan rata-rata 0,5 s. RANSAC kembali menunjukkan performa yang stabil dengan waktu minimum 0,13 s, maksimum 0,3 s, serta rata-rata 0,2 s. Hasil ini memperlihatkan bahwa RANSAC tetap mampu mempertahankan efisiensi waktu meskipun kondisi lingkungan berubah. 
+B. Pipeline Sistem Tanpa Downsampling 
+Tabel 5. 2 Tabel Waktu Komputasi Pipeline Tanpa Downsampling 
+Lingkungan Pengujian Algoritma Min (s) Max (s) Average (s) 1 RANSAC 0.32 0.5 0.3 PencarianTitik Aman 0.06 0.1 0.08 2 RANSAC 0.42 1.06 0.67 Pencarian Titik 
+Aman 0.04 0.07 0.05 3 RANSAC 0.43 0.92 0.64 Pencarian Titik 
+Aman 0.03 0.05 0.04       Verfikasi waktu komputasi pipeline sistem tanpa penerapan proses downsampling pada tiga lingkungan pengujian yang berbeda. Pipeline yang diuji terdiri dari dua tahap utama, yaitu segmentasi bidang menggunakan algoritma 
+RANSAC dan proses pencarian titik aman. Parameter yang dianalisis meliputi waktu minimum, maksimum, dan rata-rata waktu komputasi pada masing-masing tahap. 
+      Pada Lingkungan Pengujian 1, algoritma RANSAC memiliki waktu komputasi minimum sebesar 0,32 s, maksimum 0,50 s, dengan rata-rata 0,30 s. Sementara itu, proses pencarian titik aman menunjukkan waktu komputasi yang jauh lebih rendah, dengan nilai minimum 0,06 s, maksimum 0,10 s, dan rata-rata 0,08 s. Hasil ini menunjukkan bahwa pada lingkungan pertama, beban komputasi pipeline didominasi oleh proses segmentasi RANSAC.Pada Lingkungan Pengujian 2, waktu komputasi RANSAC mengalami peningkatan yang signifikan, dengan nilai minimum 0,42 s, maksimum 1,06 s, dan rata-rata 0,67 s. Peningkatan ini mengindikasikan bahwa kompleksitas data point cloud pada lingkungan kedua lebih tinggi. Sebaliknya, proses pencarian titik aman tetap menunjukkan performa yang stabil dan ringan, dengan waktu minimum 0,04 s, maksimum 0,07 s, serta ratarata 0,05 s. Pada Lingkungan Pengujian 3, RANSAC kembali menunjukkan waktu komputasi yang relatif tinggi, dengan nilai minimum 0,43 s, maksimum 0,92 s, dan rata-rata 0,64 s. Sementara itu, pencarian titik aman memiliki waktu komputasi paling rendah dibandingkan lingkungan lainnya, yaitu dengan waktu minimum 0,03 s, maksimum 0,05 s, dan rata-rata 0,04 s. Hal ini menandakan bahwa proses pencarian titik aman tidak terlalu terpengaruh oleh variasi kondisi lingkungan. 
+C. Pipeline Dengan Downsampling 
+Tabel 5. 3 Tabel Waktu Komputasi Pipeline Dengan Downsampling 
+Lingkungan Pengujian Algoritma Min (s) Max (s) Average (s) 1 RANSAC 0.13 0.36 0.16 PencarianTitik Aman 0.03 0.06 0.04 Downsampling 0.01 0.03 0.02 2 RANSAC 0.14 0.68 0.41 Pencarian Titik 
+Aman 0.02 0.04 0.02 Downsampling 0.01 0.04 0.02 3 RANSAC 0.15 0.31 0.21 Pencarian Titik 
+Aman 0.02 0.05 0.03 Downsampling 0.01 0.04 0.02       Pada Lingkungan Pengujian 1, proses downsampling memiliki waktu komputasi minimum sebesar 0,01 s, maksimum 0,03 s, dan rata-rata 0,02 s. Algoritma RANSAC pada kondisi ini menunjukkan waktu minimum 0,13 s, maksimum 0,36 s, dengan rata-rata 0,16 s. Sementara itu, proses pencarian titik aman membutuhkan waktu minimum 0,03 s, maksimum 0,06 s, dan rata-rata 0,04 s. Hasil ini menunjukkan bahwa penambahan tahap downsampling tidak memberikan beban komputasi yang signifikan, namun mampu menekan waktu pemrosesan RANSAC secara efektif. Pada Lingkungan Pengujian 2, waktu komputasi RANSAC meningkat dengan nilai minimum 0,14 s, maksimum 0,68 s, dan rata-rata 0,41 s, yang mencerminkan kompleksitas lingkungan yang lebih tinggi. Meskipun demikian, proses downsampling tetap menunjukkan waktu komputasi yang rendah dan stabil, yaitu dengan rata-rata 0,02 s. Proses pencarian titik aman juga relatif ringan dengan waktu minimum 0,02 s, maksimum 0,04 s, dan rata-rata 0,02 s. Pada Lingkungan Pengujian 3, RANSAC memiliki waktu komputasi minimum 0,15 s, maksimum 0,31 s, dan rata-rata 0,21 s. Downsampling kembali menunjukkan performa yang konsisten dengan waktu rata-rata 0,02 s, sedangkan pencarian titik aman membutuhkan waktu minimum 0,02 s, maksimum 0,05 s, dan rata-rata 0,03 s. Hal ini mengindikasikan bahwa pipeline sistem tetap efisien meskipun lingkungan pengujian mengalami variasi kondisi. 
+5.2. 	Analisis Hasil 
+5.2.1. Analisa Hasil Segmentasi Bidang Datar 
+      Setelah dilakukan pengujian pada tiga lingkungan yang memiliki karakteristik permukaan dan objek berbeda, meliputi lingkungan dengan permukaan relatif datar namun mengandung objek buatan, lingkungan dengan vegetasi alami yang rapat, serta lingkungan dengan variasi struktur permukaan dan kemiringan. Pada ketiga lingkungan tersebut, metode RANSAC menunjukkan performa yang konsisten dalam memodelkan bidang datar sebagai bidang dominan. Permukaan tanah berhasil diidentifikasi sebagai satu kesatuan bidang planar meskipun terdapat gangguan berupa noise sensor, tekstur rumput, dan variasi ketinggian kecil. Objek-objek seperti kerucut lalu lintas, semak, batang tanaman, dan objek buatan lainnya secara efektif terpisah sebagai outlier karena memiliki geometri yang tidak sesuai dengan model bidang datar. Hal ini menegaskan bahwa RANSAC memiliki ketahanan yang baik terhadap noise lokal serta mampu mempertahankan konsistensi geometris bidang pada berbagai kondisi lingkungan. Sebaliknya, hasil segmentasi menggunakan Growing Neural Gas (GNG) menunjukkan bahwa metode ini lebih sensitif terhadap variasi lokal pada distribusi titik point cloud. Pada ketiga tipe lingkungan, GNG cenderung gagal membentuk satu klaster planar yang merepresentasikan bidang datar utama. Permukaan tanah, terutama yang berupa rumput atau permukaan alami, sering diklasifikasikan sebagai struktur non-planar akibat adanya variasi kecil pada ketinggian dan kepadatan titik. Meskipun demikian, GNG mampu merepresentasikan objek-objek dengan bentuk kompleks secara detail, seperti semak dan struktur vegetasi, karena sifatnya yang adaptif dan tidak bergantung pada asumsi model geometri tertentu.  
+ 
+5.2.2. Analisa Waktu Komputasi RANSAC dan GNG 
+      Berdasarkan hasil pengukuran waktu komputasi pada ketiga lingkungan pengujian, RANSAC secara konsisten menunjukkan waktu pemrosesan yang lebih cepat dan stabil dibandingkan GNG. Hal ini disebabkan karena RANSAC hanya berfokus pada pencarian satu model bidang planar dominan melalui proses sampling acak dan iterasi sederhana, sehingga kompleksitas komputasinya relatif rendah. Sebaliknya, GNG membutuhkan waktu komputasi yang lebih tinggi karena melakukan pembelajaran adaptif terhadap seluruh distribusi point cloud, termasuk penentuan node pemenang, pembaruan posisi node dan edge, serta perhitungan kovarians dan kelengkungan lokal. Pada lingkungan dengan permukaan kasar dan objek vegetasi, GNG cenderung membentuk jaringan node yang lebih rapat untuk merepresentasikan detail lokal, sehingga jumlah operasi meningkat dan waktu komputasi menjadi lebih lama. 
+5.2.3. Analisa Hasil Deteksi Titik Pendaratan Aman 
+      Berdasarkan hasil deteksi titik pendaratan aman pada ketiga lingkungan pengujian, terlihat bahwa kemampuan sistem sangat dipengaruhi oleh karakteristik permukaan. Pada lingkungan pertama, yang didominasi oleh permukaan relatif datar dengan beberapa objek terisolasi seperti kerucut lalu lintas dan semak kecil, sistem mampu mengidentifikasi area pendaratan aman secara jelas karena bidang datar terdeteksi secara konsisten dan terpisah dari objek non-planar. Lingkungan kedua memiliki permukaan rumput dengan tingkat kekasaran alami dan vegetasi yang lebih rapat, sehingga area pendaratan aman menjadi lebih terbatas dan terfragmentasi akibat variasi ketinggian lokal yang mengurangi konsistensi bidang datar. Pada lingkungan ketiga, keberadaan bidang datar dan bidang miring secara bersamaan menyebabkan sistem tetap dapat mendeteksi area pendaratan aman. Secara keseluruhan, hasil ini menunjukkan bahwa deteksi titik pendaratan aman bekerja paling optimal pada lingkungan dengan dominasi bidang datar yang homogen, sedangkan pada lingkungan dengan permukaan kasar dan kompleks, area aman yang terdeteksi cenderung berkurang meskipun tetap dapat diidentifikasi. 
+5.2.4 	Analisa Waktu Komputasi Sistem 
+      Dengan adanya penerapan downsampling, secara konsisten mampu menurunkan waktu komputasi pipeline pada seluruh lingkungan pengujian. Pada pipeline tanpa downsampling, waktu komputasi RANSAC relatif tinggi, khususnya pada Lingkungan Pengujian 2 dan 3 dengan waktu rata-rata masing-masing sebesar 0,67 s dan 0,64 s, akibat besarnya jumlah titik point cloud yang harus diproses. Setelah downsampling diterapkan, waktu komputasi RANSAC menurun secara signifikan, menjadi 0,16 s pada Lingkungan 1, 0,41 s pada Lingkungan 2, dan 0,21 s pada Lingkungan 3, yang menunjukkan bahwa pengurangan jumlah titik sangat berpengaruh terhadap efisiensi proses segmentasi bidang. Waktu pencarian titik aman juga mengalami penurunan dan cenderung lebih stabil, dari kisaran 0,04-0,08 s pada pipeline tanpa downsampling menjadi sekitar 0,02-0,04 s pada pipeline dengan downsampling. Meskipun tahap downsampling menambahkan overhead komputasi sekitar 0,02 s, nilai ini relatif kecil dibandingkan penghematan waktu yang diperoleh pada tahap RANSAC, sehingga secara keseluruhan pipeline dengan downsampling memiliki kinerja komputasi yang lebih efisien dan lebih sesuai untuk kebutuhan sistem yang menuntut pemrosesan real-time. 
+ 	 
+
+ 
+BAB VI KESIMPULAN DAN SARAN 
+6.1. 	Kesimpulan 
+      Secara keseluruhan, sistem yang dikembangkan mampu melakukan pemrosesan point cloud untuk mendeteksi bidang datar dan menentukan titik pendaratan aman secara efektif pada berbagai lingkungan pengujian. Hasil eksperimen menunjukkan bahwa algoritma RANSAC memiliki kinerja yang andal dalam mendeteksi bidang datar, khususnya setelah dipadukan dengan tahapan downsampling yang secara signifikan menurunkan waktu komputasi tanpa mengurangi kualitas hasil segmentasi. Sementara itu, Growing Neural Gas (GNG) mampu merepresentasikan struktur lingkungan yang kompleks seperti vegetasi atau semak, namun kurang optimal dalam membedakan bidang datar dan bidang miring secara eksplisit untuk kebutuhan pendaratan. Integrasi tahapan downsampling, segmentasi bidang, dan pencarian titik aman terbukti meningkatkan efisiensi pipeline secara keseluruhan, sehingga sistem dapat bekerja lebih cepat dan stabil.  
+6.2. 	Saran 
+      Sebagai saran pengembangan, sistem ini dapat ditingkatkan dengan penambahan fitur deteksi obstacle dinamis, seperti manusia atau kendaraan, agar lebih aman di lingkungan nyata. Integrasi pelacakan objek atau fusi sensor memungkinkan sistem mengenali perubahan lingkungan secara real-time, sehingga titik pendaratan dapat dievaluasi kembali secara adaptif dan lebih aman untuk operasi wahana udara nirawak.  
+DAFTAR PUSTAKA 
+ 
+Backman, K., Kulic, D., & Chung, H. (2021). Learning to Assist Drone Landings. IEEE Robotics and Automation Letters. 
+Cao, Y., Li, M., Xu, L., & Wei, M. (2024). Autonomous Landing Spot Detection for Unmanned Aerial Vehicles Based on Monocular Vision. ISPRS Archives (The International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences), 51-58. 
+Fang, K., Xu, K., Wu, Z., Huang, T., & Yang, Y. (2024). Three-Dimensional Point Cloud Segmentation Algorithm Based on Depth Camera for Large Size Model Point Cloud Unsupervised Class Segmentation. Sensors, 112. 
+Foote, T. (2013). tf: The Transform Library. (Conference) Technologies for Practical Robot Applications (TePRA). 
+Hossain, R. (2022). A Short Review of the Drone Technology. International Journal of Mechatronics and Manufacturing Technology, 53-68. 
+Isa, S. N., Abdul Shukor, S. A., Rahim, N. A., Maarof, I., Yahya, Z. R., Zakaria, A., . . . Wong, R. (2019). Point Cloud Data Segmentation Using RANSAC and Localization. IOP Conference Series: Materials Science and Engineering, 012004. 
+Isa, S. N., Abdul Shukor, S. A., Rahim, N. A., Maarof, I., Yahya, Z. R., Zakaria, A., . . . Wong, R. (2019). Point Cloud Data Segmentation Using RANSAC and Localization. IOP Conference Series: Materials Science and Engineering, 012004. 
+Lee, S., & Kwon, Y. (2020). Safe Landing of Drone Using AI-based Obstacle Avoidance. International Journal of Mechanical Engineering and Robotics Research, 1495-1501. 
+Loureiro, G., Dias, A., Martins, A., & Almeida, J. (2021). Emergency Landing Spot Detection Algorithm for Unmanned Aerial Vehicles. Remote Sensing, 1930. 
+Lyu, W., Ke, W., Sheng, H., Ma, X., & Zhang, H. (2024). Dynamic 
+Downsampling Algorithm for 3D Point Cloud Map Based on Voxel Filtering. Dynamic Downsampling Algorithm for 3D Point Cloud Map Based on Voxel Filtering, 3160 (article number). 
+Oluoch, J., & Alam, M. S. (2021). A survey of safe landing zone detection techniques for autonomous UAVs. Expert Systems with Applications, 115091. 
+Saputra, A. A., Chin, W. H., Toda, Y., Takesue, N., & Kubota, N. (2018). Dynamic Density Topological Structure Generation for Real-Time Ladder Affordance Detection. 1-6. 
+ 
+ 
+ 
+      
+ 
+LAMPIRAN 
+ 
+ 
+ 
+ 
+
+      
+
+      
+
+      
+iii 
+ 
+      
+iii 
+ 
+      
+iii 
+ 
+      
+1 
+ 
+      
+1 
+ 
+      
+1 
+ 
+      
+
+      
+
+      
+
+      

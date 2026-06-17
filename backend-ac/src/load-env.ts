@@ -25,7 +25,7 @@ if (existsSync(envPath)) {
       .trim()
       .replace(/^["']|["']$/g, '');
 
-    if (key && process.env[key] === undefined) {
+    if (key) {
       process.env[key] = value;
     }
   }
