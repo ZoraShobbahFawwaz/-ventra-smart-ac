@@ -224,7 +224,7 @@ export default function KelolaRuangan() {
   };
 
   const hasFreshSensorData = selectedRoomIsOn && isFreshData(selectedSensorData);
-  const hasFreshYoloData = selectedRoomIsOn && isFreshData(selectedYoloData);
+  const hasYoloData = Boolean(selectedYoloData);
 
   const actualTemperatureDisplay = hasFreshSensorData
     ? formatActualTemperature(selectedSensorData?.temperature)
@@ -232,19 +232,19 @@ export default function KelolaRuangan() {
   const actualHumidityDisplay = hasFreshSensorData
     ? formatHumidity(selectedSensorData?.humidity)
     : "-";
-  const actualOccupancyDisplay = hasFreshYoloData
+  const actualOccupancyDisplay = hasYoloData
     ? formatOccupancy(selectedYoloData?.occupancy)
     : "-";
-  const actualFanSpeedDisplay = hasFreshYoloData
+  const actualFanSpeedDisplay = selectedRoomIsOn && hasYoloData
     ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
     : "-";
-  const yoloTemperatureDisplay = hasFreshYoloData
+  const yoloTemperatureDisplay = hasYoloData
     ? formatTemperature(selectedYoloData?.temperature)
     : "-";
-  const yoloOccupancyDisplay = hasFreshYoloData
+  const yoloOccupancyDisplay = hasYoloData
     ? formatOccupancy(selectedYoloData?.occupancy)
     : "-";
-  const yoloFanSpeedDisplay = hasFreshYoloData
+  const yoloFanSpeedDisplay = hasYoloData
     ? formatFanSpeed(selectedYoloData?.fan_speed)
     : "-";
 

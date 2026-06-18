@@ -297,7 +297,7 @@ function Dashboard() {
 
             const latestSensor = sensorData?.[r.name];
             const hasFreshSensorData = isOn && isFreshData(latestSensor);
-            const hasFreshYoloData = isOn && isFreshData(latestYolo);
+            const hasYoloData = Boolean(latestYolo);
 
             const temperature = hasFreshSensorData
               ? formatTemperature(latestSensor?.temperature)
@@ -306,10 +306,10 @@ function Dashboard() {
               ? formatHumidity(latestSensor?.humidity)
               : "-";
             const fanSpeed = formatAppliedFanSpeed(
-              hasFreshYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
-              isOn && hasFreshYoloData,
+              hasYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
+              isOn && hasYoloData,
             );
-            const occupancy = hasFreshYoloData
+            const occupancy = hasYoloData
               ? formatOccupancy(latestYolo?.occupancy, r.occ)
               : "-";
 

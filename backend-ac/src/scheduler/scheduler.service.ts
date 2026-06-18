@@ -61,7 +61,7 @@ export class SchedulerService implements OnModuleInit {
         const start = row.start_time.slice(0, 5);
         const end = row.end_time.slice(0, 5);
         const pre = this.getPreTime(start);
-        const yoloStart = this.addMinutes(start, 30);
+        const yoloStart = this.addMinutes(start, 10);
 
         const keyPre = `${row.id}-${roomName}-${pre}-PRE`;
         const keyStart = `${row.id}-${roomName}-${start}-START`;
@@ -73,9 +73,12 @@ export class SchedulerService implements OnModuleInit {
         const startMin = this.toMinutes(start);
         const yoloStartMin = this.toMinutes(yoloStart);
         const endMin = this.toMinutes(end);
+        const scheduleDurationMin =
+          (endMin - startMin + 24 * 60) % (24 * 60);
+        const hasYoloWindow = scheduleDurationMin > 10;
         const isPreTime = jam === pre;
         const isStartTime = jam === start;
-        const isYoloStartTime = jam === yoloStart;
+        const isYoloStartTime = hasYoloWindow && jam === yoloStart;
         const isEndTime = jam === end;
         const isPreWindow = this.isTimeInRangeBeforeEnd(
           nowMin,
@@ -88,8 +91,8 @@ export class SchedulerService implements OnModuleInit {
           endMin,
         );
         const isYoloActiveWindow =
-          this.isTimeInRangeBeforeEnd(nowMin, yoloStartMin, endMin) &&
-          yoloStartMin !== endMin;
+          hasYoloWindow &&
+          this.isTimeInRangeBeforeEnd(nowMin, yoloStartMin, endMin);
         const manualOffOverrideActive = this.isManualOffOverrideActive(
           roomName,
           preMin,
