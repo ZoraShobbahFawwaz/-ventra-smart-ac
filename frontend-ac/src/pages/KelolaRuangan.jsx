@@ -232,19 +232,19 @@ export default function KelolaRuangan() {
   const actualHumidityDisplay = hasFreshSensorData
     ? formatHumidity(selectedSensorData?.humidity)
     : "-";
-  const actualOccupancyDisplay = hasYoloData
+  const actualOccupancyDisplay = selectedRoomIsOn && hasYoloData
     ? formatOccupancy(selectedYoloData?.occupancy)
     : "-";
   const actualFanSpeedDisplay = selectedRoomIsOn && hasYoloData
     ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
     : "-";
-  const yoloTemperatureDisplay = hasYoloData
+  const yoloTemperatureDisplay = selectedRoomIsOn && hasYoloData
     ? formatTemperature(selectedYoloData?.temperature)
     : "-";
-  const yoloOccupancyDisplay = hasYoloData
+  const yoloOccupancyDisplay = selectedRoomIsOn && hasYoloData
     ? formatOccupancy(selectedYoloData?.occupancy)
     : "-";
-  const yoloFanSpeedDisplay = hasYoloData
+  const yoloFanSpeedDisplay = selectedRoomIsOn && hasYoloData
     ? formatFanSpeed(selectedYoloData?.fan_speed)
     : "-";
 
@@ -583,7 +583,9 @@ export default function KelolaRuangan() {
                 <div style={miniGrid}>
                   <div style={energyStatCard}>
                     <span style={energyStatLabel}>Daya Saat Ini</span>
-                    <b style={energyStatValue}>500 W</b>
+                    <b style={energyStatValue}>
+                      {selectedRoomIsOn ? "500 W" : "-"}
+                    </b>
                   </div>
 
                   <div style={energyStatCard}>
