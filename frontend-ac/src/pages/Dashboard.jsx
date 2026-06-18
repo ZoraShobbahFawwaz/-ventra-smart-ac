@@ -290,10 +290,9 @@ function Dashboard() {
 
           {filteredRooms.map((r) => {
             const latestYolo = yoloData?.[r.name];
-            const hasFreshYoloStatus = isFreshData(latestYolo);
-            const status = hasFreshYoloStatus
-              ? latestYolo?.ac_status
-              : roomStatus?.[r.name];
+            const status =
+              roomStatus?.[r.name] ??
+              (isFreshData(latestYolo) ? latestYolo?.ac_status : undefined);
             const isOn = status === "ON";
 
             const latestSensor = sensorData?.[r.name];

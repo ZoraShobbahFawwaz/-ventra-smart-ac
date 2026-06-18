@@ -39,6 +39,7 @@ export class SchedulerService implements OnModuleInit {
 
     try {
       const schedules = await this.roomsService.getAllSchedules();
+      const activeScheduleRooms = new Set<string>();
 
       for (const row of schedules) {
         if (
@@ -95,6 +96,10 @@ export class SchedulerService implements OnModuleInit {
           endMin,
           now,
         );
+
+        if (isPreWindow || isActiveSchedule) {
+          activeScheduleRooms.add(roomName);
+        }
 
         if (manualOffOverrideActive && (isPreWindow || isActiveSchedule)) {
           console.log(
@@ -198,6 +203,8 @@ export class SchedulerService implements OnModuleInit {
         }
       }
 
+      this.turnOffRoomsOutsideSchedule(activeScheduleRooms);
+
       if (jam === '00:00' && this.executedEvents.size > 0) {
         this.executedEvents.clear();
         console.log('Reset event harian');
@@ -276,6 +283,45 @@ export class SchedulerService implements OnModuleInit {
     this.mqttService.publish('ac/control', payload);
     this.roomsService.updateRoomStatus(roomName, 'ON', 'schedule');
     this.roomsService.recordAcCommand(roomName, command, source);
+  }
+
+  private turnOffRoomsOutsideSchedule(activeScheduleRooms: Set<string>) {
+    const runtimeStates = this.roomsService.getRoomRuntimeStatus();
+
+    Object.entries(runtimeStates).forEach(([roomName, runtimeState]) => {
+      const controlledBySchedule =
+        runtimeState.source === 'schedule' ||
+        runtimeState.source === 'schedule-pre';
+
+      if (
+        !controlledBySchedule ||
+        runtimeState.ac_status !== 'ON' ||
+        activeScheduleRooms.has(roomName)
+      ) {
+        return;
+      }
+
+      console.log(
+        `SCHEDULE CHANGED/INACTIVE: ${roomName} tidak lagi dalam rentang jadwal, kirim OFF`,
+      );
+
+      const command = {
+        power: 'off' as const,
+      };
+      const payload = {
+        room: roomName,
+        power: 'off',
+        source: 'scheduler-sync',
+      };
+
+      this.mqttService.publish('ac/control', payload);
+      this.roomsService.updateRoomStatus(roomName, 'OFF', 'schedule');
+      this.roomsService.recordAcCommand(
+        roomName,
+        command,
+        'scheduler-sync',
+      );
+    });
   }
 
   private isManualOffOverrideActive(

@@ -40,11 +40,15 @@ export default function KelolaRuangan() {
   function getEffectiveRoomStatus(roomName) {
     const latestYolo = yoloData?.[roomName];
 
-    if (isFreshData(latestYolo) && latestYolo?.ac_status) {
-      return latestYolo.ac_status;
+    if (roomStatus[roomName]) {
+      return roomStatus[roomName];
     }
 
-    return roomStatus[roomName];
+    if (isFreshData(latestYolo)) {
+      return latestYolo?.ac_status;
+    }
+
+    return undefined;
   }
 
   const selectedRoomIsOn = selectedRoom
