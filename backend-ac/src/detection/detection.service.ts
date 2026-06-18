@@ -138,7 +138,7 @@ export class DetectionService {
       console.log('KIRIM OFF VIA MQTT:', payload);
 
       this.mqttService.publish('ac/control', payload);
-      this.roomRuntimeService.recordCommandSent(roomName, command, 'yolo');
+      this.roomRuntimeService.recordYoloCommandSent(roomName, command);
       this.roomsService.syncYoloRoomStatus(roomName, 'OFF');
 
       return {
@@ -226,7 +226,7 @@ export class DetectionService {
 
       this.mqttService.publish('ac/control', payload);
 
-      this.roomRuntimeService.recordCommandSent(roomName, command, 'yolo');
+      this.roomRuntimeService.recordYoloCommandSent(roomName, command);
       this.roomsService.syncYoloRoomStatus(roomName, 'ON');
 
       const runtimeState = this.roomRuntimeService.getRoomState(roomName);

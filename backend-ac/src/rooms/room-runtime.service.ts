@@ -208,13 +208,35 @@ export class RoomRuntimeService {
   }
 
   recordCommandSent(roomName: string, command: AcCommand, sentBy: string) {
+    this.saveCommandState(roomName, command, sentBy);
+  }
+
+  recordYoloCommandSent(roomName: string, command: AcCommand) {
+    const previousState = this.roomStates[roomName];
+
+    if (!previousState?.yolo_enabled) {
+      return false;
+    }
+
+    this.saveCommandState(roomName, command, 'yolo', true);
+    return true;
+  }
+
+  private saveCommandState(
+    roomName: string,
+    command: AcCommand,
+    sentBy: string,
+    preserveYoloSession = false,
+  ) {
     const now = new Date().toISOString();
     const previousState = this.roomStates[roomName];
     const normalizedCommand = this.normalizeCommand(command);
 
     this.roomStates[roomName] = {
       ac_status: normalizedCommand.power === 'on' ? 'ON' : 'OFF',
-      yolo_enabled: previousState?.yolo_enabled ?? false,
+      yolo_enabled: preserveYoloSession
+        ? true
+        : (previousState?.yolo_enabled ?? false),
       source: previousState?.source,
       updated_at: now,
       manual_off_override: previousState?.manual_off_override,
