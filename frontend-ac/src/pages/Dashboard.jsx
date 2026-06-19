@@ -309,7 +309,7 @@ function Dashboard() {
               hasYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
               isOn && hasYoloData,
             );
-            const occupancy = hasYoloData
+            const occupancy = isOn && hasYoloData
               ? formatOccupancy(latestYolo?.occupancy, r.occ)
               : "-";
 
