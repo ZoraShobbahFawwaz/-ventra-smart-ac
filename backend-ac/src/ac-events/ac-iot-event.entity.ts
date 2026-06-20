@@ -16,7 +16,7 @@ export class AcIotEvent {
   @Column({ name: 'event_time', type: 'datetime' })
   eventTime!: Date;
 
-  @Column({ name: 'event_type', length: 50, nullable: true })
+  @Column({ name: 'event_type', type: 'varchar', length: 50, nullable: true })
   eventType!: string | null;
 
   @Column({ type: 'enum', enum: ['ON', 'OFF'] })
@@ -39,7 +39,7 @@ export class AcIotEvent {
   })
   fanSpeed!: 'LOW' | 'MEDIUM' | 'HIGH' | null;
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   source!: string;
 
   @CreateDateColumn({ name: 'created_at' })
