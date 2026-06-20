@@ -24,6 +24,8 @@ type AcLogPayload = {
   source?: string;
   timestamp?: string;
   event_type?: string;
+  suhu_aktual?: number | string | null;
+  humidity?: number | string | null;
 };
 
 @Injectable()
@@ -171,11 +173,7 @@ export class MqttService implements OnModuleInit {
     try {
       const data = JSON.parse(payload) as AcLogPayload;
       const roomName = (data.room ?? data.room_name ?? '').trim();
-      const eventType = String(data.event_type ?? '').trim().toLowerCase();
-
-      if (eventType !== 'ir_sent') {
-        return;
-      }
+      const eventType = String(data.event_type ?? 'unknown').trim();
 
       const power = String(data.power ?? data.command ?? '')
         .trim()
@@ -193,6 +191,8 @@ export class MqttService implements OnModuleInit {
 
       const temperatureValue = data.temperature ?? data.temp ?? data.setpoint;
       const fanValue = data.fan_speed ?? data.fan;
+      const actualTemperature = this.toNullableNumber(data.suhu_aktual);
+      const humidity = this.toNullableNumber(data.humidity);
       const temperature =
         power === 'OFF' || temperatureValue === null
           ? null
@@ -215,8 +215,11 @@ export class MqttService implements OnModuleInit {
       const event = this.acIotEventRepo.create({
         roomName,
         eventTime: this.getEventTime(data.timestamp),
+        eventType,
         power,
         temperature,
+        actualTemperature,
+        humidity,
         fanSpeed,
         source: this.normalizeSource(data.source),
       });
@@ -224,7 +227,7 @@ export class MqttService implements OnModuleInit {
       await this.acIotEventRepo.save(event);
 
       console.log(
-        `AC event saved: ${roomName} | ${power} | ${temperature ?? 'NULL'} | ${fanSpeed ?? 'NULL'} | ${event.source}`,
+        `AC event saved: ${roomName} | ${eventType} | ${power} | ${temperature ?? 'NULL'} | ${fanSpeed ?? 'NULL'} | ${event.source}`,
       );
     } catch (error) {
       if (error instanceof Error) {
@@ -246,18 +249,19 @@ export class MqttService implements OnModuleInit {
   }
 
   private normalizeSource(value: string | undefined) {
-    const source = String(value ?? 'esp32').trim().toLowerCase();
+    const source = String(value ?? 'esp32').trim();
 
-    if (
-      source === 'scheduler' ||
-      source === 'yolo' ||
-      source === 'manual' ||
-      source === 'esp32'
-    ) {
-      return source;
+    return source || 'esp32';
+  }
+
+  private toNullableNumber(value: number | string | null | undefined) {
+    if (value === null || value === undefined || value === '') {
+      return null;
     }
 
-    return 'esp32';
+    const numberValue = Number(value);
+
+    return isNaN(numberValue) ? null : numberValue;
   }
 
   private getEventTime(timestamp: string | undefined) {

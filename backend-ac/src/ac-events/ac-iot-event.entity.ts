@@ -16,11 +16,20 @@ export class AcIotEvent {
   @Column({ name: 'event_time', type: 'datetime' })
   eventTime!: Date;
 
+  @Column({ name: 'event_type', length: 50, nullable: true })
+  eventType!: string | null;
+
   @Column({ type: 'enum', enum: ['ON', 'OFF'] })
   power!: 'ON' | 'OFF';
 
   @Column({ type: 'int', nullable: true })
   temperature!: number | null;
+
+  @Column({ name: 'actual_temperature', type: 'float', nullable: true })
+  actualTemperature!: number | null;
+
+  @Column({ type: 'float', nullable: true })
+  humidity!: number | null;
 
   @Column({
     name: 'fan_speed',
@@ -30,11 +39,8 @@ export class AcIotEvent {
   })
   fanSpeed!: 'LOW' | 'MEDIUM' | 'HIGH' | null;
 
-  @Column({
-    type: 'enum',
-    enum: ['scheduler', 'yolo', 'manual', 'esp32'],
-  })
-  source!: 'scheduler' | 'yolo' | 'manual' | 'esp32';
+  @Column({ length: 50 })
+  source!: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
