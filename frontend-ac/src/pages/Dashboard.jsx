@@ -15,34 +15,34 @@ function Dashboard() {
   const getRoomsData = async () => {
     const data = [
       {
-        lantai: "Lantai 1",
+        lantai: "Sayap Kanan",
         rooms: [
-          { name: "Lab. Ergonomic and Innovation Design" },
-          { name: "Lab. System and Energy Conversation" },
-          { name: "Lab. Robotics and Embedded System" },
-          { name: "Lab. Circular Ecosystem and Sustainable Technology" },
+          { name: "Ruang Kelas 2.02" },
+          { name: "Ruang Kelas 2.03" },
+          { name: "Ruang Kelas 2.03" },
+          { name: "Ruang Kelas 2.04" },
         ],
       },
       {
-        lantai: "Lantai 2",
+        lantai: "",
         rooms: [
-          { name: "Lab. Basic Electronics" },
-          { name: "Lab. Telematics and Communication Network" },
-          { name: "Lab. Telecommunication and Signal Processing" },
-          { name: "Lab. Gait and Motion" },
+          { name: "Ruang Kelas 2.05" },
+          { name: "Ruang Kelas 2.06" },
+          { name: "Ruang Kelas 2.07" },
+          { name: "Ruang Kelas 2.08" },
         ],
       },
       {
-        lantai: "Lantai 3",
+        lantai: "",
         rooms: [
-          { name: "Lab. Engineering Management" },
-          { name: "Lab. Enterprise System" },
-          { name: "Lab. Basic Physics and Energy Storage Materials" },
-          { name: "Lab. Smart Computing Technology" },
+          { name: "Ruang Kelas 2.09" },
+          { name: "Ruang Kelas 2.23" },
+          { name: "Ruang Kelas 2.24" },
+          { name: "Ruang Kelas 2.25" },
         ],
       },
       {
-        lantai: "Lantai 4",
+        lantai: "Sayap Kiri",
         rooms: [
           { name: "Ruang Kelas 2.15" },
           { name: "Ruang Kelas 2.16" },
@@ -51,7 +51,7 @@ function Dashboard() {
         ],
       },
       {
-        lantai: "Lantai 5",
+        lantai: "",
         rooms: [
           { name: "Ruang Kelas 2.19" },
           { name: "Ruang Kelas 2.20" },
