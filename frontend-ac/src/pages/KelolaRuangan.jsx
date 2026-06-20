@@ -253,26 +253,16 @@ export default function KelolaRuangan() {
   // =========================
   const data = [
     {
-      lantai: "Lantai 1",
+      lantai: "Sayap Kanan",
       rooms: [
         { name: "Lab. Ergonomic and Innovation Design" },
         { name: "Lab. System and Energy Conversation" },
         { name: "Lab. Robotics and Embedded System" },
         { name: "Lab. Circular Ecosystem and Sustainable Technology" },
-      ],
-    },
-    {
-      lantai: "Lantai 2",
-      rooms: [
         { name: "Lab. Basic Electronics" },
         { name: "Lab. Telematics and Communication Network" },
         { name: "Lab. Telecommunication and Signal Processing" },
         { name: "Lab. Gait and Motion" },
-      ],
-    },
-    {
-      lantai: "Lantai 3",
-      rooms: [
         { name: "Lab. Engineering Management" },
         { name: "Lab. Enterprise System" },
         { name: "Lab. Basic Physics and Energy Storage Materials" },
@@ -280,21 +270,16 @@ export default function KelolaRuangan() {
       ],
     },
     {
-      lantai: "Lantai 4",
+      lantai: "Sayap Kiri",
       rooms: [
-        { name: "Lab. Cybersecurity & Cloud Computing" },
-        { name: "Lab. Software Engineering" },
-        { name: "Lab. Application Development" },
-        { name: "Lab. Core Programming" },
-      ],
-    },
-    {
-      lantai: "Lantai 5",
-      rooms: [
-        { name: "Lab. Quantitative Modelling For Business and Industry" },
-        { name: "Lab. Control and Automation" },
-        { name: "Lab. Big Data & Artificial Intelligence" },
-        { name: "Lab. Digital Start-Up" },
+        { name: "Ruang Kelas 2.15" },
+        { name: "Ruang Kelas 2.16" },
+        { name: "Ruang Kelas 2.17" },
+        { name: "Ruang Kelas 2.18" },
+        { name: "Ruang Kelas 2.19" },
+        { name: "Ruang Kelas 2.20" },
+        { name: "Ruang Kelas 2.35" },
+        { name: "Ruang Kelas 2.36" },
       ],
     },
   ];
