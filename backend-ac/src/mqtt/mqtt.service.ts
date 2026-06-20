@@ -1,11 +1,26 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as mqtt from 'mqtt';
+import { Repository } from 'typeorm';
+import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
 
 type SensorData = {
   room: string;
   temperature: number;
   humidity: number;
   updated_at: string;
+};
+
+type AcFeedbackPayload = {
+  room?: string;
+  room_name?: string;
+  power?: string;
+  temp?: number | string | null;
+  temperature?: number | string | null;
+  fan?: string | null;
+  fan_speed?: string | null;
+  source?: string;
+  timestamp?: string;
 };
 
 @Injectable()
@@ -16,6 +31,11 @@ export class MqttService implements OnModuleInit {
   private readonly brokerUrl = process.env.MQTT_URL || 'mqtt://127.0.0.1:1883';
 
   private latestSensorData: Record<string, SensorData> = {};
+
+  constructor(
+    @InjectRepository(AcIotEvent)
+    private readonly acIotEventRepo: Repository<AcIotEvent>,
+  ) {}
 
   onModuleInit() {
     this.client = mqtt.connect(this.brokerUrl, {
@@ -57,6 +77,10 @@ export class MqttService implements OnModuleInit {
 
       if (topic === 'lab/sensor') {
         this.handleSensorData(payload);
+      }
+
+      if (topic === 'ac/feedback') {
+        void this.handleAcFeedback(payload);
       }
     });
 
@@ -138,6 +162,105 @@ export class MqttService implements OnModuleInit {
     } catch {
       console.log('❌ Gagal parsing data sensor MQTT:', payload);
     }
+  }
+
+  private async handleAcFeedback(payload: string) {
+    try {
+      const data = JSON.parse(payload) as AcFeedbackPayload;
+      const roomName = (data.room ?? data.room_name ?? '').trim();
+      const power = String(data.power ?? '').trim().toUpperCase();
+
+      if (!roomName) {
+        console.log('Feedback AC tidak memiliki room:', data);
+        return;
+      }
+
+      if (power !== 'ON' && power !== 'OFF') {
+        console.log('Feedback AC power tidak valid:', data);
+        return;
+      }
+
+      const temperatureValue = data.temperature ?? data.temp;
+      const fanValue = data.fan_speed ?? data.fan;
+      const temperature =
+        power === 'OFF' || temperatureValue === null
+          ? null
+          : Number(temperatureValue);
+      const fanSpeed =
+        power === 'OFF' || fanValue === null
+          ? null
+          : this.normalizeFanSpeed(fanValue);
+
+      if (temperature !== null && isNaN(temperature)) {
+        console.log('Feedback AC temperature tidak valid:', data);
+        return;
+      }
+
+      if (power === 'ON' && !fanSpeed) {
+        console.log('Feedback AC fan_speed tidak valid:', data);
+        return;
+      }
+
+      const event = this.acIotEventRepo.create({
+        roomName,
+        eventTime: this.getEventTime(data.timestamp),
+        power,
+        temperature,
+        fanSpeed,
+        source: this.normalizeSource(data.source),
+      });
+
+      await this.acIotEventRepo.save(event);
+
+      console.log(
+        `AC event saved: ${roomName} | ${power} | ${temperature ?? 'NULL'} | ${fanSpeed ?? 'NULL'} | ${event.source}`,
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log('Gagal simpan feedback AC:', error.message);
+      } else {
+        console.log('Gagal simpan feedback AC:', error);
+      }
+    }
+  }
+
+  private normalizeFanSpeed(value: string | number | null | undefined) {
+    const fanSpeed = String(value ?? '').trim().toUpperCase();
+
+    if (fanSpeed === 'LOW' || fanSpeed === 'MEDIUM' || fanSpeed === 'HIGH') {
+      return fanSpeed;
+    }
+
+    return null;
+  }
+
+  private normalizeSource(value: string | undefined) {
+    const source = String(value ?? 'esp32').trim().toLowerCase();
+
+    if (
+      source === 'scheduler' ||
+      source === 'yolo' ||
+      source === 'manual' ||
+      source === 'esp32'
+    ) {
+      return source;
+    }
+
+    return 'esp32';
+  }
+
+  private getEventTime(timestamp: string | undefined) {
+    if (!timestamp) {
+      return new Date();
+    }
+
+    const eventTime = new Date(timestamp);
+
+    if (isNaN(eventTime.getTime())) {
+      return new Date();
+    }
+
+    return eventTime;
   }
 
   getLatestSensorData() {

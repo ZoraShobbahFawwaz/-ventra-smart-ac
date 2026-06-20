@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
 
 import { User } from './users/user.entity';
 import { Schedule } from './rooms/schedule.entity';
+import { AcIotEvent } from './ac-events/ac-iot-event.entity';
 
 import { SchedulerService } from './scheduler/scheduler.service';
 
@@ -32,7 +33,7 @@ import { SchedulerService } from './scheduler/scheduler.service';
               rejectUnauthorized: false,
             }
           : undefined,
-      entities: [User, Schedule],
+      entities: [User, Schedule, AcIotEvent],
       synchronize: false,
     }),
 
