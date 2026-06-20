@@ -15,12 +15,15 @@ type AcFeedbackPayload = {
   room?: string;
   room_name?: string;
   power?: string;
+  command?: string;
   temp?: number | string | null;
   temperature?: number | string | null;
+  setpoint?: number | string | null;
   fan?: string | null;
   fan_speed?: string | null;
   source?: string;
   timestamp?: string;
+  event_type?: string;
 };
 
 @Injectable()
@@ -68,6 +71,14 @@ export class MqttService implements OnModuleInit {
           console.log('📡 Subscribed to lab/sensor');
         }
       });
+
+      this.client.subscribe('ac/log', (err) => {
+        if (err) {
+          console.log('❌ Gagal subscribe ac/log:', err.message);
+        } else {
+          console.log('📡 Subscribed to ac/log');
+        }
+      });
     });
 
     this.client.on('message', (topic, message) => {
@@ -79,8 +90,8 @@ export class MqttService implements OnModuleInit {
         this.handleSensorData(payload);
       }
 
-      if (topic === 'ac/feedback') {
-        void this.handleAcFeedback(payload);
+      if (topic === 'ac/feedback' || topic === 'ac/log') {
+        void this.handleAcFeedback(payload, topic);
       }
     });
 
@@ -164,11 +175,19 @@ export class MqttService implements OnModuleInit {
     }
   }
 
-  private async handleAcFeedback(payload: string) {
+  private async handleAcFeedback(payload: string, topic: string) {
     try {
       const data = JSON.parse(payload) as AcFeedbackPayload;
       const roomName = (data.room ?? data.room_name ?? '').trim();
-      const power = String(data.power ?? '').trim().toUpperCase();
+      const eventType = String(data.event_type ?? '').trim().toLowerCase();
+
+      if (topic === 'ac/log' && eventType !== 'ir_sent') {
+        return;
+      }
+
+      const power = String(data.power ?? data.command ?? '')
+        .trim()
+        .toUpperCase();
 
       if (!roomName) {
         console.log('Feedback AC tidak memiliki room:', data);
@@ -180,7 +199,7 @@ export class MqttService implements OnModuleInit {
         return;
       }
 
-      const temperatureValue = data.temperature ?? data.temp;
+      const temperatureValue = data.temperature ?? data.temp ?? data.setpoint;
       const fanValue = data.fan_speed ?? data.fan;
       const temperature =
         power === 'OFF' || temperatureValue === null
