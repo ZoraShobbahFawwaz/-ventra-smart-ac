@@ -11,7 +11,7 @@ type SensorData = {
   updated_at: string;
 };
 
-type AcFeedbackPayload = {
+type AcLogPayload = {
   room?: string;
   room_name?: string;
   power?: string;
@@ -56,14 +56,6 @@ export class MqttService implements OnModuleInit {
       this.isConnected = true;
       console.log(`✅ [MQTT] Connected to broker: ${this.brokerUrl}`);
 
-      this.client.subscribe('ac/feedback', (err) => {
-        if (err) {
-          console.log('❌ Gagal subscribe ac/feedback:', err.message);
-        } else {
-          console.log('📡 Subscribed to ac/feedback');
-        }
-      });
-
       this.client.subscribe('lab/sensor', (err) => {
         if (err) {
           console.log('❌ Gagal subscribe lab/sensor:', err.message);
@@ -90,8 +82,8 @@ export class MqttService implements OnModuleInit {
         this.handleSensorData(payload);
       }
 
-      if (topic === 'ac/feedback' || topic === 'ac/log') {
-        void this.handleAcFeedback(payload, topic);
+      if (topic === 'ac/log') {
+        void this.handleAcLog(payload);
       }
     });
 
@@ -175,13 +167,13 @@ export class MqttService implements OnModuleInit {
     }
   }
 
-  private async handleAcFeedback(payload: string, topic: string) {
+  private async handleAcLog(payload: string) {
     try {
-      const data = JSON.parse(payload) as AcFeedbackPayload;
+      const data = JSON.parse(payload) as AcLogPayload;
       const roomName = (data.room ?? data.room_name ?? '').trim();
       const eventType = String(data.event_type ?? '').trim().toLowerCase();
 
-      if (topic === 'ac/log' && eventType !== 'ir_sent') {
+      if (eventType !== 'ir_sent') {
         return;
       }
 
