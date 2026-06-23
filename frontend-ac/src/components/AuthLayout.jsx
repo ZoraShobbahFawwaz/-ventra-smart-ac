@@ -13,7 +13,7 @@ function AuthLayout({ children }) {
         className="auth-visual"
         style={{
           flex: 1,
-          backgroundImage: "url('/astro.png')",
+          backgroundImage: "url('/ac.jpeg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
