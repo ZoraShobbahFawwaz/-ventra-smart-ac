@@ -227,6 +227,41 @@ select {
   filter: brightness(0.98);
 }
 
+.reason-button {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    filter 180ms ease;
+}
+
+.reason-button:not(:disabled):hover,
+.reason-button:not(:disabled):focus-visible {
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.reason-button-cancel:not(:disabled):hover,
+.reason-button-cancel:not(:disabled):focus-visible {
+  border-color: rgba(147, 197, 253, 0.48) !important;
+  background: rgba(45, 140, 255, 0.14) !important;
+  box-shadow: 0 12px 22px rgba(2, 8, 23, 0.2);
+}
+
+.reason-button-submit:not(:disabled):hover,
+.reason-button-submit:not(:disabled):focus-visible {
+  filter: brightness(1.06);
+  box-shadow:
+    0 14px 26px rgba(45, 140, 255, 0.28),
+    0 0 0 3px rgba(45, 140, 255, 0.12);
+}
+
+.reason-button:not(:disabled):active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
 .table-scroll {
   width: 100%;
 }

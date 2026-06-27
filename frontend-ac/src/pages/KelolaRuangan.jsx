@@ -747,6 +747,7 @@ export default function KelolaRuangan() {
 
                   <div style={reasonButtonWrapper}>
                     <button
+                      className="reason-button reason-button-cancel"
                       style={reasonCancelBtn}
                       disabled={controlLoading}
                       onClick={closeReasonModal}
@@ -755,6 +756,7 @@ export default function KelolaRuangan() {
                     </button>
 
                     <button
+                      className="reason-button reason-button-submit"
                       style={{
                         ...reasonSubmitBtn,
                         opacity: controlLoading ? 0.6 : 1,
