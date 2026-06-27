@@ -4,8 +4,6 @@ import {
   FaCalendarAlt,
   FaChartLine,
   FaChevronRight,
-  FaDoorOpen,
-  FaPowerOff,
 } from "react-icons/fa";
 import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
@@ -391,8 +389,6 @@ export default function KelolaRuangan() {
   // =========================
   const RoomCard = ({ room }) => {
     const isOn = getEffectiveRoomStatus(room.name) === "ON";
-    const statusText = isOn ? "AC Aktif" : "AC Nonaktif";
-    const statusDescription = isOn ? "Sedang beroperasi" : "Menunggu jadwal";
 
     return (
       <button
@@ -401,76 +397,45 @@ export default function KelolaRuangan() {
         aria-label={`Buka detail ${room.name}`}
         onClick={() => setSelectedRoom(room)}
         style={{
-          minHeight: 120,
-          borderRadius: 14,
-          padding: 0,
+          minHeight: 88,
+          borderRadius: 12,
+          padding: "18px 20px",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "space-between",
-          alignItems: "stretch",
+          alignItems: "center",
+          gap: 14,
           textAlign: "left",
-          boxShadow: isOn
-            ? "0 12px 26px rgba(34, 197, 94, 0.16)"
-            : "0 6px 16px var(--shadow-color, rgba(0,0,0,0.05))",
+          boxShadow: "none",
           border: isOn
-            ? "2px solid #22c55e"
-            : "2px solid var(--border-color, #eee)",
+            ? "1px solid rgba(34, 197, 94, 0.65)"
+            : "1px solid var(--border-color, #334155)",
           background: isOn
-            ? "rgba(34, 197, 94, 0.14)"
+            ? "rgba(34, 197, 94, 0.08)"
             : "var(--bg-card-soft, #f8fafc)",
           color: "var(--text-main, #111)",
           cursor: "pointer",
-          transition:
-            "box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease",
+          transition: "border-color 0.16s ease, background 0.16s ease",
         }}
       >
-        <div style={roomCardBody}>
-          <div style={roomCardTop}>
-            <div style={roomTitleWrap}>
-              <div style={roomIconBox}>
-                <FaDoorOpen />
-              </div>
-
-              <div>
-                <div style={roomNameText}>{room.name}</div>
-                <div style={roomMetaText}>Ruang kelas lantai 2</div>
-              </div>
-            </div>
-
-            <span style={roomOpenHint} aria-hidden="true">
-              <FaChevronRight />
-            </span>
-          </div>
-
-          <div style={roomStatusBlock}>
-            <div
-              style={{
-                ...roomStatusIcon,
-                background: isOn
-                  ? "rgba(34, 197, 94, 0.16)"
-                  : "rgba(148, 163, 184, 0.12)",
-                color: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
-              }}
-            >
-              <FaPowerOff />
-            </div>
-
-            <div>
-              <div
-                style={{
-                  ...roomStatusText,
-                  color: isOn ? "#22c55e" : "var(--text-main, #e2e8f0)",
-                }}
-              >
-                {statusText}
-              </div>
-              <div style={roomStatusDescription}>{statusDescription}</div>
-            </div>
+        <div style={roomTitleWrap}>
+          <div style={roomNameText}>{room.name}</div>
+          <div
+            style={{
+              ...roomStatusText,
+              color: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
+            }}
+          >
+            {isOn ? "AC Aktif" : "AC Nonaktif"}
           </div>
         </div>
 
-        <div style={roomCardAction}>
-          <span>Buka detail ruangan</span>
+        <div style={roomCardRight}>
+          <span
+            style={{
+              ...roomStatusDot,
+              background: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
+            }}
+          />
           <FaChevronRight />
         </div>
       </button>
@@ -848,48 +813,11 @@ const grid = {
   gap: 20,
 };
 
-const roomCardTop = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
-  gap: 12,
-};
-
-const roomCardBody = {
-  padding: 16,
-  display: "flex",
-  flexDirection: "column",
-  gap: 18,
-};
-
 const roomTitleWrap = {
   display: "flex",
-  alignItems: "center",
-  gap: 11,
-};
-
-const roomIconBox = {
-  width: 34,
-  height: 34,
-  borderRadius: 10,
-  background: "rgba(45, 140, 255, 0.12)",
-  color: "#60a5fa",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  fontSize: 14,
-};
-
-const roomOpenHint = {
-  width: 28,
-  height: 28,
-  borderRadius: 8,
-  border: "1px solid rgba(148, 163, 184, 0.24)",
-  color: "var(--text-muted, #94a3b8)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  fontSize: 11,
+  flexDirection: "column",
+  gap: 6,
+  minWidth: 0,
 };
 
 const roomNameText = {
@@ -899,53 +827,24 @@ const roomNameText = {
   color: "var(--text-main, #111)",
 };
 
-const roomMetaText = {
-  marginTop: 3,
-  fontSize: 11,
+const roomCardRight = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
   color: "var(--text-muted, #94a3b8)",
-};
-
-const roomStatusBlock = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  padding: "12px 0 0",
-  borderTop: "1px solid rgba(148, 163, 184, 0.18)",
-};
-
-const roomStatusIcon = {
-  width: 30,
-  height: 30,
-  borderRadius: 10,
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
   fontSize: 12,
 };
 
 const roomStatusText = {
-  fontSize: 13,
-  fontWeight: 800,
+  fontSize: 12,
+  fontWeight: 700,
   lineHeight: 1.2,
 };
 
-const roomStatusDescription = {
-  marginTop: 2,
-  fontSize: 11,
-  color: "var(--text-muted, #94a3b8)",
-};
-
-const roomCardAction = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 10,
-  padding: "11px 16px",
-  borderTop: "1px solid rgba(148, 163, 184, 0.18)",
-  background: "rgba(15, 23, 42, 0.08)",
-  color: "#60a5fa",
-  fontSize: 12,
-  fontWeight: 700,
+const roomStatusDot = {
+  width: 8,
+  height: 8,
+  borderRadius: "50%",
 };
 
 const overlay = {

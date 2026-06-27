@@ -30,31 +30,16 @@ select {
   position: relative;
   appearance: none;
   width: 100%;
-  overflow: hidden;
-}
-
-.room-card-button::after {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  pointer-events: none;
-  background: #2d8cff;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  overflow: visible;
 }
 
 .room-card-button:hover {
-  border-color: rgba(45, 140, 255, 0.7) !important;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18) !important;
-}
-
-.room-card-button:hover::after {
-  opacity: 1;
+  border-color: rgba(96, 165, 250, 0.75) !important;
+  background: rgba(45, 140, 255, 0.08) !important;
 }
 
 .room-card-button:active {
-  border-color: rgba(45, 140, 255, 0.9) !important;
+  border-color: rgba(96, 165, 250, 0.95) !important;
 }
 
 .room-card-button:focus-visible {
