@@ -23,6 +23,7 @@ export default function MainLayout({ children, title, subtitle }) {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
 
     const root = document.documentElement;
+    root.dataset.theme = darkMode ? "dark" : "light";
 
     if (darkMode) {
       root.style.setProperty("--bg-main", "#0f172a");
@@ -34,19 +35,33 @@ export default function MainLayout({ children, title, subtitle }) {
       root.style.setProperty("--border-color", "#334155");
       root.style.setProperty("--input-bg", "#1e293b");
       root.style.setProperty("--shadow-color", "rgba(0,0,0,0.25)");
+      root.style.setProperty("--header-action-bg", "transparent");
+      root.style.setProperty("--header-action-border", "transparent");
+      root.style.setProperty("--header-action-hover-bg", "rgba(45,140,255,0.12)");
+      root.style.setProperty("--header-action-hover-border", "rgba(96,165,250,0.28)");
+      root.style.setProperty("--profile-bg", "transparent");
+      root.style.setProperty("--profile-border", "transparent");
+      root.style.setProperty("--profile-shadow", "none");
     } else {
-      root.style.setProperty("--bg-main", "#f5f6f8");
-      root.style.setProperty("--bg-sidebar", "#ffffff");
+      root.style.setProperty("--bg-main", "linear-gradient(180deg, #f7faff 0%, #eef3f8 100%)");
+      root.style.setProperty("--bg-sidebar", "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)");
       root.style.setProperty("--bg-card", "#ffffff");
       root.style.setProperty("--bg-card-soft", "#f8fafc");
-      root.style.setProperty("--text-main", "#111111");
-      root.style.setProperty("--text-muted", "#666666");
-      root.style.setProperty("--border-color", "#eeeeee");
+      root.style.setProperty("--text-main", "#0f172a");
+      root.style.setProperty("--text-muted", "#64748b");
+      root.style.setProperty("--border-color", "#dbe3ee");
       root.style.setProperty("--input-bg", "#ffffff");
-      root.style.setProperty("--shadow-color", "rgba(0,0,0,0.05)");
+      root.style.setProperty("--shadow-color", "rgba(15,23,42,0.08)");
+      root.style.setProperty("--header-action-bg", "#ffffff");
+      root.style.setProperty("--header-action-border", "#dbe3ee");
+      root.style.setProperty("--header-action-hover-bg", "#eef6ff");
+      root.style.setProperty("--header-action-hover-border", "#b8d5ff");
+      root.style.setProperty("--profile-bg", "rgba(255,255,255,0.72)");
+      root.style.setProperty("--profile-border", "#dbe3ee");
+      root.style.setProperty("--profile-shadow", "0 10px 24px rgba(15,23,42,0.06)");
     }
 
-    document.body.style.background = darkMode ? "#0f172a" : "#f5f6f8";
+    document.body.style.background = darkMode ? "#0f172a" : "#eef3f8";
   }, [darkMode]);
 
   return (
@@ -60,6 +75,7 @@ export default function MainLayout({ children, title, subtitle }) {
         <div className="main-header-actions" style={headerRight}>
           <button
             type="button"
+            className="header-icon-button"
             onClick={() => setDarkMode(!darkMode)}
             style={iconButton}
             aria-label={darkMode ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
@@ -67,11 +83,16 @@ export default function MainLayout({ children, title, subtitle }) {
             {darkMode ? <FaSun /> : <FaMoon />}
           </button>
 
-          <span style={iconButton} aria-label="Notifikasi" role="img">
+          <span
+            className="header-icon-button"
+            style={iconButton}
+            aria-label="Notifikasi"
+            role="img"
+          >
             <FaBell />
           </span>
 
-          <div style={profile}>
+          <div className="header-profile" style={profile}>
             <img
               src={`https://i.pravatar.cc/40?u=${displayName}`}
               style={avatar}
@@ -129,7 +150,12 @@ const profile = {
   alignItems: "center",
   gap: 10,
   minHeight: 44,
-  paddingLeft: 2,
+  padding: "4px 8px 4px 4px",
+  borderRadius: 999,
+  background: "var(--profile-bg)",
+  border: "1px solid var(--profile-border)",
+  boxShadow: "var(--profile-shadow)",
+  transition: "background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
 };
 
 const avatar = {
@@ -139,6 +165,7 @@ const avatar = {
   display: "block",
   flexShrink: 0,
   objectFit: "cover",
+  border: "1px solid var(--border-color)",
 };
 
 const profileText = {
@@ -166,9 +193,9 @@ const profileRole = {
 const iconButton = {
   width: 34,
   height: 34,
-  border: "none",
+  border: "1px solid var(--header-action-border)",
   borderRadius: 10,
-  background: "transparent",
+  background: "var(--header-action-bg)",
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -177,4 +204,6 @@ const iconButton = {
   color: "var(--text-main)",
   lineHeight: 1,
   padding: 0,
+  transition:
+    "background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease",
 };

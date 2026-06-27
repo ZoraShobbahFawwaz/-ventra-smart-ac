@@ -473,14 +473,23 @@ export default function KelolaRuangan() {
             {/* MODAL HEADER */}
             <div className="modal-top" style={modalTop}>
               <div>
-                <div style={modalEyebrow}>Detail Ruangan</div>
-                <h2 style={modalTitle}>{selectedRoom.name}</h2>
-                <p style={modalSubtitle}>
+                <div className="room-modal-eyebrow" style={modalEyebrow}>
+                  Detail Ruangan
+                </div>
+                <h2 className="room-modal-title" style={modalTitle}>
+                  {selectedRoom.name}
+                </h2>
+                <p className="room-modal-subtitle" style={modalSubtitle}>
                   Detail monitoring dan kontrol manual AC ruangan
                 </p>
               </div>
 
               <div
+                className={`room-status-badge ${
+                  getEffectiveRoomStatus(selectedRoom.name) === "ON"
+                    ? "room-status-on"
+                    : "room-status-off"
+                }`}
                 style={{
                   ...statusBadge,
                   background:
@@ -505,7 +514,7 @@ export default function KelolaRuangan() {
             </div>
 
             {hasSelectedRoomDetail && (
-              <div style={detailMetaCard}>
+              <div className="room-detail-meta" style={detailMetaCard}>
                 <span>Terakhir diperbarui</span>
                 <b>{formatDateTime(selectedLastUpdated)}</b>
               </div>
@@ -513,44 +522,54 @@ export default function KelolaRuangan() {
 
             {/* DATA SECTION */}
             <div className="modal-grid" style={modalGrid}>
-              <div style={infoCard}>
-                <div style={sectionTitle}>Data Aktual</div>
+              <div className="room-modal-panel" style={infoCard}>
+                <div className="room-section-title" style={sectionTitle}>
+                  Data Aktual
+                </div>
 
-                <div style={dataRow}>
+                <div className="room-data-row" style={dataRow}>
                   <span>Temperature</span>
                   <b>{actualTemperatureDisplay}</b>
                 </div>
 
-                <div style={dataRow}>
+                <div className="room-data-row" style={dataRow}>
                   <span>Humidity</span>
                   <b>{actualHumidityDisplay}</b>
                 </div>
 
-                <div style={dataRow}>
+                <div className="room-data-row" style={dataRow}>
                   <span>Occupancy</span>
                   <b>{actualOccupancyDisplay}</b>
                 </div>
 
-                <div style={{ ...dataRow, borderBottom: "none" }}>
+                <div
+                  className="room-data-row"
+                  style={{ ...dataRow, borderBottom: "none" }}
+                >
                   <span>Fan Speed</span>
                   <b>{actualFanSpeedDisplay}</b>
                 </div>
               </div>
 
-              <div style={infoCard}>
-                <div style={sectionTitle}>Rekomendasi YOLO</div>
+              <div className="room-modal-panel" style={infoCard}>
+                <div className="room-section-title" style={sectionTitle}>
+                  Rekomendasi YOLO
+                </div>
 
-                <div style={dataRow}>
+                <div className="room-data-row" style={dataRow}>
                   <span>Temperature</span>
                   <b>{yoloTemperatureDisplay}</b>
                 </div>
 
-                <div style={dataRow}>
+                <div className="room-data-row" style={dataRow}>
                   <span>Occupancy</span>
                   <b>{yoloOccupancyDisplay}</b>
                 </div>
 
-                <div style={{ ...dataRow, borderBottom: "none" }}>
+                <div
+                  className="room-data-row"
+                  style={{ ...dataRow, borderBottom: "none" }}
+                >
                   <span>Fan Speed</span>
                   <b>{yoloFanSpeedDisplay}</b>
                 </div>
@@ -559,15 +578,20 @@ export default function KelolaRuangan() {
 
             {/* ENERGY SECTION */}
             <div className="modal-grid" style={modalGrid}>
-              <div style={energyCard}>
+              <div className="room-modal-panel room-energy-card" style={energyCard}>
                 <div style={energyCardHeader}>
                   <div style={energyTitleWrap}>
                     <div style={energyIconBox}>
                       <FaBolt />
                     </div>
                     <div>
-                      <div style={energyCardTitle}>Used Energy Today</div>
-                      <div style={energyCardSubtitle}>
+                      <div className="room-energy-title" style={energyCardTitle}>
+                        Used Energy Today
+                      </div>
+                      <div
+                        className="room-energy-subtitle"
+                        style={energyCardSubtitle}
+                      >
                         Monitoring energi harian ruangan
                       </div>
                     </div>
@@ -575,41 +599,52 @@ export default function KelolaRuangan() {
                 </div>
 
                 <div style={dateTimeWrapper}>
-                  <div style={dateTimeCard}>
-                    <div style={dateTimeLabel}>
+                  <div className="room-date-card" style={dateTimeCard}>
+                    <div className="room-date-label" style={dateTimeLabel}>
                       <FaCalendarAlt style={{ marginRight: 6 }} />
                       Tanggal
                     </div>
-                    <div style={dateTimeValue}>
+                    <div className="room-date-value" style={dateTimeValue}>
                       {formatDateRealtime(currentDateTime)}
                     </div>
                   </div>
                 </div>
 
                 <div style={miniGrid}>
-                  <div style={energyStatCard}>
-                    <span style={energyStatLabel}>Daya Saat Ini</span>
-                    <b style={energyStatValue}>
+                  <div className="room-energy-stat" style={energyStatCard}>
+                    <span className="room-energy-stat-label" style={energyStatLabel}>
+                      Daya Saat Ini
+                    </span>
+                    <b className="room-energy-stat-value" style={energyStatValue}>
                       {selectedRoomIsOn ? "500 W" : "-"}
                     </b>
                   </div>
 
-                  <div style={energyStatCard}>
-                    <span style={energyStatLabel}>Energi Hari Ini</span>
-                    <b style={energyStatValue}>15.2 kWh</b>
+                  <div className="room-energy-stat" style={energyStatCard}>
+                    <span className="room-energy-stat-label" style={energyStatLabel}>
+                      Energi Hari Ini
+                    </span>
+                    <b className="room-energy-stat-value" style={energyStatValue}>
+                      15.2 kWh
+                    </b>
                   </div>
                 </div>
               </div>
 
-              <div style={energyCard}>
+              <div className="room-modal-panel room-energy-card" style={energyCard}>
                 <div style={energyCardHeader}>
                   <div style={energyTitleWrap}>
                     <div style={energyIconBox}>
                       <FaChartLine />
                     </div>
                     <div>
-                      <div style={energyCardTitle}>Used Energy Period</div>
-                      <div style={energyCardSubtitle}>
+                      <div className="room-energy-title" style={energyCardTitle}>
+                        Used Energy Period
+                      </div>
+                      <div
+                        className="room-energy-subtitle"
+                        style={energyCardSubtitle}
+                      >
                         Ringkasan penggunaan energi
                       </div>
                     </div>
@@ -618,6 +653,9 @@ export default function KelolaRuangan() {
 
                 <div style={tabContainer}>
                   <button
+                    className={`room-modal-tab ${
+                      activeTab === "hari" ? "room-modal-tab-active" : ""
+                    }`}
                     style={activeTab === "hari" ? tabActive : tab}
                     onClick={() => setActiveTab("hari")}
                   >
@@ -625,6 +663,9 @@ export default function KelolaRuangan() {
                   </button>
 
                   <button
+                    className={`room-modal-tab ${
+                      activeTab === "minggu" ? "room-modal-tab-active" : ""
+                    }`}
                     style={activeTab === "minggu" ? tabActive : tab}
                     onClick={() => setActiveTab("minggu")}
                   >
@@ -632,6 +673,9 @@ export default function KelolaRuangan() {
                   </button>
 
                   <button
+                    className={`room-modal-tab ${
+                      activeTab === "bulan" ? "room-modal-tab-active" : ""
+                    }`}
                     style={activeTab === "bulan" ? tabActive : tab}
                     onClick={() => setActiveTab("bulan")}
                   >
@@ -640,9 +684,11 @@ export default function KelolaRuangan() {
                 </div>
 
                 <div style={miniGrid}>
-                  <div style={energyStatCard}>
-                    <span style={energyStatLabel}>Total Energi</span>
-                    <b style={energyStatValue}>
+                  <div className="room-energy-stat" style={energyStatCard}>
+                    <span className="room-energy-stat-label" style={energyStatLabel}>
+                      Total Energi
+                    </span>
+                    <b className="room-energy-stat-value" style={energyStatValue}>
                       {activeTab === "hari"
                         ? "15.2 kWh"
                         : activeTab === "minggu"
@@ -651,9 +697,11 @@ export default function KelolaRuangan() {
                     </b>
                   </div>
 
-                  <div style={energyStatCard}>
-                    <span style={energyStatLabel}>Rata-rata</span>
-                    <b style={energyStatValue}>
+                  <div className="room-energy-stat" style={energyStatCard}>
+                    <span className="room-energy-stat-label" style={energyStatLabel}>
+                      Rata-rata
+                    </span>
+                    <b className="room-energy-stat-value" style={energyStatValue}>
                       {activeTab === "hari"
                         ? "15.2 kWh"
                         : activeTab === "minggu"
@@ -663,7 +711,7 @@ export default function KelolaRuangan() {
                   </div>
                 </div>
 
-                <div style={periodInfoBox}>
+                <div className="room-period-info" style={periodInfoBox}>
                   Periode aktif:{" "}
                   <b>
                     {activeTab === "hari"
@@ -679,8 +727,10 @@ export default function KelolaRuangan() {
             {/* CONTROL SECTION */}
             <div className="control-card" style={controlCard}>
               <div>
-                <div style={sectionTitle}>Kontrol Manual</div>
-                <p style={controlText}>
+                <div className="room-section-title" style={sectionTitle}>
+                  Kontrol Manual
+                </div>
+                <p className="room-control-text" style={controlText}>
                   Gunakan kontrol manual hanya saat ada kebutuhan di luar
                   jadwal. Semua tindakan wajib menyertakan alasan dan akan
                   tercatat di audit log.
@@ -719,7 +769,7 @@ export default function KelolaRuangan() {
             {/* REASON MODAL */}
             {reasonModalOpen && (
               <div style={reasonOverlay}>
-                <div style={reasonBox}>
+                <div className="reason-box" style={reasonBox}>
                   <h3 style={reasonTitle}>
                     Konfirmasi AC {pendingCommand}
                   </h3>
@@ -728,13 +778,14 @@ export default function KelolaRuangan() {
                     Ruangan: <b>{selectedRoom?.name}</b>
                   </p>
 
-                  <div style={reasonWarningBox}>
+                  <div className="reason-warning-box" style={reasonWarningBox}>
                     {pendingCommand === "ON"
                       ? "Anda akan menyalakan AC ke 24°C dan YOLO akan langsung aktif untuk ruangan ini."
                       : "Anda akan mematikan AC dan YOLO akan dinonaktifkan sampai ada jadwal berikutnya atau perintah manual ON."}
                   </div>
 
                   <textarea
+                    className="reason-textarea"
                     style={reasonTextarea}
                     placeholder={
                       pendingCommand === "ON"
