@@ -443,16 +443,9 @@ export default function KelolaRuangan() {
           </span>
         </div>
 
-        <button
-          type="button"
-          className="room-card-detail"
-          onClick={(event) => {
-            event.stopPropagation();
-            openRoomDetail();
-          }}
-        >
+        <span className="room-card-detail">
           Lihat detail -&gt;
-        </button>
+        </span>
       </div>
     );
   };

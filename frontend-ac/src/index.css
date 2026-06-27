@@ -40,8 +40,7 @@ select {
   transform: none;
   transition:
     border-color 220ms ease,
-    box-shadow 220ms ease,
-    background 220ms ease;
+    box-shadow 220ms ease;
 }
 
 .room-card::before {
@@ -75,17 +74,11 @@ select {
 .room-card:hover {
   border-color: rgba(125, 178, 255, 0.72);
   box-shadow: 0 14px 30px rgba(2, 8, 23, 0.28);
-  background:
-    linear-gradient(145deg, rgba(44, 63, 94, 0.98), rgba(21, 36, 60, 0.98)),
-    var(--bg-card-soft, #172033);
 }
 
 .room-card-on:hover {
   border-color: rgba(74, 222, 128, 0.68);
   box-shadow: 0 14px 30px rgba(34, 197, 94, 0.16);
-  background:
-    linear-gradient(145deg, rgba(25, 84, 74, 0.98), rgba(19, 59, 59, 0.98)),
-    var(--bg-card-soft, #172033);
 }
 
 .room-card:active {
@@ -159,34 +152,17 @@ select {
   border-radius: 999px;
   border: 1px solid rgba(96, 165, 250, 0.34);
   background: rgba(15, 23, 42, 0.18);
-  cursor: pointer;
+  pointer-events: none;
   color: #60a5fa;
   font-size: 11.5px;
   font-weight: 700;
   opacity: 0;
-  transform: translateY(2px);
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
+  transition: opacity 180ms ease;
 }
 
 .room-card:hover .room-card-detail,
 .room-card:focus-within .room-card-detail {
   opacity: 1;
-  transform: translateY(0);
-}
-
-.room-card-detail:hover,
-.room-card-detail:focus-visible {
-  border-color: rgba(96, 165, 250, 0.72);
-  background: rgba(45, 140, 255, 0.16);
-  outline: none;
-}
-
-.room-card-detail:active {
-  background: rgba(45, 140, 255, 0.22);
 }
 
 .table-scroll {
