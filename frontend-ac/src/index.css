@@ -85,7 +85,6 @@ select {
 
 .room-card:hover,
 .room-card:focus-visible {
-  transform: translateY(-3px);
   border-color: rgba(125, 178, 255, 0.78);
   background:
     linear-gradient(145deg, rgba(45, 65, 96, 0.98), rgba(21, 37, 62, 0.98)),
@@ -104,7 +103,7 @@ select {
 }
 
 .room-card:active {
-  transform: translateY(-1px) scale(0.992);
+  box-shadow: 0 10px 24px rgba(2, 8, 23, 0.22);
   transition-duration: 120ms;
 }
 
