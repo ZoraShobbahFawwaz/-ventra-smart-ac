@@ -462,7 +462,11 @@ export default function KelolaRuangan() {
         <div style={overlay}>
           <div className="room-modal responsive-modal" style={modal}>
             {/* CLOSE BUTTON */}
-            <button style={closeBtn} onClick={() => setSelectedRoom(null)}>
+            <button
+              className="modal-close-button"
+              style={closeBtn}
+              onClick={() => setSelectedRoom(null)}
+            >
               ×
             </button>
 
@@ -814,42 +818,42 @@ const grid = {
 const overlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(2, 8, 23, 0.72)",
+  background: "rgba(2, 8, 23, 0.78)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   zIndex: 999,
-  backdropFilter: "blur(6px)",
+  backdropFilter: "blur(8px)",
 };
 
 const modal = {
-  width: "920px",
+  width: "960px",
   maxWidth: "92vw",
   maxHeight: "92vh",
   overflowY: "auto",
   background:
-    "linear-gradient(145deg, rgba(17, 34, 59, 0.98), rgba(11, 20, 38, 0.98))",
+    "linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
   color: "var(--text-main, #111)",
-  borderRadius: 20,
-  padding: 24,
+  borderRadius: 18,
+  padding: 26,
   position: "relative",
-  boxShadow: "0 28px 90px rgba(0,0,0,0.42)",
-  border: "1px solid rgba(96, 165, 250, 0.18)",
+  boxShadow: "0 30px 90px rgba(0,0,0,0.48)",
+  border: "1px solid rgba(96, 165, 250, 0.22)",
   transition: "0.2s ease",
 };
 
 const closeBtn = {
   position: "absolute",
-  top: 14,
-  right: 14,
-  width: 32,
-  height: 32,
-  borderRadius: 10,
-  border: "1px solid rgba(148, 163, 184, 0.24)",
-  background: "rgba(15, 23, 42, 0.32)",
-  color: "#e2e8f0",
-  fontSize: 22,
-  lineHeight: "26px",
+  top: 18,
+  right: 18,
+  width: 34,
+  height: 34,
+  borderRadius: 12,
+  border: "1px solid rgba(148, 163, 184, 0.28)",
+  background: "rgba(15, 23, 42, 0.5)",
+  color: "#f8fafc",
+  fontSize: 20,
+  lineHeight: "24px",
   cursor: "pointer",
   zIndex: 2,
 };
@@ -859,40 +863,43 @@ const modalTop = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 20,
-  marginBottom: 20,
-  padding: "16px 20px",
-  borderRadius: 14,
-  background: "linear-gradient(135deg, rgba(45, 140, 255, 0.9), rgba(26, 110, 216, 0.74))",
+  marginBottom: 18,
+  padding: "18px 22px",
+  borderRadius: 16,
+  background:
+    "linear-gradient(135deg, rgba(45, 140, 255, 0.92), rgba(26, 110, 216, 0.7))",
   color: "#fff",
-  border: "1px solid rgba(255, 255, 255, 0.08)",
+  border: "1px solid rgba(255, 255, 255, 0.1)",
+  boxShadow: "0 14px 34px rgba(45, 140, 255, 0.16)",
 };
 
 const modalTitle = {
   margin: 0,
-  fontSize: 18,
-  fontWeight: 700,
+  fontSize: 20,
+  fontWeight: 800,
+  letterSpacing: 0,
 };
 
 const modalSubtitle = {
   margin: "4px 0 0",
   fontSize: 12,
-  opacity: 0.9,
+  color: "rgba(255,255,255,0.82)",
 };
 
 const statusBadge = {
   padding: "8px 12px",
   borderRadius: 999,
   fontSize: 12,
-  fontWeight: 700,
+  fontWeight: 800,
   whiteSpace: "nowrap",
 };
 
 const detailEmptyState = {
   marginBottom: 16,
-  padding: "12px 14px",
+  padding: "13px 15px",
   borderRadius: 12,
   border: "1px solid rgba(148, 163, 184, 0.2)",
-  background: "rgba(15, 23, 42, 0.28)",
+  background: "rgba(15, 23, 42, 0.34)",
   color: "var(--text-muted, #94a3b8)",
   fontSize: 13,
   fontWeight: 600,
@@ -900,10 +907,10 @@ const detailEmptyState = {
 
 const detailMetaCard = {
   marginBottom: 16,
-  padding: "12px 14px",
+  padding: "13px 15px",
   borderRadius: 12,
-  border: "1px solid rgba(96, 165, 250, 0.18)",
-  background: "rgba(45, 140, 255, 0.1)",
+  border: "1px solid rgba(96, 165, 250, 0.22)",
+  background: "rgba(45, 140, 255, 0.11)",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -920,38 +927,41 @@ const modalGrid = {
 };
 
 const infoCard = {
-  background: "var(--bg-card-soft, #f9fafb)",
-  border: "1px solid var(--border-color, #eee)",
+  background:
+    "linear-gradient(145deg, rgba(39, 54, 80, 0.96), rgba(30, 43, 66, 0.96))",
+  border: "1px solid rgba(148, 163, 184, 0.16)",
   borderRadius: 16,
-  padding: 16,
+  padding: 18,
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
 };
 
 const sectionTitle = {
   fontSize: 14,
-  fontWeight: 700,
-  marginBottom: 12,
-  color: "var(--text-main, #111)",
+  fontWeight: 800,
+  marginBottom: 14,
+  color: "#f8fafc",
 };
 
 const dataRow = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "8px 0",
-  borderBottom: "1px solid var(--border-color, #eee)",
+  padding: "9px 0",
+  borderBottom: "1px solid rgba(148, 163, 184, 0.14)",
   fontSize: 13,
-  color: "var(--text-main, #111)",
+  color: "#cbd5e1",
 };
 
 const energyCard = {
-  background: "var(--bg-card-soft, #f9fafb)",
-  border: "1px solid var(--border-color, #eee)",
-  borderRadius: 18,
+  background:
+    "linear-gradient(145deg, rgba(39, 54, 80, 0.96), rgba(30, 43, 66, 0.96))",
+  border: "1px solid rgba(148, 163, 184, 0.16)",
+  borderRadius: 16,
   padding: 18,
   display: "flex",
   flexDirection: "column",
   gap: 14,
-  boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
 };
 
 const energyCardHeader = {
@@ -970,7 +980,7 @@ const energyIconBox = {
   width: 42,
   height: 42,
   borderRadius: 12,
-  background: "linear-gradient(90deg, #2d8cff, #1a6ed8)",
+  background: "linear-gradient(135deg, #2d8cff, #1a6ed8)",
   color: "#fff",
   display: "flex",
   justifyContent: "center",
@@ -980,13 +990,13 @@ const energyIconBox = {
 
 const energyCardTitle = {
   fontSize: 15,
-  fontWeight: 700,
-  color: "var(--text-main, #111)",
+  fontWeight: 800,
+  color: "#f8fafc",
 };
 
 const energyCardSubtitle = {
   fontSize: 12,
-  color: "var(--text-muted, #666)",
+  color: "#cbd5e1",
   marginTop: 2,
 };
 
@@ -997,15 +1007,15 @@ const dateTimeWrapper = {
 };
 
 const dateTimeCard = {
-  background: "var(--bg-card, #fff)",
-  border: "1px solid var(--border-color, #eee)",
+  background: "rgba(15, 23, 42, 0.28)",
+  border: "1px solid rgba(148, 163, 184, 0.14)",
   borderRadius: 12,
   padding: "12px 14px",
 };
 
 const dateTimeLabel = {
   fontSize: 12,
-  color: "var(--text-muted, #666)",
+  color: "#cbd5e1",
   display: "flex",
   alignItems: "center",
   marginBottom: 6,
@@ -1014,7 +1024,7 @@ const dateTimeLabel = {
 const dateTimeValue = {
   fontSize: 13,
   fontWeight: 700,
-  color: "var(--text-main, #111)",
+  color: "#f8fafc",
 };
 
 const miniGrid = {
@@ -1024,8 +1034,8 @@ const miniGrid = {
 };
 
 const energyStatCard = {
-  background: "var(--bg-card, #fff)",
-  border: "1px solid var(--border-color, #eee)",
+  background: "rgba(15, 23, 42, 0.3)",
+  border: "1px solid rgba(148, 163, 184, 0.14)",
   borderRadius: 14,
   padding: 14,
   display: "flex",
@@ -1035,20 +1045,20 @@ const energyStatCard = {
 
 const energyStatLabel = {
   fontSize: 12,
-  color: "var(--text-muted, #666)",
+  color: "#cbd5e1",
 };
 
 const energyStatValue = {
   fontSize: 20,
   fontWeight: 800,
-  color: "var(--text-main, #111)",
+  color: "#f8fafc",
 };
 
 const periodInfoBox = {
   fontSize: 12,
-  color: "var(--text-muted, #666)",
+  color: "#cbd5e1",
   background: "rgba(45, 140, 255, 0.08)",
-  border: "1px solid rgba(45, 140, 255, 0.15)",
+  border: "1px solid rgba(45, 140, 255, 0.2)",
   padding: "10px 12px",
   borderRadius: 10,
 };
@@ -1060,9 +1070,9 @@ const tabContainer = {
 };
 
 const tab = {
-  border: "1px solid var(--border-color, #eee)",
-  background: "var(--input-bg, #eee)",
-  color: "var(--text-main, #111)",
+  border: "1px solid rgba(148, 163, 184, 0.16)",
+  background: "rgba(15, 23, 42, 0.3)",
+  color: "#e2e8f0",
   padding: 8,
   borderRadius: 10,
   cursor: "pointer",
@@ -1075,13 +1085,15 @@ const tabActive = {
   background: "#2d8cff",
   color: "#fff",
   border: "1px solid #2d8cff",
+  boxShadow: "0 10px 18px rgba(45, 140, 255, 0.16)",
 };
 
 const controlCard = {
-  background: "var(--bg-card-soft, #f9fafb)",
-  border: "1px solid var(--border-color, #eee)",
+  background:
+    "linear-gradient(145deg, rgba(39, 54, 80, 0.96), rgba(30, 43, 66, 0.96))",
+  border: "1px solid rgba(148, 163, 184, 0.16)",
   borderRadius: 16,
-  padding: 16,
+  padding: 18,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -1091,7 +1103,7 @@ const controlCard = {
 const controlText = {
   margin: 0,
   fontSize: 12,
-  color: "var(--text-muted, #666)",
+  color: "#cbd5e1",
   maxWidth: 520,
 };
 
@@ -1104,18 +1116,20 @@ const btnOn = {
   background: "#22c55e",
   color: "#fff",
   border: "none",
-  padding: "10px 16px",
+  padding: "11px 18px",
   borderRadius: 10,
   fontWeight: 700,
+  boxShadow: "0 10px 22px rgba(34, 197, 94, 0.18)",
 };
 
 const btnOff = {
   background: "#ef4444",
   color: "#fff",
   border: "none",
-  padding: "10px 16px",
+  padding: "11px 18px",
   borderRadius: 10,
   fontWeight: 700,
+  boxShadow: "0 10px 22px rgba(239, 68, 68, 0.16)",
 };
 
 const reasonOverlay = {

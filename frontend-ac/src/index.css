@@ -176,6 +176,21 @@ select {
   color: #bfdbfe;
 }
 
+.modal-close-button {
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.modal-close-button:hover,
+.modal-close-button:focus-visible {
+  border-color: rgba(147, 197, 253, 0.55) !important;
+  background: rgba(45, 140, 255, 0.18) !important;
+  color: #ffffff !important;
+  outline: none;
+}
+
 .table-scroll {
   width: 100%;
 }
