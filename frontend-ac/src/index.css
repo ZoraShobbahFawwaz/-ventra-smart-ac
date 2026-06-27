@@ -38,7 +38,10 @@ select {
   box-shadow: 0 10px 24px rgba(2, 8, 23, 0.18);
   isolation: isolate;
   transform: none;
-  transition: none;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
 }
 
 .room-card::before {
@@ -67,6 +70,26 @@ select {
     radial-gradient(circle at 18% 12%, rgba(74, 222, 128, 0.16), transparent 44%),
     radial-gradient(circle at 92% 90%, rgba(20, 184, 166, 0.12), transparent 38%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 58%);
+}
+
+.room-card:hover {
+  border-color: rgba(125, 178, 255, 0.72);
+  box-shadow: 0 14px 30px rgba(2, 8, 23, 0.28);
+  background:
+    linear-gradient(145deg, rgba(44, 63, 94, 0.98), rgba(21, 36, 60, 0.98)),
+    var(--bg-card-soft, #172033);
+}
+
+.room-card-on:hover {
+  border-color: rgba(74, 222, 128, 0.68);
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.16);
+  background:
+    linear-gradient(145deg, rgba(25, 84, 74, 0.98), rgba(19, 59, 59, 0.98)),
+    var(--bg-card-soft, #172033);
+}
+
+.room-card:active {
+  box-shadow: 0 8px 18px rgba(2, 8, 23, 0.22);
 }
 
 .room-card:focus-visible {
@@ -128,16 +151,42 @@ select {
   position: absolute;
   right: 20px;
   bottom: 15px;
-  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(96, 165, 250, 0.34);
+  background: rgba(15, 23, 42, 0.18);
+  cursor: pointer;
   color: #60a5fa;
   font-size: 11.5px;
   font-weight: 700;
-  opacity: 0.72;
-  transition: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
 }
 
-.room-card > * {
-  pointer-events: none;
+.room-card:hover .room-card-detail,
+.room-card:focus-within .room-card-detail {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.room-card-detail:hover,
+.room-card-detail:focus-visible {
+  border-color: rgba(96, 165, 250, 0.72);
+  background: rgba(45, 140, 255, 0.16);
+  outline: none;
+}
+
+.room-card-detail:active {
+  background: rgba(45, 140, 255, 0.22);
 }
 
 .table-scroll {
