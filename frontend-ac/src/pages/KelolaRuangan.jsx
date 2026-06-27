@@ -504,10 +504,6 @@ export default function KelolaRuangan() {
               </div>
             </div>
 
-            {!hasSelectedRoomDetail && (
-              <div style={detailEmptyState}>Detail ruangan belum tersedia</div>
-            )}
-
             {hasSelectedRoomDetail && (
               <div style={detailMetaCard}>
                 <span>Terakhir diperbarui</span>
@@ -904,17 +900,6 @@ const statusBadge = {
   fontSize: 12,
   fontWeight: 800,
   whiteSpace: "nowrap",
-};
-
-const detailEmptyState = {
-  marginBottom: 16,
-  padding: "13px 15px",
-  borderRadius: 12,
-  border: "1px solid rgba(148, 163, 184, 0.2)",
-  background: "rgba(15, 23, 42, 0.34)",
-  color: "var(--text-muted, #94a3b8)",
-  fontSize: 13,
-  fontWeight: 600,
 };
 
 const detailMetaCard = {
