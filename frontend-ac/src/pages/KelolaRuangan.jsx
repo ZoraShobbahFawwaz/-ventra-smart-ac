@@ -411,16 +411,7 @@ export default function KelolaRuangan() {
 
     return (
       <div
-        role="button"
-        tabIndex={0}
         className={`room-card ${isOn ? "room-card-on" : "room-card-off"}`}
-        onClick={openRoomDetail}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            openRoomDetail();
-          }
-        }}
         style={{
           height: 120,
           padding: 15,
@@ -429,7 +420,6 @@ export default function KelolaRuangan() {
           justifyContent: "center",
           alignItems: "center",
           textAlign: "center",
-          cursor: "pointer",
         }}
       >
         <div className="room-card-title">
@@ -443,9 +433,13 @@ export default function KelolaRuangan() {
           </span>
         </div>
 
-        <span className="room-card-detail">
+        <button
+          type="button"
+          className="room-card-detail"
+          onClick={openRoomDetail}
+        >
           Lihat detail -&gt;
-        </span>
+        </button>
       </div>
     );
   };
