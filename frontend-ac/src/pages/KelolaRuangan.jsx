@@ -3,9 +3,6 @@ import {
   FaBolt,
   FaCalendarAlt,
   FaChartLine,
-  FaChevronRight,
-  FaDoorOpen,
-  FaSnowflake,
 } from "react-icons/fa";
 import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
@@ -393,71 +390,48 @@ export default function KelolaRuangan() {
     const isOn = getEffectiveRoomStatus(room.name) === "ON";
 
     return (
-      <button
-        type="button"
-        className={`room-card-button${isOn ? " is-on" : ""}`}
-        aria-label={`Buka detail ${room.name}`}
+      <div
         onClick={() => setSelectedRoom(room)}
         style={{
           height: 120,
-          borderRadius: 16,
-          padding: 0,
+          borderRadius: 14,
+          padding: 15,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "stretch",
-          alignItems: "stretch",
+          justifyContent: "center",
+          alignItems: "center",
           textAlign: "center",
-          boxShadow: isOn
-            ? "0 12px 28px rgba(34, 197, 94, 0.1)"
-            : "0 12px 28px rgba(2, 8, 23, 0.16)",
+          boxShadow: "0 6px 16px var(--shadow-color, rgba(0,0,0,0.05))",
           border: isOn
-            ? "1px solid rgba(34, 197, 94, 0.45)"
-            : "1px solid rgba(59, 130, 246, 0.18)",
+            ? "2px solid #22c55e"
+            : "2px solid var(--border-color, #eee)",
           background: isOn
-            ? "linear-gradient(135deg, rgba(13, 78, 61, 0.98), rgba(15, 61, 59, 0.96))"
-            : "linear-gradient(135deg, rgba(17, 34, 59, 0.98), rgba(15, 29, 52, 0.96))",
+            ? "rgba(34, 197, 94, 0.14)"
+            : "var(--bg-card-soft, #f8fafc)",
           color: "var(--text-main, #111)",
           cursor: "pointer",
-          transition: "border-color 0.16s ease, box-shadow 0.16s ease",
+          transition: "0.2s ease",
         }}
       >
-        <div style={roomHeaderArea}>
-          <div style={roomDoorIcon}>
-            <FaDoorOpen />
-          </div>
-
-          <div style={roomVerticalDivider} />
-
-          <div style={roomNameText}>{room.name}</div>
+        <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>
+          {room.name}
         </div>
 
-        <div style={roomDivider} />
-
-        <div style={roomFooterArea}>
-          <div style={roomStatusGroup}>
-            <span
-              style={{
-                ...roomStatusDot,
-                background: isOn ? "#22c55e" : "#22c55e",
-              }}
-            />
-
-            <div style={roomSnowIcon}>
-              <FaSnowflake />
-            </div>
-
-            <div style={roomStatusCopy}>
-              <span style={roomStatusLabel}>AC Status</span>
-              <b style={roomStatusValue}>{isOn ? "AC Aktif" : "AC Nonaktif"}</b>
-            </div>
-          </div>
-
-          <span style={roomDetailButton}>
-            Detail
-            <FaChevronRight />
+        <div style={{ display: "flex", gap: 6, fontWeight: 600 }}>
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: isOn ? "#22c55e" : "var(--text-muted, #888)",
+              marginTop: 5,
+            }}
+          ></span>
+          <span style={{ color: isOn ? "#22c55e" : "var(--text-main, #111)" }}>
+            {isOn ? "ON" : "OFF"}
           </span>
         </div>
-      </button>
+      </div>
     );
   };
 
@@ -830,123 +804,6 @@ const grid = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 20,
-};
-
-const roomHeaderArea = {
-  flex: "0 0 67px",
-  display: "flex",
-  alignItems: "center",
-  gap: 14,
-  padding: "14px 18px",
-};
-
-const roomDoorIcon = {
-  width: 42,
-  height: 42,
-  borderRadius: 14,
-  background: "rgba(45, 140, 255, 0.15)",
-  border: "1px solid rgba(96, 165, 250, 0.2)",
-  color: "#dbeafe",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  fontSize: 18,
-};
-
-const roomVerticalDivider = {
-  width: 1,
-  height: 34,
-  background: "rgba(148, 163, 184, 0.24)",
-};
-
-const roomNameText = {
-  flex: 1,
-  minWidth: 0,
-  color: "#f8fafc",
-  fontSize: 18,
-  fontWeight: 700,
-  lineHeight: 1.25,
-  textAlign: "left",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
-const roomDivider = {
-  height: 1,
-  background: "rgba(148, 163, 184, 0.18)",
-};
-
-const roomFooterArea = {
-  flex: 1,
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 14,
-  padding: "12px 18px",
-};
-
-const roomStatusGroup = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  minWidth: 0,
-};
-
-const roomStatusDot = {
-  width: 8,
-  height: 8,
-  borderRadius: "50%",
-  boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.08)",
-  flex: "0 0 auto",
-};
-
-const roomSnowIcon = {
-  width: 34,
-  height: 34,
-  borderRadius: "50%",
-  background: "rgba(59, 130, 246, 0.16)",
-  color: "#7dd3fc",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  fontSize: 16,
-  flex: "0 0 auto",
-};
-
-const roomStatusCopy = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  minWidth: 0,
-};
-
-const roomStatusLabel = {
-  color: "rgba(203, 213, 225, 0.68)",
-  fontSize: 11,
-  fontWeight: 600,
-  lineHeight: 1.1,
-};
-
-const roomStatusValue = {
-  color: "#f8fafc",
-  fontSize: 13,
-  lineHeight: 1.25,
-  marginTop: 3,
-  whiteSpace: "nowrap",
-};
-
-const roomDetailButton = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "8px 12px",
-  borderRadius: 10,
-  border: "1px solid rgba(59, 130, 246, 0.38)",
-  color: "#60a5fa",
-  fontSize: 12,
-  fontWeight: 700,
-  flex: "0 0 auto",
 };
 
 const overlay = {

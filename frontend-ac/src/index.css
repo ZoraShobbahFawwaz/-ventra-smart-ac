@@ -26,35 +26,6 @@ select {
   font: inherit;
 }
 
-.room-card-button {
-  position: relative;
-  appearance: none;
-  width: 100%;
-  overflow: visible;
-}
-
-.room-card-button:hover {
-  border-color: rgba(96, 165, 250, 0.75) !important;
-}
-
-.room-card-button:active {
-  border-color: rgba(96, 165, 250, 0.95) !important;
-}
-
-.room-card-button:focus-visible {
-  outline: 3px solid rgba(45, 140, 255, 0.42);
-  outline-offset: 3px;
-}
-
-.room-card-button > * {
-  position: relative;
-  z-index: 1;
-}
-
-.room-card-button svg {
-  flex-shrink: 0;
-}
-
 .table-scroll {
   width: 100%;
 }
