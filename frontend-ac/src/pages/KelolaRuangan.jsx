@@ -833,12 +833,12 @@ const grid = {
 const overlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(15,23,42,0.65)",
+  background: "rgba(2, 8, 23, 0.72)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   zIndex: 999,
-  backdropFilter: "blur(4px)",
+  backdropFilter: "blur(6px)",
 };
 
 const modal = {
@@ -846,13 +846,14 @@ const modal = {
   maxWidth: "92vw",
   maxHeight: "92vh",
   overflowY: "auto",
-  background: "var(--bg-card, #fff)",
+  background:
+    "linear-gradient(145deg, rgba(17, 34, 59, 0.98), rgba(11, 20, 38, 0.98))",
   color: "var(--text-main, #111)",
-  borderRadius: 22,
+  borderRadius: 20,
   padding: 24,
   position: "relative",
-  boxShadow: "0 25px 80px rgba(0,0,0,0.35)",
-  border: "1px solid var(--border-color, #eee)",
+  boxShadow: "0 28px 90px rgba(0,0,0,0.42)",
+  border: "1px solid rgba(96, 165, 250, 0.18)",
   transition: "0.2s ease",
 };
 
@@ -862,10 +863,10 @@ const closeBtn = {
   right: 14,
   width: 32,
   height: 32,
-  borderRadius: "50%",
-  border: "1px solid var(--border-color, #ddd)",
-  background: "var(--bg-card-soft, #f8fafc)",
-  color: "var(--text-main, #111)",
+  borderRadius: 10,
+  border: "1px solid rgba(148, 163, 184, 0.24)",
+  background: "rgba(15, 23, 42, 0.32)",
+  color: "#e2e8f0",
   fontSize: 22,
   lineHeight: "26px",
   cursor: "pointer",
@@ -879,9 +880,10 @@ const modalTop = {
   gap: 20,
   marginBottom: 20,
   padding: "16px 20px",
-  borderRadius: 16,
-  background: "linear-gradient(90deg, #2d8cff, #1a6ed8)",
+  borderRadius: 14,
+  background: "linear-gradient(135deg, rgba(45, 140, 255, 0.9), rgba(26, 110, 216, 0.74))",
   color: "#fff",
+  border: "1px solid rgba(255, 255, 255, 0.08)",
 };
 
 const modalTitle = {
@@ -908,8 +910,8 @@ const detailEmptyState = {
   marginBottom: 16,
   padding: "12px 14px",
   borderRadius: 12,
-  border: "1px solid rgba(148, 163, 184, 0.22)",
-  background: "rgba(15, 23, 42, 0.18)",
+  border: "1px solid rgba(148, 163, 184, 0.2)",
+  background: "rgba(15, 23, 42, 0.28)",
   color: "var(--text-muted, #94a3b8)",
   fontSize: 13,
   fontWeight: 600,
@@ -920,7 +922,7 @@ const detailMetaCard = {
   padding: "12px 14px",
   borderRadius: 12,
   border: "1px solid rgba(96, 165, 250, 0.18)",
-  background: "rgba(45, 140, 255, 0.08)",
+  background: "rgba(45, 140, 255, 0.1)",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
