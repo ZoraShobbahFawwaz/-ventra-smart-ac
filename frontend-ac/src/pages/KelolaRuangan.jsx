@@ -296,8 +296,8 @@ export default function KelolaRuangan() {
     {
       lantai: "Sayap Kanan",
       rooms: [
+        { name: "Ruang Kelas 2.01" },
         { name: "Ruang Kelas 2.02" },
-        { name: "Ruang Kelas 2.03" },
         { name: "Ruang Kelas 2.03" },
         { name: "Ruang Kelas 2.04" },
       ],
