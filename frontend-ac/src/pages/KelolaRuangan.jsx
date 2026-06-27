@@ -5,6 +5,7 @@ import {
   FaChartLine,
   FaChevronRight,
   FaDoorOpen,
+  FaPowerOff,
 } from "react-icons/fa";
 import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
@@ -390,6 +391,8 @@ export default function KelolaRuangan() {
   // =========================
   const RoomCard = ({ room }) => {
     const isOn = getEffectiveRoomStatus(room.name) === "ON";
+    const statusText = isOn ? "AC Aktif" : "AC Nonaktif";
+    const statusDescription = isOn ? "Sedang beroperasi" : "Menunggu jadwal";
 
     return (
       <button
@@ -400,7 +403,7 @@ export default function KelolaRuangan() {
         style={{
           minHeight: 120,
           borderRadius: 14,
-          padding: 16,
+          padding: 0,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -418,46 +421,56 @@ export default function KelolaRuangan() {
           color: "var(--text-main, #111)",
           cursor: "pointer",
           transition:
-            "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease",
+            "box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease",
         }}
       >
-        <div style={roomCardTop}>
-          <div style={roomIconBox}>
-            <FaDoorOpen />
+        <div style={roomCardBody}>
+          <div style={roomCardTop}>
+            <div style={roomTitleWrap}>
+              <div style={roomIconBox}>
+                <FaDoorOpen />
+              </div>
+
+              <div>
+                <div style={roomNameText}>{room.name}</div>
+                <div style={roomMetaText}>Ruang kelas lantai 2</div>
+              </div>
+            </div>
+
+            <span style={roomOpenHint} aria-hidden="true">
+              <FaChevronRight />
+            </span>
           </div>
 
-          <span style={roomOpenHint} aria-hidden="true">
-            <FaChevronRight />
-          </span>
-        </div>
-
-        <div>
-          <div style={roomNameText}>{room.name}</div>
-
-          <div
-            style={{
-              ...roomStatusPill,
-              color: isOn ? "#22c55e" : "var(--text-muted, #cbd5e1)",
-              background: isOn
-                ? "rgba(34, 197, 94, 0.12)"
-                : "rgba(148, 163, 184, 0.12)",
-              border: isOn
-                ? "1px solid rgba(34, 197, 94, 0.32)"
-                : "1px solid rgba(148, 163, 184, 0.24)",
-            }}
-          >
-            <span
+          <div style={roomStatusBlock}>
+            <div
               style={{
-                ...roomStatusDot,
-                background: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
+                ...roomStatusIcon,
+                background: isOn
+                  ? "rgba(34, 197, 94, 0.16)"
+                  : "rgba(148, 163, 184, 0.12)",
+                color: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
               }}
-            />
-            {isOn ? "ON" : "OFF"}
+            >
+              <FaPowerOff />
+            </div>
+
+            <div>
+              <div
+                style={{
+                  ...roomStatusText,
+                  color: isOn ? "#22c55e" : "var(--text-main, #e2e8f0)",
+                }}
+              >
+                {statusText}
+              </div>
+              <div style={roomStatusDescription}>{statusDescription}</div>
+            </div>
           </div>
         </div>
 
         <div style={roomCardAction}>
-          <span>Lihat detail</span>
+          <span>Buka detail ruangan</span>
           <FaChevronRight />
         </div>
       </button>
@@ -838,8 +851,21 @@ const grid = {
 const roomCardTop = {
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "center",
+  alignItems: "flex-start",
   gap: 12,
+};
+
+const roomCardBody = {
+  padding: 16,
+  display: "flex",
+  flexDirection: "column",
+  gap: 18,
+};
+
+const roomTitleWrap = {
+  display: "flex",
+  alignItems: "center",
+  gap: 11,
 };
 
 const roomIconBox = {
@@ -870,26 +896,43 @@ const roomNameText = {
   fontSize: 14,
   fontWeight: 700,
   lineHeight: 1.35,
-  marginBottom: 10,
   color: "var(--text-main, #111)",
 };
 
-const roomStatusPill = {
-  width: "fit-content",
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 7,
-  padding: "5px 9px",
-  borderRadius: 999,
-  fontSize: 12,
-  fontWeight: 800,
-  letterSpacing: 0,
+const roomMetaText = {
+  marginTop: 3,
+  fontSize: 11,
+  color: "var(--text-muted, #94a3b8)",
 };
 
-const roomStatusDot = {
-  width: 7,
-  height: 7,
-  borderRadius: "50%",
+const roomStatusBlock = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  padding: "12px 0 0",
+  borderTop: "1px solid rgba(148, 163, 184, 0.18)",
+};
+
+const roomStatusIcon = {
+  width: 30,
+  height: 30,
+  borderRadius: 10,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  fontSize: 12,
+};
+
+const roomStatusText = {
+  fontSize: 13,
+  fontWeight: 800,
+  lineHeight: 1.2,
+};
+
+const roomStatusDescription = {
+  marginTop: 2,
+  fontSize: 11,
+  color: "var(--text-muted, #94a3b8)",
 };
 
 const roomCardAction = {
@@ -897,8 +940,9 @@ const roomCardAction = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 10,
-  paddingTop: 12,
+  padding: "11px 16px",
   borderTop: "1px solid rgba(148, 163, 184, 0.18)",
+  background: "rgba(15, 23, 42, 0.08)",
   color: "#60a5fa",
   fontSize: 12,
   fontWeight: 700,
