@@ -38,14 +38,8 @@ export default function KelolaRuangan() {
   };
 
   function getEffectiveRoomStatus(roomName) {
-    const latestYolo = yoloData?.[roomName];
-
     if (roomStatus[roomName]) {
       return roomStatus[roomName];
-    }
-
-    if (isFreshData(latestYolo)) {
-      return latestYolo?.ac_status;
     }
 
     return undefined;
