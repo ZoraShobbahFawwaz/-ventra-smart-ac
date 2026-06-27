@@ -273,7 +273,11 @@ function Dashboard() {
             />
           </div>
 
-          <button style={refreshBtn} onClick={handleRefresh}>
+          <button
+            className="action-button action-button-primary"
+            style={refreshBtn}
+            onClick={handleRefresh}
+          >
             Refresh
           </button>
         </div>

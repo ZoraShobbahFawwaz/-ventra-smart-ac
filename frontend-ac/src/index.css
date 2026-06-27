@@ -262,6 +262,55 @@ select {
   filter: brightness(0.98);
 }
 
+.action-button,
+.icon-action-button {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.action-button:hover,
+.action-button:focus-visible,
+.icon-action-button:hover,
+.icon-action-button:focus-visible {
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.action-button-primary:hover,
+.action-button-primary:focus-visible {
+  filter: brightness(1.06);
+  box-shadow:
+    0 12px 24px rgba(45, 140, 255, 0.28),
+    0 0 0 3px rgba(45, 140, 255, 0.12);
+}
+
+.action-button-view:hover,
+.action-button-view:focus-visible {
+  filter: brightness(1.07);
+  box-shadow: 0 10px 18px rgba(45, 140, 255, 0.22);
+}
+
+.icon-action-danger:hover,
+.icon-action-danger:focus-visible {
+  color: #fff !important;
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  background: #ef4444 !important;
+  box-shadow:
+    0 10px 20px rgba(239, 68, 68, 0.24),
+    0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.action-button:active,
+.icon-action-button:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
 .sidebar-menu-item {
   position: relative;
   overflow: hidden;

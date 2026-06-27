@@ -235,7 +235,11 @@ function AuditLogs() {
             />
           </div>
 
-          <button style={refreshBtn} onClick={fetchLogs}>
+          <button
+            className="action-button action-button-primary"
+            style={refreshBtn}
+            onClick={fetchLogs}
+          >
             Refresh
           </button>
         </div>
@@ -287,7 +291,11 @@ function AuditLogs() {
                 </div>
 
                 <div>
-                  <button style={btn} onClick={() => setSelectedLog(log)}>
+                  <button
+                    className="action-button action-button-view"
+                    style={btn}
+                    onClick={() => setSelectedLog(log)}
+                  >
                     View
                   </button>
                 </div>

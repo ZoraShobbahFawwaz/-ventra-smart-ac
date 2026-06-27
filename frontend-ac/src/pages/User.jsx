@@ -148,7 +148,11 @@ function User() {
               <div>{u.role}</div>
 
               <div style={actions}>
-                <button style={iconBtn} onClick={() => handleDelete(u.id)}>
+                <button
+                  className="icon-action-button icon-action-danger"
+                  style={iconBtn}
+                  onClick={() => handleDelete(u.id)}
+                >
                   <FaTrash />
                 </button>
               </div>
