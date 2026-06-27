@@ -8,6 +8,34 @@ import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
 import { apiHeaders, apiUrl } from "../services/api";
 
+function RoomCard({ room, isOn, onOpen }) {
+  return (
+    <div
+      className={`room-card ${isOn ? "room-card-on" : "room-card-off"}`}
+      style={{
+        height: 120,
+        padding: 15,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
+      <div className="room-card-title">{room.name}</div>
+
+      <div className="room-card-status">
+        <span className="room-card-dot"></span>
+        <span>{isOn ? "ON" : "OFF"}</span>
+      </div>
+
+      <button type="button" className="room-card-detail" onClick={onOpen}>
+        Lihat detail -&gt;
+      </button>
+    </div>
+  );
+}
+
 export default function KelolaRuangan() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [activeTab, setActiveTab] = useState("hari");
@@ -396,48 +424,6 @@ export default function KelolaRuangan() {
     }
   };
 
-  // =========================
-  // COMPONENT ROOM CARD
-  // =========================
-  const RoomCard = ({ room }) => {
-    const isOn = getEffectiveRoomStatus(room.name) === "ON";
-    const openRoomDetail = () => setSelectedRoom(room);
-
-    return (
-      <div
-        className={`room-card ${isOn ? "room-card-on" : "room-card-off"}`}
-        style={{
-          height: 120,
-          padding: 15,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
-        <div className="room-card-title">
-          {room.name}
-        </div>
-
-        <div className="room-card-status">
-          <span className="room-card-dot"></span>
-          <span>
-            {isOn ? "ON" : "OFF"}
-          </span>
-        </div>
-
-        <button
-          type="button"
-          className="room-card-detail"
-          onClick={openRoomDetail}
-        >
-          Lihat detail -&gt;
-        </button>
-      </div>
-    );
-  };
-
   return (
     <div className="app-shell" style={layout}>
       <Sidebar />
@@ -457,7 +443,12 @@ export default function KelolaRuangan() {
 
                 <div className="room-grid" style={grid}>
                   {floor.rooms.map((room, idx) => (
-                    <RoomCard key={idx} room={room} />
+                    <RoomCard
+                      key={idx}
+                      room={room}
+                      isOn={getEffectiveRoomStatus(room.name) === "ON"}
+                      onOpen={() => setSelectedRoom(room)}
+                    />
                   ))}
                 </div>
               </div>
