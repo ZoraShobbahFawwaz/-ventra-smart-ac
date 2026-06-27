@@ -3,6 +3,8 @@ import {
   FaBolt,
   FaCalendarAlt,
   FaChartLine,
+  FaChevronRight,
+  FaDoorOpen,
 } from "react-icons/fa";
 import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
@@ -390,18 +392,23 @@ export default function KelolaRuangan() {
     const isOn = getEffectiveRoomStatus(room.name) === "ON";
 
     return (
-      <div
+      <button
+        type="button"
+        className={`room-card-button${isOn ? " is-on" : ""}`}
+        aria-label={`Buka detail ${room.name}`}
         onClick={() => setSelectedRoom(room)}
         style={{
-          height: 120,
+          minHeight: 120,
           borderRadius: 14,
-          padding: 15,
+          padding: 16,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          boxShadow: "0 6px 16px var(--shadow-color, rgba(0,0,0,0.05))",
+          justifyContent: "space-between",
+          alignItems: "stretch",
+          textAlign: "left",
+          boxShadow: isOn
+            ? "0 12px 26px rgba(34, 197, 94, 0.16)"
+            : "0 6px 16px var(--shadow-color, rgba(0,0,0,0.05))",
           border: isOn
             ? "2px solid #22c55e"
             : "2px solid var(--border-color, #eee)",
@@ -410,28 +417,50 @@ export default function KelolaRuangan() {
             : "var(--bg-card-soft, #f8fafc)",
           color: "var(--text-main, #111)",
           cursor: "pointer",
-          transition: "0.2s ease",
+          transition:
+            "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease",
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>
-          {room.name}
-        </div>
+        <div style={roomCardTop}>
+          <div style={roomIconBox}>
+            <FaDoorOpen />
+          </div>
 
-        <div style={{ display: "flex", gap: 6, fontWeight: 600 }}>
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: isOn ? "#22c55e" : "var(--text-muted, #888)",
-              marginTop: 5,
-            }}
-          ></span>
-          <span style={{ color: isOn ? "#22c55e" : "var(--text-main, #111)" }}>
-            {isOn ? "ON" : "OFF"}
+          <span style={roomOpenHint} aria-hidden="true">
+            <FaChevronRight />
           </span>
         </div>
-      </div>
+
+        <div>
+          <div style={roomNameText}>{room.name}</div>
+
+          <div
+            style={{
+              ...roomStatusPill,
+              color: isOn ? "#22c55e" : "var(--text-muted, #cbd5e1)",
+              background: isOn
+                ? "rgba(34, 197, 94, 0.12)"
+                : "rgba(148, 163, 184, 0.12)",
+              border: isOn
+                ? "1px solid rgba(34, 197, 94, 0.32)"
+                : "1px solid rgba(148, 163, 184, 0.24)",
+            }}
+          >
+            <span
+              style={{
+                ...roomStatusDot,
+                background: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
+              }}
+            />
+            {isOn ? "ON" : "OFF"}
+          </div>
+        </div>
+
+        <div style={roomCardAction}>
+          <span>Lihat detail</span>
+          <FaChevronRight />
+        </div>
+      </button>
     );
   };
 
@@ -804,6 +833,75 @@ const grid = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 20,
+};
+
+const roomCardTop = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+};
+
+const roomIconBox = {
+  width: 34,
+  height: 34,
+  borderRadius: 10,
+  background: "rgba(45, 140, 255, 0.12)",
+  color: "#60a5fa",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  fontSize: 14,
+};
+
+const roomOpenHint = {
+  width: 28,
+  height: 28,
+  borderRadius: 8,
+  border: "1px solid rgba(148, 163, 184, 0.24)",
+  color: "var(--text-muted, #94a3b8)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  fontSize: 11,
+};
+
+const roomNameText = {
+  fontSize: 14,
+  fontWeight: 700,
+  lineHeight: 1.35,
+  marginBottom: 10,
+  color: "var(--text-main, #111)",
+};
+
+const roomStatusPill = {
+  width: "fit-content",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 7,
+  padding: "5px 9px",
+  borderRadius: 999,
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: 0,
+};
+
+const roomStatusDot = {
+  width: 7,
+  height: 7,
+  borderRadius: "50%",
+};
+
+const roomCardAction = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 10,
+  paddingTop: 12,
+  borderTop: "1px solid rgba(148, 163, 184, 0.18)",
+  color: "#60a5fa",
+  fontSize: 12,
+  fontWeight: 700,
 };
 
 const overlay = {
