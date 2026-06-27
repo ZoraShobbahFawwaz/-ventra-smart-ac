@@ -473,6 +473,7 @@ export default function KelolaRuangan() {
             {/* MODAL HEADER */}
             <div className="modal-top" style={modalTop}>
               <div>
+                <div style={modalEyebrow}>Detail Ruangan</div>
                 <h2 style={modalTitle}>{selectedRoom.name}</h2>
                 <p style={modalSubtitle}>
                   Detail monitoring dan kontrol manual AC ruangan
@@ -692,6 +693,7 @@ export default function KelolaRuangan() {
 
               <div style={controlButtons}>
                 <button
+                  className="manual-control-button manual-control-on"
                   style={{
                     ...btnOn,
                     opacity: controlLoading ? 0.6 : 1,
@@ -704,6 +706,7 @@ export default function KelolaRuangan() {
                 </button>
 
                 <button
+                  className="manual-control-button manual-control-off"
                   style={{
                     ...btnOff,
                     opacity: controlLoading ? 0.6 : 1,
@@ -832,7 +835,7 @@ const modal = {
   maxHeight: "92vh",
   overflowY: "auto",
   background:
-    "linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
+    "radial-gradient(circle at top left, rgba(45, 140, 255, 0.13), transparent 34%), linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
   color: "var(--text-main, #111)",
   borderRadius: 18,
   padding: 26,
@@ -863,19 +866,28 @@ const modalTop = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 20,
-  marginBottom: 18,
-  padding: "18px 22px",
+  marginBottom: 20,
+  padding: "20px 22px",
   borderRadius: 16,
   background:
-    "linear-gradient(135deg, rgba(45, 140, 255, 0.92), rgba(26, 110, 216, 0.7))",
+    "linear-gradient(145deg, rgba(28, 47, 77, 0.96), rgba(16, 31, 56, 0.98))",
   color: "#fff",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
-  boxShadow: "0 14px 34px rgba(45, 140, 255, 0.16)",
+  border: "1px solid rgba(96, 165, 250, 0.28)",
+  boxShadow: "0 18px 42px rgba(2, 8, 23, 0.24)",
+};
+
+const modalEyebrow = {
+  marginBottom: 6,
+  color: "#93c5fd",
+  fontSize: 11,
+  fontWeight: 800,
+  letterSpacing: 0.6,
+  textTransform: "uppercase",
 };
 
 const modalTitle = {
   margin: 0,
-  fontSize: 20,
+  fontSize: 22,
   fontWeight: 800,
   letterSpacing: 0,
 };
@@ -887,7 +899,7 @@ const modalSubtitle = {
 };
 
 const statusBadge = {
-  padding: "8px 12px",
+  padding: "9px 13px",
   borderRadius: 999,
   fontSize: 12,
   fontWeight: 800,
@@ -928,8 +940,8 @@ const modalGrid = {
 
 const infoCard = {
   background:
-    "linear-gradient(145deg, rgba(39, 54, 80, 0.96), rgba(30, 43, 66, 0.96))",
-  border: "1px solid rgba(148, 163, 184, 0.16)",
+    "linear-gradient(145deg, rgba(43, 60, 90, 0.98), rgba(30, 43, 66, 0.98))",
+  border: "1px solid rgba(148, 163, 184, 0.2)",
   borderRadius: 16,
   padding: 18,
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
@@ -954,8 +966,8 @@ const dataRow = {
 
 const energyCard = {
   background:
-    "linear-gradient(145deg, rgba(39, 54, 80, 0.96), rgba(30, 43, 66, 0.96))",
-  border: "1px solid rgba(148, 163, 184, 0.16)",
+    "linear-gradient(145deg, rgba(43, 60, 90, 0.98), rgba(30, 43, 66, 0.98))",
+  border: "1px solid rgba(148, 163, 184, 0.2)",
   borderRadius: 16,
   padding: 18,
   display: "flex",
@@ -1090,10 +1102,10 @@ const tabActive = {
 
 const controlCard = {
   background:
-    "linear-gradient(145deg, rgba(39, 54, 80, 0.96), rgba(30, 43, 66, 0.96))",
-  border: "1px solid rgba(148, 163, 184, 0.16)",
+    "linear-gradient(145deg, rgba(45, 64, 94, 0.98), rgba(28, 42, 66, 0.98))",
+  border: "1px solid rgba(96, 165, 250, 0.2)",
   borderRadius: 16,
-  padding: 18,
+  padding: 20,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -1113,23 +1125,23 @@ const controlButtons = {
 };
 
 const btnOn = {
-  background: "#22c55e",
+  background: "linear-gradient(135deg, #22c55e, #16a34a)",
   color: "#fff",
-  border: "none",
-  padding: "11px 18px",
-  borderRadius: 10,
-  fontWeight: 700,
-  boxShadow: "0 10px 22px rgba(34, 197, 94, 0.18)",
+  border: "1px solid rgba(134, 239, 172, 0.22)",
+  padding: "12px 20px",
+  borderRadius: 12,
+  fontWeight: 800,
+  boxShadow: "0 12px 24px rgba(34, 197, 94, 0.2)",
 };
 
 const btnOff = {
-  background: "#ef4444",
+  background: "linear-gradient(135deg, #ef4444, #dc2626)",
   color: "#fff",
-  border: "none",
-  padding: "11px 18px",
-  borderRadius: 10,
-  fontWeight: 700,
-  boxShadow: "0 10px 22px rgba(239, 68, 68, 0.16)",
+  border: "1px solid rgba(252, 165, 165, 0.22)",
+  padding: "12px 20px",
+  borderRadius: 12,
+  fontWeight: 800,
+  boxShadow: "0 12px 24px rgba(239, 68, 68, 0.18)",
 };
 
 const reasonOverlay = {

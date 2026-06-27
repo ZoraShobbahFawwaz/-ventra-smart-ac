@@ -191,6 +191,42 @@ select {
   outline: none;
 }
 
+.manual-control-button {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease,
+    border-color 180ms ease;
+}
+
+.manual-control-button:hover,
+.manual-control-button:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  outline: none;
+}
+
+.manual-control-on:hover,
+.manual-control-on:focus-visible {
+  border-color: rgba(187, 247, 208, 0.55) !important;
+  box-shadow:
+    0 16px 28px rgba(34, 197, 94, 0.28),
+    0 0 0 3px rgba(34, 197, 94, 0.12) !important;
+}
+
+.manual-control-off:hover,
+.manual-control-off:focus-visible {
+  border-color: rgba(254, 202, 202, 0.55) !important;
+  box-shadow:
+    0 16px 28px rgba(239, 68, 68, 0.26),
+    0 0 0 3px rgba(239, 68, 68, 0.11) !important;
+}
+
+.manual-control-button:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
 .table-scroll {
   width: 100%;
 }
