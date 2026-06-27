@@ -75,6 +75,22 @@ export default function KelolaRuangan() {
     });
   };
 
+  const formatDateTime = (value) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) return "-";
+
+    return date.toLocaleString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   // =========================
   // FETCH STATUS ROOM
   // =========================
@@ -247,6 +263,9 @@ export default function KelolaRuangan() {
   const yoloFanSpeedDisplay = selectedRoomIsOn && hasYoloData
     ? formatFanSpeed(selectedYoloData?.fan_speed)
     : "-";
+  const selectedLastUpdated =
+    selectedYoloData?.updated_at || selectedSensorData?.updated_at;
+  const hasSelectedRoomDetail = Boolean(selectedYoloData || selectedSensorData);
 
   // =========================
   // DATA RUANGAN STATIC
@@ -388,49 +407,43 @@ export default function KelolaRuangan() {
   // =========================
   const RoomCard = ({ room }) => {
     const isOn = getEffectiveRoomStatus(room.name) === "ON";
+    const openRoomDetail = () => setSelectedRoom(room);
 
     return (
       <div
-        onClick={() => setSelectedRoom(room)}
+        role="button"
+        tabIndex={0}
+        className={`room-card ${isOn ? "room-card-on" : "room-card-off"}`}
+        onClick={openRoomDetail}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openRoomDetail();
+          }
+        }}
         style={{
           height: 120,
-          borderRadius: 14,
           padding: 15,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           textAlign: "center",
-          boxShadow: "0 6px 16px var(--shadow-color, rgba(0,0,0,0.05))",
-          border: isOn
-            ? "2px solid #22c55e"
-            : "2px solid var(--border-color, #eee)",
-          background: isOn
-            ? "rgba(34, 197, 94, 0.14)"
-            : "var(--bg-card-soft, #f8fafc)",
-          color: "var(--text-main, #111)",
           cursor: "pointer",
-          transition: "0.2s ease",
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>
+        <div className="room-card-title">
           {room.name}
         </div>
 
-        <div style={{ display: "flex", gap: 6, fontWeight: 600 }}>
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: isOn ? "#22c55e" : "var(--text-muted, #888)",
-              marginTop: 5,
-            }}
-          ></span>
-          <span style={{ color: isOn ? "#22c55e" : "var(--text-main, #111)" }}>
+        <div className="room-card-status">
+          <span className="room-card-dot"></span>
+          <span>
             {isOn ? "ON" : "OFF"}
           </span>
         </div>
+
+        <div className="room-card-detail">Lihat detail -&gt;</div>
       </div>
     );
   };
@@ -504,6 +517,17 @@ export default function KelolaRuangan() {
                   : "AC OFF"}
               </div>
             </div>
+
+            {!hasSelectedRoomDetail && (
+              <div style={detailEmptyState}>Detail ruangan belum tersedia</div>
+            )}
+
+            {hasSelectedRoomDetail && (
+              <div style={detailMetaCard}>
+                <span>Terakhir diperbarui</span>
+                <b>{formatDateTime(selectedLastUpdated)}</b>
+              </div>
+            )}
 
             {/* DATA SECTION */}
             <div className="modal-grid" style={modalGrid}>
@@ -878,6 +902,31 @@ const statusBadge = {
   fontSize: 12,
   fontWeight: 700,
   whiteSpace: "nowrap",
+};
+
+const detailEmptyState = {
+  marginBottom: 16,
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1px solid rgba(148, 163, 184, 0.22)",
+  background: "rgba(15, 23, 42, 0.18)",
+  color: "var(--text-muted, #94a3b8)",
+  fontSize: 13,
+  fontWeight: 600,
+};
+
+const detailMetaCard = {
+  marginBottom: 16,
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1px solid rgba(96, 165, 250, 0.18)",
+  background: "rgba(45, 140, 255, 0.08)",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+  color: "var(--text-main, #f8fafc)",
+  fontSize: 13,
 };
 
 const modalGrid = {
