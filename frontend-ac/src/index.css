@@ -37,11 +37,10 @@ select {
     var(--bg-card-soft, #172033);
   box-shadow: 0 10px 24px rgba(2, 8, 23, 0.18);
   isolation: isolate;
+  transform: none;
   transition:
-    transform 240ms ease,
     border-color 240ms ease,
-    box-shadow 240ms ease,
-    background 240ms ease;
+    box-shadow 240ms ease;
 }
 
 .room-card::before {
@@ -55,17 +54,6 @@ select {
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 58%);
   opacity: 0.88;
   z-index: -1;
-}
-
-.room-card::after {
-  content: "";
-  position: absolute;
-  inset: auto 20px 14px;
-  height: 1px;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.5), transparent);
-  opacity: 0;
-  transition: opacity 240ms ease;
 }
 
 .room-card-on {
@@ -85,10 +73,8 @@ select {
 
 .room-card:hover,
 .room-card:focus-visible {
+  transform: none;
   border-color: rgba(125, 178, 255, 0.78);
-  background:
-    linear-gradient(145deg, rgba(45, 65, 96, 0.98), rgba(21, 37, 62, 0.98)),
-    var(--bg-card-soft, #172033);
   box-shadow: 0 16px 34px rgba(2, 8, 23, 0.28);
   outline: none;
 }
@@ -96,20 +82,13 @@ select {
 .room-card-on:hover,
 .room-card-on:focus-visible {
   border-color: rgba(74, 222, 128, 0.72);
-  background:
-    linear-gradient(145deg, rgba(25, 86, 76, 0.98), rgba(20, 61, 61, 0.98)),
-    var(--bg-card-soft, #172033);
   box-shadow: 0 16px 34px rgba(34, 197, 94, 0.18);
 }
 
 .room-card:active {
   box-shadow: 0 10px 24px rgba(2, 8, 23, 0.22);
   transition-duration: 120ms;
-}
-
-.room-card:hover::after,
-.room-card:focus-visible::after {
-  opacity: 1;
+  transform: none;
 }
 
 .room-card-title {
@@ -166,20 +145,21 @@ select {
   position: absolute;
   right: 20px;
   bottom: 15px;
+  pointer-events: none;
   color: #60a5fa;
   font-size: 11.5px;
   font-weight: 700;
   opacity: 0;
-  transform: translate(4px, 4px);
-  transition:
-    opacity 240ms ease,
-    transform 240ms ease;
+  transition: opacity 240ms ease;
 }
 
 .room-card:hover .room-card-detail,
 .room-card:focus-visible .room-card-detail {
   opacity: 1;
-  transform: translate(0, 0);
+}
+
+.room-card > * {
+  pointer-events: none;
 }
 
 .table-scroll {
