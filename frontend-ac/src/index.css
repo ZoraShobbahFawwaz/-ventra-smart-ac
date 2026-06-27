@@ -262,6 +262,58 @@ select {
   filter: brightness(0.98);
 }
 
+.sidebar-menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-menu-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(45, 140, 255, 0.16), rgba(45, 140, 255, 0.04));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-menu-item:hover,
+.sidebar-menu-item:focus-visible {
+  color: #ffffff !important;
+  transform: translateX(3px);
+  outline: none;
+}
+
+.sidebar-menu-item:hover::before,
+.sidebar-menu-item:focus-visible::before {
+  opacity: 1;
+}
+
+.sidebar-menu-item-active:hover,
+.sidebar-menu-item-active:focus-visible {
+  box-shadow: 0 10px 24px rgba(45, 140, 255, 0.24);
+}
+
+.sidebar-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-menu-item span:last-child {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-menu-item:hover .sidebar-menu-icon,
+.sidebar-menu-item:focus-visible .sidebar-menu-icon {
+  transform: scale(1.08);
+}
+
 .table-scroll {
   width: 100%;
 }

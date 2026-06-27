@@ -86,7 +86,16 @@ export default function Sidebar() {
 
 const MenuItem = ({ icon, label, active, onClick }) => (
   <div
+    className={`sidebar-menu-item${active ? " sidebar-menu-item-active" : ""}`}
     onClick={onClick}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onClick();
+      }
+    }}
     style={{
       display: "flex",
       alignItems: "center",
@@ -99,11 +108,12 @@ const MenuItem = ({ icon, label, active, onClick }) => (
       color: active ? "#fff" : "var(--text-main, #111)",
       cursor: "pointer",
       marginBottom: 10,
-      transition: "0.2s ease",
+      transition:
+        "background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease",
     }}
   >
-    {icon}
-    {label}
+    <span className="sidebar-menu-icon">{icon}</span>
+    <span>{label}</span>
   </div>
 );
 
