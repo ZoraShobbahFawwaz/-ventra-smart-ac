@@ -397,46 +397,52 @@ export default function KelolaRuangan() {
         aria-label={`Buka detail ${room.name}`}
         onClick={() => setSelectedRoom(room)}
         style={{
-          minHeight: 88,
-          borderRadius: 12,
-          padding: "18px 20px",
+          height: 120,
+          borderRadius: 14,
+          padding: 0,
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 14,
-          textAlign: "left",
+          flexDirection: "column",
+          justifyContent: "stretch",
+          alignItems: "stretch",
+          textAlign: "center",
           boxShadow: "none",
           border: isOn
-            ? "1px solid rgba(34, 197, 94, 0.65)"
-            : "1px solid var(--border-color, #334155)",
+            ? "2px solid #22c55e"
+            : "2px solid var(--border-color, #334155)",
           background: isOn
-            ? "rgba(34, 197, 94, 0.08)"
+            ? "rgba(34, 197, 94, 0.16)"
             : "var(--bg-card-soft, #f8fafc)",
           color: "var(--text-main, #111)",
           cursor: "pointer",
           transition: "border-color 0.16s ease, background 0.16s ease",
         }}
       >
-        <div style={roomTitleWrap}>
-          <div style={roomNameText}>{room.name}</div>
+        <div style={roomLabelArea}>
+          <div style={roomLabelBox}>{room.name}</div>
+        </div>
+
+        <div style={roomDivider} />
+
+        <div style={roomStatusArea}>
           <div
             style={{
               ...roomStatusText,
               color: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
             }}
           >
+            <span
+              style={{
+                ...roomStatusDot,
+                background: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
+              }}
+            />
             {isOn ? "AC Aktif" : "AC Nonaktif"}
           </div>
-        </div>
 
-        <div style={roomCardRight}>
-          <span
-            style={{
-              ...roomStatusDot,
-              background: isOn ? "#22c55e" : "var(--text-muted, #94a3b8)",
-            }}
-          />
-          <FaChevronRight />
+          <span style={roomOpenHint}>
+            Detail
+            <FaChevronRight />
+          </span>
         </div>
       </button>
     );
@@ -813,32 +819,60 @@ const grid = {
   gap: 20,
 };
 
-const roomTitleWrap = {
+const roomLabelArea = {
+  flex: "0 0 66px",
   display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  minWidth: 0,
-};
-
-const roomNameText = {
-  fontSize: 14,
-  fontWeight: 700,
-  lineHeight: 1.35,
-  color: "var(--text-main, #111)",
-};
-
-const roomCardRight = {
-  display: "flex",
+  justifyContent: "center",
   alignItems: "center",
-  gap: 12,
-  color: "var(--text-muted, #94a3b8)",
-  fontSize: 12,
+  padding: "10px 14px",
+};
+
+const roomLabelBox = {
+  width: "100%",
+  minHeight: 38,
+  borderRadius: 10,
+  background: "var(--bg-card, rgba(255, 255, 255, 0.94))",
+  border: "1px solid rgba(148, 163, 184, 0.2)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "8px 12px",
+  color: "var(--text-main, #111)",
+  fontSize: 13,
+  fontWeight: 700,
+  lineHeight: 1.25,
+};
+
+const roomDivider = {
+  height: 1,
+  background: "rgba(148, 163, 184, 0.32)",
+};
+
+const roomStatusArea = {
+  flex: 1,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: 10,
+  padding: "10px 14px",
 };
 
 const roomStatusText = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 7,
   fontSize: 12,
   fontWeight: 700,
   lineHeight: 1.2,
+};
+
+const roomOpenHint = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 5,
+  color: "#60a5fa",
+  fontSize: 11,
+  fontWeight: 700,
 };
 
 const roomStatusDot = {
