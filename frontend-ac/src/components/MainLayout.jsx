@@ -58,11 +58,18 @@ export default function MainLayout({ children, title, subtitle }) {
         </div>
 
         <div className="main-header-actions" style={headerRight}>
-          <span onClick={() => setDarkMode(!darkMode)} style={iconStyle}>
+          <button
+            type="button"
+            onClick={() => setDarkMode(!darkMode)}
+            style={iconButton}
+            aria-label={darkMode ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
+          >
             {darkMode ? <FaSun /> : <FaMoon />}
-          </span>
+          </button>
 
-          <FaBell style={iconStyle} />
+          <span style={iconButton} aria-label="Notifikasi" role="img">
+            <FaBell />
+          </span>
 
           <div style={profile}>
             <img
@@ -71,7 +78,7 @@ export default function MainLayout({ children, title, subtitle }) {
               alt="profile"
             />
 
-            <div>
+            <div style={profileText}>
               <div style={profileName}>{displayName}</div>
               <div style={profileRole}>{formattedRole}</div>
             </div>
@@ -113,33 +120,61 @@ const subtitleStyle = {
 const headerRight = {
   display: "flex",
   alignItems: "center",
-  gap: 15,
+  gap: 10,
+  minHeight: 44,
 };
 
 const profile = {
   display: "flex",
   alignItems: "center",
   gap: 10,
+  minHeight: 44,
+  paddingLeft: 2,
 };
 
 const avatar = {
-  width: 40,
-  height: 40,
+  width: 42,
+  height: 42,
   borderRadius: "50%",
+  display: "block",
+  flexShrink: 0,
+  objectFit: "cover",
+};
+
+const profileText = {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  minHeight: 42,
+  lineHeight: 1.15,
 };
 
 const profileName = {
-  fontWeight: 600,
+  fontWeight: 700,
+  fontSize: 15,
   color: "var(--text-main)",
+  whiteSpace: "nowrap",
 };
 
 const profileRole = {
   fontSize: 12,
   color: "var(--text-muted)",
+  marginTop: 3,
+  whiteSpace: "nowrap",
 };
 
-const iconStyle = {
+const iconButton = {
+  width: 34,
+  height: 34,
+  border: "none",
+  borderRadius: 10,
+  background: "transparent",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   cursor: "pointer",
   fontSize: 16,
   color: "var(--text-main)",
+  lineHeight: 1,
+  padding: 0,
 };
