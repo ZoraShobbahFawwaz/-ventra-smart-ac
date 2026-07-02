@@ -18,6 +18,9 @@ function Dashboard() {
     new Date().getMonth(),
   );
   const [selectedEnergyWeek, setSelectedEnergyWeek] = useState(1);
+  const [selectedEnergyDate, setSelectedEnergyDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   const DATA_FRESH_MS = 30 * 1000;
   const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
   const monthNames = [
@@ -470,11 +473,31 @@ function Dashboard() {
     );
   };
 
+  const getDailyEnergyValue = (roomName) => {
+    const seed = getRoomSeed(roomName);
+    const base = dummyRoomData[roomName];
+    const day = Number(selectedEnergyDate.split("-")[2] || 1);
+
+    if (roomName === IMPLEMENTED_ROOM) {
+      return 9 + (day % 5) + (seed % 4);
+    }
+
+    if (!base) return 0;
+
+    if (base.status === "OFF") {
+      return 0.6 + ((seed + day) % 3) * 0.4;
+    }
+
+    return 6 + base.occ * 0.28 + ((seed + day) % 6);
+  };
+
   const energyPeriodData = rooms.map((room) => {
     const usageSource =
-      selectedEnergyPeriod === "week"
-        ? getWeeklyEnergyValue(room.name)
-        : getMonthlyEnergyValue(room.name);
+      selectedEnergyPeriod === "day"
+        ? getDailyEnergyValue(room.name)
+        : selectedEnergyPeriod === "week"
+          ? getWeeklyEnergyValue(room.name)
+          : getMonthlyEnergyValue(room.name);
     const usage = Number(usageSource.toFixed(1));
 
     return {
@@ -496,7 +519,13 @@ function Dashboard() {
     1,
   );
   const selectedPeriodLabel =
-    selectedEnergyPeriod === "week"
+    selectedEnergyPeriod === "day"
+      ? new Date(selectedEnergyDate).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : selectedEnergyPeriod === "week"
       ? `Minggu ${selectedEnergyWeek} - ${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`
       : `${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`;
 
@@ -651,6 +680,24 @@ function Dashboard() {
                     <button
                       type="button"
                       style={
+                        selectedEnergyPeriod === "day"
+                          ? periodToggleActive
+                          : {
+                              ...periodToggleButton,
+                              ...(hoveredEnergyButton === "day"
+                                ? periodToggleButtonHover
+                                : {}),
+                            }
+                      }
+                      onMouseEnter={() => setHoveredEnergyButton("day")}
+                      onMouseLeave={() => setHoveredEnergyButton("")}
+                      onClick={() => setSelectedEnergyPeriod("day")}
+                    >
+                      Hari
+                    </button>
+                    <button
+                      type="button"
+                      style={
                         selectedEnergyPeriod === "week"
                           ? periodToggleActive
                           : {
@@ -686,6 +733,18 @@ function Dashboard() {
                     </button>
                   </div>
                 </label>
+
+                {selectedEnergyPeriod === "day" && (
+                  <label style={selectLabel}>
+                    Tanggal
+                    <input
+                      type="date"
+                      style={monthSelect}
+                      value={selectedEnergyDate}
+                      onChange={(e) => setSelectedEnergyDate(e.target.value)}
+                    />
+                  </label>
+                )}
 
                 <label style={selectLabel}>
                   Bulan Acuan
@@ -1059,7 +1118,7 @@ const monthSelect = {
 
 const periodToggle = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
+  gridTemplateColumns: "1fr 1fr 1fr",
   gap: 8,
 };
 
