@@ -42,6 +42,8 @@ export default function KelolaRuangan() {
   const [roomStatus, setRoomStatus] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
+  const [todayEnergySummary, setTodayEnergySummary] = useState(null);
+  const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
   const [dummyTick, setDummyTick] = useState(0);
   const [controlLoading, setControlLoading] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -272,6 +274,70 @@ export default function KelolaRuangan() {
     return () => clearInterval(interval);
   }, []);
 
+  const fetchEnergySummary = async (params, setter) => {
+    try {
+      const token = localStorage.getItem("token");
+      const query = new URLSearchParams(params).toString();
+
+      const res = await fetch(apiUrl(`/energy/summary?${query}`), {
+        headers: apiHeaders({
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Gagal ambil data energi:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      setter(data);
+    } catch (err) {
+      console.error("Gagal ambil data energi:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedRoom) return;
+
+    fetchEnergySummary(
+      {
+        period: "day",
+        date: new Date().toISOString().slice(0, 10),
+      },
+      setTodayEnergySummary,
+    );
+  }, [selectedRoom]);
+
+  useEffect(() => {
+    if (!selectedRoom) return;
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const currentWeek = Math.min(Math.ceil(now.getDate() / 7), 4);
+    const params =
+      activeTab === "hari"
+        ? {
+            period: "day",
+            date: now.toISOString().slice(0, 10),
+          }
+        : activeTab === "minggu"
+          ? {
+              period: "week",
+              year: String(currentYear),
+              month: String(currentMonth),
+              week: String(currentWeek),
+            }
+          : {
+              period: "month",
+              year: String(currentYear),
+              month: String(currentMonth),
+            };
+
+    fetchEnergySummary(params, setPeriodEnergySummary);
+  }, [selectedRoom, activeTab]);
+
   // =========================
   // FORMAT DATA
   // =========================
@@ -328,6 +394,57 @@ export default function KelolaRuangan() {
 
     return formatFanSpeed(value);
   };
+
+  const getEnergyRoomSummary = (summary, roomName) => {
+    return summary?.rooms?.find((room) => room.room_name === roomName) ?? null;
+  };
+
+  const formatEnergyValue = (value) => {
+    if (typeof value !== "number") return "-";
+
+    return `${value.toFixed(3)} kWh`;
+  };
+
+  const formatPowerValue = (value, isOn) => {
+    if (!isOn || typeof value !== "number") return "-";
+
+    return `${value} W`;
+  };
+
+  const getDummyEnergyValue = (period) => {
+    if (!selectedDummyData) return null;
+
+    const seed = getRoomSeed(selectedRoom?.name ?? "");
+    const occupancy = Number(selectedDummyData.occ ?? 0);
+    const base =
+      selectedDummyData.status === "OFF"
+        ? 0.8 + (seed % 3) * 0.3
+        : 6 + occupancy * 0.28 + (seed % 5);
+
+    if (period === "minggu") return base * 6.4;
+    if (period === "bulan") return base * 25.2;
+
+    return base;
+  };
+
+  const todayEnergyRoom = selectedRoom
+    ? getEnergyRoomSummary(todayEnergySummary, selectedRoom.name)
+    : null;
+  const periodEnergyRoom = selectedRoom
+    ? getEnergyRoomSummary(periodEnergySummary, selectedRoom.name)
+    : null;
+  const todayEnergyValue =
+    todayEnergyRoom?.total_energy_kwh ?? getDummyEnergyValue("hari");
+  const periodEnergyValue =
+    periodEnergyRoom?.total_energy_kwh ?? getDummyEnergyValue(activeTab);
+  const periodAverageValue =
+    activeTab === "hari"
+      ? periodEnergyValue
+      : typeof periodEnergyValue === "number"
+        ? periodEnergyValue / (activeTab === "minggu" ? 7 : 30)
+        : null;
+  const currentPowerValue =
+    todayEnergyRoom?.power_watt ?? periodEnergyRoom?.power_watt ?? 330;
 
   const hasFreshSensorData = selectedRoomIsOn && isFreshData(selectedSensorData);
   const hasYoloData = Boolean(selectedYoloData);
@@ -702,7 +819,7 @@ export default function KelolaRuangan() {
                       Daya Saat Ini
                     </span>
                     <b className="room-energy-stat-value" style={energyStatValue}>
-                      {selectedRoomIsOn ? "500 W" : "-"}
+                      {formatPowerValue(currentPowerValue, selectedRoomIsOn)}
                     </b>
                   </div>
 
@@ -711,7 +828,7 @@ export default function KelolaRuangan() {
                       Energi Hari Ini
                     </span>
                     <b className="room-energy-stat-value" style={energyStatValue}>
-                      15.2 kWh
+                      {formatEnergyValue(todayEnergyValue)}
                     </b>
                   </div>
                 </div>
@@ -775,11 +892,7 @@ export default function KelolaRuangan() {
                       Total Energi
                     </span>
                     <b className="room-energy-stat-value" style={energyStatValue}>
-                      {activeTab === "hari"
-                        ? "15.2 kWh"
-                        : activeTab === "minggu"
-                          ? "90 kWh"
-                          : "320 kWh"}
+                      {formatEnergyValue(periodEnergyValue)}
                     </b>
                   </div>
 
@@ -788,11 +901,7 @@ export default function KelolaRuangan() {
                       Rata-rata
                     </span>
                     <b className="room-energy-stat-value" style={energyStatValue}>
-                      {activeTab === "hari"
-                        ? "15.2 kWh"
-                        : activeTab === "minggu"
-                          ? "12.8 kWh"
-                          : "10.6 kWh"}
+                      {formatEnergyValue(periodAverageValue)}
                     </b>
                   </div>
                 </div>
