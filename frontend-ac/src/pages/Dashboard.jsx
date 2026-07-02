@@ -11,6 +11,136 @@ function Dashboard() {
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
   const DATA_FRESH_MS = 30 * 1000;
+  const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
+
+  const dummyRoomData = {
+    "Ruang Kelas 2.02": {
+      temp: "24.8\u00B0C",
+      humidity: "61.5%",
+      fan: "Low",
+      occ: "12 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.03": {
+      temp: "25.1\u00B0C",
+      humidity: "59.8%",
+      fan: "Low",
+      occ: "8 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.05": {
+      temp: "26.0\u00B0C",
+      humidity: "63.2%",
+      fan: "OFF",
+      occ: "0 People",
+      status: "OFF",
+    },
+    "Ruang Kelas 2.06": {
+      temp: "24.5\u00B0C",
+      humidity: "60.1%",
+      fan: "Medium",
+      occ: "17 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.07": {
+      temp: "25.7\u00B0C",
+      humidity: "62.4%",
+      fan: "Low",
+      occ: "6 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.08": {
+      temp: "26.4\u00B0C",
+      humidity: "64.0%",
+      fan: "OFF",
+      occ: "0 People",
+      status: "OFF",
+    },
+    "Ruang Kelas 2.09": {
+      temp: "24.2\u00B0C",
+      humidity: "58.7%",
+      fan: "Medium",
+      occ: "21 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.23": {
+      temp: "25.9\u00B0C",
+      humidity: "62.9%",
+      fan: "Low",
+      occ: "9 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.24": {
+      temp: "26.2\u00B0C",
+      humidity: "65.1%",
+      fan: "OFF",
+      occ: "0 People",
+      status: "OFF",
+    },
+    "Ruang Kelas 2.25": {
+      temp: "24.0\u00B0C",
+      humidity: "59.3%",
+      fan: "Medium",
+      occ: "18 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.15": {
+      temp: "25.4\u00B0C",
+      humidity: "61.0%",
+      fan: "Low",
+      occ: "7 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.16": {
+      temp: "26.1\u00B0C",
+      humidity: "63.8%",
+      fan: "OFF",
+      occ: "0 People",
+      status: "OFF",
+    },
+    "Ruang Kelas 2.17": {
+      temp: "24.7\u00B0C",
+      humidity: "60.5%",
+      fan: "Low",
+      occ: "10 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.18": {
+      temp: "23.9\u00B0C",
+      humidity: "58.9%",
+      fan: "Medium",
+      occ: "24 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.19": {
+      temp: "25.8\u00B0C",
+      humidity: "62.7%",
+      fan: "Low",
+      occ: "5 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.20": {
+      temp: "26.5\u00B0C",
+      humidity: "64.5%",
+      fan: "OFF",
+      occ: "0 People",
+      status: "OFF",
+    },
+    "Ruang Kelas 2.35": {
+      temp: "24.3\u00B0C",
+      humidity: "59.6%",
+      fan: "Medium",
+      occ: "16 People",
+      status: "ON",
+    },
+    "Ruang Kelas 2.36": {
+      temp: "25.0\u00B0C",
+      humidity: "61.9%",
+      fan: "Low",
+      occ: "11 People",
+      status: "ON",
+    },
+  };
 
   const getRoomsData = async () => {
     const data = [
@@ -180,7 +310,7 @@ function Dashboard() {
 
     if (isNaN(numberValue)) return "-";
 
-    return `${numberValue.toFixed(1)}°C`;
+    return `${numberValue.toFixed(1)}\u00B0C`;
   };
 
   const formatHumidity = (value) => {
@@ -293,29 +423,41 @@ function Dashboard() {
           </div>
 
           {filteredRooms.map((r) => {
+            const dummyData = dummyRoomData[r.name];
+            const useDummyData = r.name !== IMPLEMENTED_ROOM && dummyData;
             const latestYolo = yoloData?.[r.name];
             const status =
-              roomStatus?.[r.name] ??
-              (isFreshData(latestYolo) ? latestYolo?.ac_status : undefined);
+              useDummyData
+                ? dummyData.status
+                : roomStatus?.[r.name] ??
+                  (isFreshData(latestYolo) ? latestYolo?.ac_status : undefined);
             const isOn = status === "ON";
 
             const latestSensor = sensorData?.[r.name];
             const hasFreshSensorData = isOn && isFreshData(latestSensor);
             const hasYoloData = Boolean(latestYolo);
 
-            const temperature = hasFreshSensorData
-              ? formatTemperature(latestSensor?.temperature)
-              : "-";
-            const humidity = hasFreshSensorData
-              ? formatHumidity(latestSensor?.humidity)
-              : "-";
-            const fanSpeed = formatAppliedFanSpeed(
-              hasYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
-              isOn && hasYoloData,
-            );
-            const occupancy = isOn && hasYoloData
-              ? formatOccupancy(latestYolo?.occupancy, r.occ)
-              : "-";
+            const temperature = useDummyData
+              ? dummyData.temp
+              : hasFreshSensorData
+                ? formatTemperature(latestSensor?.temperature)
+                : "-";
+            const humidity = useDummyData
+              ? dummyData.humidity
+              : hasFreshSensorData
+                ? formatHumidity(latestSensor?.humidity)
+                : "-";
+            const fanSpeed = useDummyData
+              ? dummyData.fan
+              : formatAppliedFanSpeed(
+                  hasYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
+                  isOn && hasYoloData,
+                );
+            const occupancy = useDummyData
+              ? dummyData.occ
+              : isOn && hasYoloData
+                ? formatOccupancy(latestYolo?.occupancy, r.occ)
+                : "-";
 
             return (
               <div key={r.id} className="table-grid dashboard-table-grid table-data-row" style={tableRow}>
@@ -465,3 +607,4 @@ const emptyRow = {
 };
 
 export default Dashboard;
+
