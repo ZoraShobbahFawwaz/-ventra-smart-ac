@@ -10,136 +10,160 @@ function Dashboard() {
   const [roomStatus, setRoomStatus] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
+  const [dummyTick, setDummyTick] = useState(0);
   const DATA_FRESH_MS = 30 * 1000;
   const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
 
   const dummyRoomData = {
     "Ruang Kelas 2.02": {
-      temp: "24.8\u00B0C",
-      humidity: "61.5%",
+      temp: 24.8,
+      humidity: 61.5,
       fan: "Low",
-      occ: "12 People",
+      occ: 12,
       status: "ON",
     },
     "Ruang Kelas 2.03": {
-      temp: "25.1\u00B0C",
-      humidity: "59.8%",
+      temp: 25.1,
+      humidity: 59.8,
       fan: "Low",
-      occ: "8 People",
+      occ: 8,
       status: "ON",
     },
     "Ruang Kelas 2.05": {
-      temp: "26.0\u00B0C",
-      humidity: "63.2%",
+      temp: 26.0,
+      humidity: 63.2,
       fan: "OFF",
-      occ: "0 People",
+      occ: 0,
       status: "OFF",
     },
     "Ruang Kelas 2.06": {
-      temp: "24.5\u00B0C",
-      humidity: "60.1%",
+      temp: 24.5,
+      humidity: 60.1,
       fan: "Medium",
-      occ: "17 People",
+      occ: 17,
       status: "ON",
     },
     "Ruang Kelas 2.07": {
-      temp: "25.7\u00B0C",
-      humidity: "62.4%",
+      temp: 25.7,
+      humidity: 62.4,
       fan: "Low",
-      occ: "6 People",
+      occ: 6,
       status: "ON",
     },
     "Ruang Kelas 2.08": {
-      temp: "26.4\u00B0C",
-      humidity: "64.0%",
+      temp: 26.4,
+      humidity: 64.0,
       fan: "OFF",
-      occ: "0 People",
+      occ: 0,
       status: "OFF",
     },
     "Ruang Kelas 2.09": {
-      temp: "24.2\u00B0C",
-      humidity: "58.7%",
+      temp: 24.2,
+      humidity: 58.7,
       fan: "Medium",
-      occ: "21 People",
+      occ: 21,
       status: "ON",
     },
     "Ruang Kelas 2.23": {
-      temp: "25.9\u00B0C",
-      humidity: "62.9%",
+      temp: 25.9,
+      humidity: 62.9,
       fan: "Low",
-      occ: "9 People",
+      occ: 9,
       status: "ON",
     },
     "Ruang Kelas 2.24": {
-      temp: "26.2\u00B0C",
-      humidity: "65.1%",
+      temp: 26.2,
+      humidity: 65.1,
       fan: "OFF",
-      occ: "0 People",
+      occ: 0,
       status: "OFF",
     },
     "Ruang Kelas 2.25": {
-      temp: "24.0\u00B0C",
-      humidity: "59.3%",
+      temp: 24.0,
+      humidity: 59.3,
       fan: "Medium",
-      occ: "18 People",
+      occ: 18,
       status: "ON",
     },
     "Ruang Kelas 2.15": {
-      temp: "25.4\u00B0C",
-      humidity: "61.0%",
+      temp: 25.4,
+      humidity: 61.0,
       fan: "Low",
-      occ: "7 People",
+      occ: 7,
       status: "ON",
     },
     "Ruang Kelas 2.16": {
-      temp: "26.1\u00B0C",
-      humidity: "63.8%",
+      temp: 26.1,
+      humidity: 63.8,
       fan: "OFF",
-      occ: "0 People",
+      occ: 0,
       status: "OFF",
     },
     "Ruang Kelas 2.17": {
-      temp: "24.7\u00B0C",
-      humidity: "60.5%",
+      temp: 24.7,
+      humidity: 60.5,
       fan: "Low",
-      occ: "10 People",
+      occ: 10,
       status: "ON",
     },
     "Ruang Kelas 2.18": {
-      temp: "23.9\u00B0C",
-      humidity: "58.9%",
+      temp: 23.9,
+      humidity: 58.9,
       fan: "Medium",
-      occ: "24 People",
+      occ: 24,
       status: "ON",
     },
     "Ruang Kelas 2.19": {
-      temp: "25.8\u00B0C",
-      humidity: "62.7%",
+      temp: 25.8,
+      humidity: 62.7,
       fan: "Low",
-      occ: "5 People",
+      occ: 5,
       status: "ON",
     },
     "Ruang Kelas 2.20": {
-      temp: "26.5\u00B0C",
-      humidity: "64.5%",
+      temp: 26.5,
+      humidity: 64.5,
       fan: "OFF",
-      occ: "0 People",
+      occ: 0,
       status: "OFF",
     },
     "Ruang Kelas 2.35": {
-      temp: "24.3\u00B0C",
-      humidity: "59.6%",
+      temp: 24.3,
+      humidity: 59.6,
       fan: "Medium",
-      occ: "16 People",
+      occ: 16,
       status: "ON",
     },
     "Ruang Kelas 2.36": {
-      temp: "25.0\u00B0C",
-      humidity: "61.9%",
+      temp: 25.0,
+      humidity: 61.9,
       fan: "Low",
-      occ: "11 People",
+      occ: 11,
       status: "ON",
     },
+  };
+
+  const getRoomSeed = (roomName) =>
+    roomName.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
+
+  const getAnimatedDummyData = (roomName) => {
+    const base = dummyRoomData[roomName];
+
+    if (!base) return null;
+
+    const seed = getRoomSeed(roomName);
+    const tempDelta = ((dummyTick + seed) % 5 - 2) * 0.1;
+    const humidityDelta = ((dummyTick * 2 + seed) % 7 - 3) * 0.2;
+    const occupancyDelta =
+      base.status === "ON" ? ((dummyTick + seed) % 5) - 2 : 0;
+    const occupancy = Math.max(0, base.occ + occupancyDelta);
+
+    return {
+      ...base,
+      temp: `${(base.temp + tempDelta).toFixed(1)}\u00B0C`,
+      humidity: `${(base.humidity + humidityDelta).toFixed(1)}%`,
+      occ: `${occupancy} People`,
+    };
   };
 
   const getRoomsData = async () => {
@@ -210,6 +234,14 @@ function Dashboard() {
     };
 
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDummyTick((prev) => prev + 1);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // =========================
@@ -423,7 +455,7 @@ function Dashboard() {
           </div>
 
           {filteredRooms.map((r) => {
-            const dummyData = dummyRoomData[r.name];
+            const dummyData = getAnimatedDummyData(r.name);
             const useDummyData = r.name !== IMPLEMENTED_ROOM && dummyData;
             const latestYolo = yoloData?.[r.name];
             const status =
