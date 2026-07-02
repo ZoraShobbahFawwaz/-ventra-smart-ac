@@ -13,6 +13,7 @@ function Dashboard() {
   const [dummyTick, setDummyTick] = useState(0);
   const [energyModalOpen, setEnergyModalOpen] = useState(false);
   const [selectedEnergyPeriod, setSelectedEnergyPeriod] = useState("month");
+  const [hoveredEnergyButton, setHoveredEnergyButton] = useState("");
   const [selectedEnergyMonth, setSelectedEnergyMonth] = useState(
     new Date().getMonth(),
   );
@@ -645,8 +646,15 @@ function Dashboard() {
                       style={
                         selectedEnergyPeriod === "week"
                           ? periodToggleActive
-                          : periodToggleButton
+                          : {
+                              ...periodToggleButton,
+                              ...(hoveredEnergyButton === "week"
+                                ? periodToggleButtonHover
+                                : {}),
+                            }
                       }
+                      onMouseEnter={() => setHoveredEnergyButton("week")}
+                      onMouseLeave={() => setHoveredEnergyButton("")}
                       onClick={() => setSelectedEnergyPeriod("week")}
                     >
                       Minggu
@@ -656,8 +664,15 @@ function Dashboard() {
                       style={
                         selectedEnergyPeriod === "month"
                           ? periodToggleActive
-                          : periodToggleButton
+                          : {
+                              ...periodToggleButton,
+                              ...(hoveredEnergyButton === "month"
+                                ? periodToggleButtonHover
+                                : {}),
+                            }
                       }
+                      onMouseEnter={() => setHoveredEnergyButton("month")}
+                      onMouseLeave={() => setHoveredEnergyButton("")}
                       onClick={() => setSelectedEnergyPeriod("month")}
                     >
                       Bulan
@@ -1031,6 +1046,15 @@ const periodToggleButton = {
   fontSize: 12,
   fontWeight: 800,
   cursor: "pointer",
+  transition: "0.18s ease",
+};
+
+const periodToggleButtonHover = {
+  background: "rgba(45, 140, 255, 0.18)",
+  color: "#bfdbfe",
+  border: "1px solid rgba(96, 165, 250, 0.48)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 10px 18px rgba(45, 140, 255, 0.12)",
 };
 
 const periodToggleActive = {
