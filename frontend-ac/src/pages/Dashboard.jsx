@@ -10,6 +10,9 @@ function Dashboard() {
   const [roomStatus, setRoomStatus] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
+  const [schedules, setSchedules] = useState([]);
+  const [scheduleModalRoom, setScheduleModalRoom] = useState(null);
+  const [hoveredScheduleRoom, setHoveredScheduleRoom] = useState("");
   const [todayEnergySummary, setTodayEnergySummary] = useState(null);
   const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
   const [dummyTick, setDummyTick] = useState(0);
@@ -39,6 +42,24 @@ function Dashboard() {
     "November",
     "Desember",
   ];
+  const dayNames = {
+    monday: "Senin",
+    tuesday: "Selasa",
+    wednesday: "Rabu",
+    thursday: "Kamis",
+    friday: "Jumat",
+    saturday: "Sabtu",
+    sunday: "Minggu",
+  };
+  const dayOrder = {
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+    sunday: 7,
+  };
 
   const dummyRoomData = {
     "Ruang Kelas 2.01": {
@@ -344,6 +365,28 @@ function Dashboard() {
     }
   };
 
+  const fetchSchedules = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(apiUrl("/rooms"), {
+        headers: apiHeaders({
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Gagal ambil data jadwal:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      setSchedules(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Gagal ambil data jadwal:", err);
+    }
+  };
+
   const fetchEnergySummary = async (params, setter) => {
     try {
       const token = localStorage.getItem("token");
@@ -386,6 +429,10 @@ function Dashboard() {
 
     const interval = setInterval(fetchSensorData, 2000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetchSchedules();
   }, []);
 
   useEffect(() => {
@@ -463,6 +510,39 @@ function Dashboard() {
     return formatFanSpeed(value);
   };
 
+  const formatTime = (value) => {
+    if (!value) return "-";
+
+    return String(value).slice(0, 5);
+  };
+
+  const getRoomSchedules = (roomName) => {
+    return schedules
+      .filter((schedule) => schedule.room_name === roomName)
+      .sort((a, b) => {
+        const dayA = String(a.day || "").toLowerCase();
+        const dayB = String(b.day || "").toLowerCase();
+        const dayDiff = (dayOrder[dayA] || 99) - (dayOrder[dayB] || 99);
+
+        if (dayDiff !== 0) return dayDiff;
+
+        return String(a.start_time || "").localeCompare(String(b.start_time || ""));
+      });
+  };
+
+  const getScheduleSummary = (roomName) => {
+    const roomSchedules = getRoomSchedules(roomName);
+
+    if (roomSchedules.length === 0) {
+      return "Belum ada jadwal";
+    }
+
+    const firstSchedule = roomSchedules[0];
+    const day = String(firstSchedule.day || "").toLowerCase();
+
+    return `${dayNames[day] || firstSchedule.day} ${formatTime(firstSchedule.start_time)}`;
+  };
+
   const formatOccupancy = (value, fallback = "0 People") => {
     if (value === undefined || value === null) return fallback;
 
@@ -490,6 +570,7 @@ function Dashboard() {
     fetchStatus();
     fetchYoloData();
     fetchSensorData();
+    fetchSchedules();
     fetchEnergySummary(
       {
         period: "day",
@@ -680,6 +761,7 @@ function Dashboard() {
             <div>Fan Speed</div>
             <div>Occupancy</div>
             <div>Status</div>
+            <div>Schedule</div>
           </div>
 
           {filteredRooms.map((r) => {
@@ -736,6 +818,23 @@ function Dashboard() {
                     {isOn ? "ON" : "OFF"}
                   </span>
                 </div>
+                <div>
+                  <button
+                    type="button"
+                    style={{
+                      ...scheduleButton,
+                      ...(hoveredScheduleRoom === r.name
+                        ? scheduleButtonHover
+                        : {}),
+                    }}
+                    title={getScheduleSummary(r.name)}
+                    onMouseEnter={() => setHoveredScheduleRoom(r.name)}
+                    onMouseLeave={() => setHoveredScheduleRoom("")}
+                    onClick={() => setScheduleModalRoom(r.name)}
+                  >
+                    Jadwal
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -744,6 +843,57 @@ function Dashboard() {
             <div style={emptyRow}>Tidak ada ruangan ditemukan</div>
           )}
         </div>
+
+        {scheduleModalRoom && (
+          <div style={modalOverlay}>
+            <div style={scheduleModal}>
+              <div style={energyModalHeader}>
+                <div>
+                  <div style={modalEyebrow}>Schedule Room</div>
+                  <h2 style={modalTitle}>{scheduleModalRoom}</h2>
+                  <p style={modalSubtitle}>
+                    Daftar jadwal penggunaan ruang yang tersimpan pada database.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  style={modalCloseButton}
+                  onClick={() => setScheduleModalRoom(null)}
+                >
+                  Ã—
+                </button>
+              </div>
+
+              <div style={scheduleList}>
+                {getRoomSchedules(scheduleModalRoom).length > 0 ? (
+                  getRoomSchedules(scheduleModalRoom).map((schedule) => {
+                    const day = String(schedule.day || "").toLowerCase();
+
+                    return (
+                      <div key={schedule.id} style={scheduleItem}>
+                        <div>
+                          <div style={scheduleDay}>
+                            {dayNames[day] || schedule.day}
+                          </div>
+                          <div style={scheduleTime}>
+                            {formatTime(schedule.start_time)} -{" "}
+                            {formatTime(schedule.end_time)}
+                          </div>
+                        </div>
+                        <span style={scheduleBadge}>Aktif Terjadwal</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div style={emptySchedule}>
+                    Belum ada jadwal untuk ruangan ini.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {energyModalOpen && (
           <div style={modalOverlay}>
@@ -1112,7 +1262,7 @@ const tableContainer = {
 
 const tableHeader = {
   display: "grid",
-  gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr",
+  gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr 1fr",
   padding: 15,
   background: "linear-gradient(90deg, #2d8cff, #1a6ed8)",
   color: "#fff",
@@ -1121,7 +1271,7 @@ const tableHeader = {
 
 const tableRow = {
   display: "grid",
-  gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr",
+  gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 1fr 1fr",
   padding: 15,
   borderBottom: "1px solid var(--border-color)",
   color: "var(--text-main)",
@@ -1196,6 +1346,90 @@ const modalCloseButton = {
   color: "#f8fafc",
   fontSize: 22,
   cursor: "pointer",
+};
+
+const scheduleButton = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(45, 140, 255, 0.14)",
+  color: "#93c5fd",
+  border: "1px solid rgba(96, 165, 250, 0.32)",
+  borderRadius: 999,
+  padding: "7px 12px",
+  fontSize: 12,
+  fontWeight: 800,
+  cursor: "pointer",
+  transition: "0.18s ease",
+};
+
+const scheduleButtonHover = {
+  background: "rgba(45, 140, 255, 0.3)",
+  color: "#dbeafe",
+  border: "1px solid rgba(96, 165, 250, 0.62)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 10px 18px rgba(45, 140, 255, 0.14)",
+};
+
+const scheduleModal = {
+  width: "520px",
+  maxWidth: "92vw",
+  background:
+    "linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
+  color: "#f8fafc",
+  borderRadius: 18,
+  padding: 24,
+  boxShadow: "0 30px 90px rgba(0,0,0,0.48)",
+  border: "1px solid rgba(96, 165, 250, 0.22)",
+};
+
+const scheduleList = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+};
+
+const scheduleItem = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 14,
+  background: "rgba(30, 43, 66, 0.98)",
+  border: "1px solid rgba(148, 163, 184, 0.18)",
+  borderRadius: 14,
+  padding: "13px 14px",
+};
+
+const scheduleDay = {
+  fontSize: 14,
+  fontWeight: 800,
+  color: "#f8fafc",
+};
+
+const scheduleTime = {
+  marginTop: 4,
+  fontSize: 13,
+  color: "#cbd5e1",
+};
+
+const scheduleBadge = {
+  flexShrink: 0,
+  background: "rgba(34, 197, 94, 0.14)",
+  color: "#4ade80",
+  border: "1px solid rgba(34, 197, 94, 0.3)",
+  borderRadius: 999,
+  padding: "6px 10px",
+  fontSize: 11,
+  fontWeight: 800,
+};
+
+const emptySchedule = {
+  background: "rgba(30, 43, 66, 0.98)",
+  border: "1px solid rgba(148, 163, 184, 0.18)",
+  borderRadius: 14,
+  padding: 16,
+  color: "#cbd5e1",
+  fontSize: 13,
 };
 
 const energyToolbar = {
