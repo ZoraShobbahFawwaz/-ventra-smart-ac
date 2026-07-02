@@ -239,7 +239,7 @@ function Dashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       setDummyTick((prev) => prev + 1);
-    }, 10000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
