@@ -44,6 +44,7 @@ export default function KelolaRuangan() {
   const [sensorData, setSensorData] = useState({});
   const [todayEnergySummary, setTodayEnergySummary] = useState(null);
   const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
+  const [hoveredEnergyTab, setHoveredEnergyTab] = useState("");
   const [dummyTick, setDummyTick] = useState(0);
   const [controlLoading, setControlLoading] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -859,7 +860,16 @@ export default function KelolaRuangan() {
                     className={`room-modal-tab ${
                       activeTab === "hari" ? "room-modal-tab-active" : ""
                     }`}
-                    style={activeTab === "hari" ? tabActive : tab}
+                    style={
+                      activeTab === "hari"
+                        ? tabActive
+                        : {
+                            ...tab,
+                            ...(hoveredEnergyTab === "hari" ? tabHover : {}),
+                          }
+                    }
+                    onMouseEnter={() => setHoveredEnergyTab("hari")}
+                    onMouseLeave={() => setHoveredEnergyTab("")}
                     onClick={() => setActiveTab("hari")}
                   >
                     Hari
@@ -869,7 +879,16 @@ export default function KelolaRuangan() {
                     className={`room-modal-tab ${
                       activeTab === "minggu" ? "room-modal-tab-active" : ""
                     }`}
-                    style={activeTab === "minggu" ? tabActive : tab}
+                    style={
+                      activeTab === "minggu"
+                        ? tabActive
+                        : {
+                            ...tab,
+                            ...(hoveredEnergyTab === "minggu" ? tabHover : {}),
+                          }
+                    }
+                    onMouseEnter={() => setHoveredEnergyTab("minggu")}
+                    onMouseLeave={() => setHoveredEnergyTab("")}
                     onClick={() => setActiveTab("minggu")}
                   >
                     Minggu
@@ -879,7 +898,16 @@ export default function KelolaRuangan() {
                     className={`room-modal-tab ${
                       activeTab === "bulan" ? "room-modal-tab-active" : ""
                     }`}
-                    style={activeTab === "bulan" ? tabActive : tab}
+                    style={
+                      activeTab === "bulan"
+                        ? tabActive
+                        : {
+                            ...tab,
+                            ...(hoveredEnergyTab === "bulan" ? tabHover : {}),
+                          }
+                    }
+                    onMouseEnter={() => setHoveredEnergyTab("bulan")}
+                    onMouseLeave={() => setHoveredEnergyTab("")}
                     onClick={() => setActiveTab("bulan")}
                   >
                     Bulan
@@ -1323,6 +1351,15 @@ const tab = {
   cursor: "pointer",
   fontSize: 12,
   fontWeight: 600,
+  transition: "0.18s ease",
+};
+
+const tabHover = {
+  background: "rgba(45, 140, 255, 0.18)",
+  color: "#bfdbfe",
+  border: "1px solid rgba(96, 165, 250, 0.48)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 10px 18px rgba(45, 140, 255, 0.12)",
 };
 
 const tabActive = {
