@@ -405,10 +405,10 @@ export default function KelolaRuangan() {
     return `${value.toFixed(3)} kWh`;
   };
 
-  const formatPowerValue = (value, isOn) => {
-    if (!isOn || typeof value !== "number") return "-";
+  const formatPowerValue = (value) => {
+    if (typeof value !== "number") return "-";
 
-    return `${value} W`;
+    return `${value} W (Acuan)`;
   };
 
   const getDummyEnergyValue = (period) => {
@@ -816,10 +816,10 @@ export default function KelolaRuangan() {
                 <div style={miniGrid}>
                   <div className="room-energy-stat" style={energyStatCard}>
                     <span className="room-energy-stat-label" style={energyStatLabel}>
-                      Daya Saat Ini
+                      Daya AC
                     </span>
                     <b className="room-energy-stat-value" style={energyStatValue}>
-                      {formatPowerValue(currentPowerValue, selectedRoomIsOn)}
+                      {formatPowerValue(currentPowerValue)}
                     </b>
                   </div>
 
@@ -898,7 +898,7 @@ export default function KelolaRuangan() {
 
                   <div className="room-energy-stat" style={energyStatCard}>
                     <span className="room-energy-stat-label" style={energyStatLabel}>
-                      Rata-rata
+                      Rata-rata per Hari
                     </span>
                     <b className="room-energy-stat-value" style={energyStatValue}>
                       {formatEnergyValue(periodAverageValue)}
