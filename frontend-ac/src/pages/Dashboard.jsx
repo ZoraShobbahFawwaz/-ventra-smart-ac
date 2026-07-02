@@ -490,8 +490,8 @@ function Dashboard() {
             title="USED ENERGY PERIOD"
             value={`${totalMonthlyEnergy.toFixed(1)} kWh`}
             subtitle={`Periode ${monthNames[selectedEnergyMonth]}`}
-            hint="Klik untuk melihat detail bulanan"
-            onClick={() => setEnergyModalOpen(true)}
+            actionLabel="Lihat Detail Periode"
+            onAction={() => setEnergyModalOpen(true)}
           />
         </div>
 
@@ -686,7 +686,7 @@ function Dashboard() {
   );
 }
 
-const Card = ({ title, value, subtitle, hint, onClick }) => (
+const Card = ({ title, value, subtitle, hint, onClick, actionLabel, onAction }) => (
   <div
     style={{
       ...cardStyle,
@@ -705,6 +705,18 @@ const Card = ({ title, value, subtitle, hint, onClick }) => (
     <h2 style={cardValue}>{value}</h2>
     <div style={cardSubtitle}>{subtitle}</div>
     {hint && <div style={cardHint}>{hint}</div>}
+    {actionLabel && (
+      <button
+        type="button"
+        style={cardMiniAction}
+        onClick={(e) => {
+          e.stopPropagation();
+          onAction?.();
+        }}
+      >
+        {actionLabel}
+      </button>
+    )}
   </div>
 );
 
@@ -753,6 +765,22 @@ const cardHint = {
   fontSize: 12,
   color: "#60a5fa",
   fontWeight: 600,
+};
+
+const cardMiniAction = {
+  marginTop: 14,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "fit-content",
+  background: "rgba(45, 140, 255, 0.14)",
+  color: "#60a5fa",
+  border: "1px solid rgba(96, 165, 250, 0.32)",
+  borderRadius: 10,
+  padding: "8px 12px",
+  fontSize: 12,
+  fontWeight: 800,
+  cursor: "pointer",
 };
 
 const searchWrapper = {
