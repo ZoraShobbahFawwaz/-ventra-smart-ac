@@ -485,7 +485,12 @@ function Dashboard() {
             title="USED ENERGY"
             value="15.2 kWh"
             subtitle="Energi Terpakai Hari Ini"
-            hint="Klik untuk melihat periode bulanan"
+          />
+          <Card
+            title="USED ENERGY PERIOD"
+            value={`${totalMonthlyEnergy.toFixed(1)} kWh`}
+            subtitle={`Periode ${monthNames[selectedEnergyMonth]}`}
+            hint="Klik untuk melihat detail bulanan"
             onClick={() => setEnergyModalOpen(true)}
           />
         </div>
