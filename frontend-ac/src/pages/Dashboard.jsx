@@ -10,6 +10,8 @@ function Dashboard() {
   const [roomStatus, setRoomStatus] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
+  const [todayEnergySummary, setTodayEnergySummary] = useState(null);
+  const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
   const [dummyTick, setDummyTick] = useState(0);
   const [energyModalOpen, setEnergyModalOpen] = useState(false);
   const [selectedEnergyPeriod, setSelectedEnergyPeriod] = useState("month");
@@ -342,6 +344,29 @@ function Dashboard() {
     }
   };
 
+  const fetchEnergySummary = async (params, setter) => {
+    try {
+      const token = localStorage.getItem("token");
+      const query = new URLSearchParams(params).toString();
+
+      const res = await fetch(apiUrl(`/energy/summary?${query}`), {
+        headers: apiHeaders({
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Gagal ambil data energi:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      setter(data);
+    } catch (err) {
+      console.error("Gagal ambil data energi:", err);
+    }
+  };
+
   useEffect(() => {
     fetchStatus();
 
@@ -362,6 +387,40 @@ function Dashboard() {
     const interval = setInterval(fetchSensorData, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    fetchEnergySummary(
+      {
+        period: "day",
+        date: new Date().toISOString().slice(0, 10),
+      },
+      setTodayEnergySummary,
+    );
+  }, []);
+
+  useEffect(() => {
+    const currentYear = new Date().getFullYear();
+    const params =
+      selectedEnergyPeriod === "day"
+        ? {
+            period: "day",
+            date: selectedEnergyDate,
+          }
+        : selectedEnergyPeriod === "week"
+          ? {
+              period: "week",
+              year: String(currentYear),
+              month: String(selectedEnergyMonth + 1),
+              week: String(selectedEnergyWeek),
+            }
+          : {
+              period: "month",
+              year: String(currentYear),
+              month: String(selectedEnergyMonth + 1),
+            };
+
+    fetchEnergySummary(params, setPeriodEnergySummary);
+  }, [selectedEnergyPeriod, selectedEnergyDate, selectedEnergyMonth, selectedEnergyWeek]);
 
   // =========================
   // FORMAT DATA
@@ -431,6 +490,19 @@ function Dashboard() {
     fetchStatus();
     fetchYoloData();
     fetchSensorData();
+    fetchEnergySummary(
+      {
+        period: "day",
+        date: new Date().toISOString().slice(0, 10),
+      },
+      setTodayEnergySummary,
+    );
+  };
+
+  const getActualEnergyByRoom = (roomName) => {
+    return periodEnergySummary?.rooms?.find(
+      (room) => room.room_name === roomName,
+    );
   };
 
   const getMonthlyEnergyValue = (roomName) => {
@@ -492,19 +564,31 @@ function Dashboard() {
   };
 
   const energyPeriodData = rooms.map((room) => {
-    const usageSource =
-      selectedEnergyPeriod === "day"
-        ? getDailyEnergyValue(room.name)
-        : selectedEnergyPeriod === "week"
-          ? getWeeklyEnergyValue(room.name)
-          : getMonthlyEnergyValue(room.name);
+    const actualEnergy = getActualEnergyByRoom(room.name);
+    let usageSource = null;
+
+    if (actualEnergy) {
+      usageSource = actualEnergy.total_energy_kwh;
+    } else if (room.name !== IMPLEMENTED_ROOM) {
+      usageSource =
+        selectedEnergyPeriod === "day"
+          ? getDailyEnergyValue(room.name)
+          : selectedEnergyPeriod === "week"
+            ? getWeeklyEnergyValue(room.name)
+            : getMonthlyEnergyValue(room.name);
+    }
+
     const usage =
       typeof usageSource === "number" ? Number(usageSource.toFixed(1)) : null;
 
     return {
       ...room,
       usage,
-      hours: typeof usage === "number" ? Math.round(usage / 2.4) : null,
+      hours: actualEnergy
+        ? Math.round(actualEnergy.total_duration_minutes / 60)
+        : typeof usage === "number"
+          ? Math.round(usage / 2.4)
+          : null,
     };
   });
   const totalPeriodEnergy = energyPeriodData.reduce(
@@ -534,6 +618,10 @@ function Dashboard() {
       : selectedEnergyPeriod === "week"
       ? `Minggu ${selectedEnergyWeek} - ${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`
       : `${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`;
+  const todayEnergyValue =
+    typeof todayEnergySummary?.total_energy_kwh === "number"
+      ? `${todayEnergySummary.total_energy_kwh.toFixed(3)} kWh`
+      : "0 kWh";
 
   return (
     <div className="app-shell" style={layoutStyle}>
@@ -552,7 +640,7 @@ function Dashboard() {
           />
           <Card
             title="USED ENERGY"
-            value="15.2 kWh"
+            value={todayEnergyValue}
             subtitle="Energi Terpakai Hari Ini"
           />
           <Card

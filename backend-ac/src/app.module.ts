@@ -11,10 +11,12 @@ import { RoomsModule } from './rooms/rooms.module';
 import { AuditModule } from './audit/audit.module';
 import { DetectionModule } from './detection/detection.module';
 import { UsersModule } from './users/users.module';
+import { EnergyModule } from './energy/energy.module';
 
 import { User } from './users/user.entity';
 import { Schedule } from './rooms/schedule.entity';
 import { AcIotEvent } from './ac-events/ac-iot-event.entity';
+import { AuditLog } from './audit/audit.entity';
 
 import { SchedulerService } from './scheduler/scheduler.service';
 
@@ -33,7 +35,7 @@ import { SchedulerService } from './scheduler/scheduler.service';
               rejectUnauthorized: false,
             }
           : undefined,
-      entities: [User, Schedule, AcIotEvent],
+      entities: [User, Schedule, AcIotEvent, AuditLog],
       synchronize: false,
     }),
 
@@ -45,6 +47,7 @@ import { SchedulerService } from './scheduler/scheduler.service';
     RoomsModule,
     AuditModule,
     DetectionModule,
+    EnergyModule,
   ],
   controllers: [AppController],
   providers: [AppService, SchedulerService],
