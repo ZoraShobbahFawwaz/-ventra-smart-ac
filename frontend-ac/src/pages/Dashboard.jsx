@@ -686,39 +686,48 @@ function Dashboard() {
   );
 }
 
-const Card = ({ title, value, subtitle, hint, onClick, actionLabel, onAction }) => (
-  <div
-    style={{
-      ...cardStyle,
-      cursor: onClick ? "pointer" : "default",
-    }}
-    onClick={onClick}
-    role={onClick ? "button" : undefined}
-    tabIndex={onClick ? 0 : undefined}
-    onKeyDown={(e) => {
-      if (onClick && (e.key === "Enter" || e.key === " ")) {
-        onClick();
-      }
-    }}
-  >
-    <div style={cardTitle}>{title}</div>
-    <h2 style={cardValue}>{value}</h2>
-    <div style={cardSubtitle}>{subtitle}</div>
-    {hint && <div style={cardHint}>{hint}</div>}
-    {actionLabel && (
-      <button
-        type="button"
-        style={cardMiniAction}
-        onClick={(e) => {
-          e.stopPropagation();
-          onAction?.();
-        }}
-      >
-        {actionLabel}
-      </button>
-    )}
-  </div>
-);
+const Card = ({ title, value, subtitle, hint, onClick, actionLabel, onAction }) => {
+  const [isActionHovered, setIsActionHovered] = useState(false);
+
+  return (
+    <div
+      style={{
+        ...cardStyle,
+        cursor: onClick ? "pointer" : "default",
+      }}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
+          onClick();
+        }
+      }}
+    >
+      <div style={cardTitle}>{title}</div>
+      <h2 style={cardValue}>{value}</h2>
+      <div style={cardSubtitle}>{subtitle}</div>
+      {hint && <div style={cardHint}>{hint}</div>}
+      {actionLabel && (
+        <button
+          type="button"
+          style={{
+            ...cardMiniAction,
+            ...(isActionHovered ? cardMiniActionHover : {}),
+          }}
+          onMouseEnter={() => setIsActionHovered(true)}
+          onMouseLeave={() => setIsActionHovered(false)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction?.();
+          }}
+        >
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  );
+};
 
 /* STYLE */
 const layoutStyle = {
@@ -781,6 +790,15 @@ const cardMiniAction = {
   fontSize: 12,
   fontWeight: 800,
   cursor: "pointer",
+  transition: "0.18s ease",
+};
+
+const cardMiniActionHover = {
+  background: "rgba(45, 140, 255, 0.28)",
+  border: "1px solid rgba(96, 165, 250, 0.58)",
+  color: "#bfdbfe",
+  transform: "translateY(-1px)",
+  boxShadow: "0 10px 20px rgba(45, 140, 255, 0.16)",
 };
 
 const searchWrapper = {
