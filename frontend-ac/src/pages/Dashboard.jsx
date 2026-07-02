@@ -438,7 +438,7 @@ function Dashboard() {
     const base = dummyRoomData[roomName];
 
     if (roomName === IMPLEMENTED_ROOM) {
-      return 285 + selectedEnergyMonth * 4 + (seed % 18);
+      return null;
     }
 
     if (!base) return 0;
@@ -456,7 +456,7 @@ function Dashboard() {
     const weekFactor = selectedEnergyWeek * 3;
 
     if (roomName === IMPLEMENTED_ROOM) {
-      return 62 + selectedEnergyMonth * 1.2 + weekFactor + (seed % 8);
+      return null;
     }
 
     if (!base) return 0;
@@ -479,7 +479,7 @@ function Dashboard() {
     const day = Number(selectedEnergyDate.split("-")[2] || 1);
 
     if (roomName === IMPLEMENTED_ROOM) {
-      return 9 + (day % 5) + (seed % 4);
+      return null;
     }
 
     if (!base) return 0;
@@ -498,24 +498,30 @@ function Dashboard() {
         : selectedEnergyPeriod === "week"
           ? getWeeklyEnergyValue(room.name)
           : getMonthlyEnergyValue(room.name);
-    const usage = Number(usageSource.toFixed(1));
+    const usage =
+      typeof usageSource === "number" ? Number(usageSource.toFixed(1)) : null;
 
     return {
       ...room,
       usage,
-      hours: Math.round(usage / 2.4),
+      hours: typeof usage === "number" ? Math.round(usage / 2.4) : null,
     };
   });
   const totalPeriodEnergy = energyPeriodData.reduce(
-    (total, room) => total + room.usage,
+    (total, room) => total + (typeof room.usage === "number" ? room.usage : 0),
     0,
   );
+  const roomsWithEnergyData = energyPeriodData.filter(
+    (room) => typeof room.usage === "number",
+  );
   const averagePeriodEnergy =
-    energyPeriodData.length > 0
-      ? totalPeriodEnergy / energyPeriodData.length
+    roomsWithEnergyData.length > 0
+      ? totalPeriodEnergy / roomsWithEnergyData.length
       : 0;
   const maxPeriodEnergy = Math.max(
-    ...energyPeriodData.map((room) => room.usage),
+    ...energyPeriodData.map((room) =>
+      typeof room.usage === "number" ? room.usage : 0,
+    ),
     1,
   );
   const selectedPeriodLabel =
@@ -806,14 +812,21 @@ function Dashboard() {
                         <div
                           style={{
                             ...barFill,
-                            width: `${Math.max(
-                              (room.usage / maxPeriodEnergy) * 100,
-                              5,
-                            )}%`,
+                            width:
+                              typeof room.usage === "number"
+                                ? `${Math.max(
+                                    (room.usage / maxPeriodEnergy) * 100,
+                                    5,
+                                  )}%`
+                                : "0%",
                           }}
                         />
                       </div>
-                      <div style={barValue}>{room.usage.toFixed(1)} kWh</div>
+                      <div style={barValue}>
+                        {typeof room.usage === "number"
+                          ? `${room.usage.toFixed(1)} kWh`
+                          : "-"}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -829,8 +842,14 @@ function Dashboard() {
                 {energyPeriodData.map((room) => (
                   <div key={room.id} style={energyTableRow}>
                     <div>{room.name}</div>
-                    <div>{room.hours} Jam</div>
-                    <div>{room.usage.toFixed(1)} kWh</div>
+                    <div>
+                      {typeof room.hours === "number" ? `${room.hours} Jam` : "-"}
+                    </div>
+                    <div>
+                      {typeof room.usage === "number"
+                        ? `${room.usage.toFixed(1)} kWh`
+                        : "-"}
+                    </div>
                   </div>
                 ))}
               </div>
