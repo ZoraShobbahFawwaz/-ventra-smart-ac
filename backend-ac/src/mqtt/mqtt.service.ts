@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as mqtt from 'mqtt';
 import { Repository } from 'typeorm';
 import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
+import { EnergyService } from '../energy/energy.service';
 
 type SensorData = {
   room: string;
@@ -40,6 +41,7 @@ export class MqttService implements OnModuleInit {
   constructor(
     @InjectRepository(AcIotEvent)
     private readonly acIotEventRepo: Repository<AcIotEvent>,
+    private readonly energyService: EnergyService,
   ) {}
 
   onModuleInit() {
@@ -224,7 +226,8 @@ export class MqttService implements OnModuleInit {
         source: this.normalizeSource(data.source),
       });
 
-      await this.acIotEventRepo.save(event);
+      const savedEvent = await this.acIotEventRepo.save(event);
+      await this.energyService.recordAcEvent(savedEvent);
 
       console.log(
         `AC event saved: ${roomName} | ${eventType} | ${power} | ${temperature ?? 'NULL'} | ${fanSpeed ?? 'NULL'} | ${event.source}`,

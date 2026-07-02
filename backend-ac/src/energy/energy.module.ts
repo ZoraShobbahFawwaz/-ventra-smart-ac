@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
 import { EnergyController } from './energy.controller';
+import { EnergyLog } from './energy-log.entity';
 import { EnergyService } from './energy.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AcIotEvent])],
+  imports: [TypeOrmModule.forFeature([EnergyLog])],
   controllers: [EnergyController],
   providers: [EnergyService],
+  exports: [EnergyService],
 })
 export class EnergyModule {}

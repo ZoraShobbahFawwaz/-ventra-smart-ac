@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, LessThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
+import { EnergyLog } from './energy-log.entity';
 
 type EnergyPeriod = 'day' | 'week' | 'month';
 
@@ -25,30 +26,25 @@ export class EnergyService {
   private readonly defaultPowerWatt = Number(process.env.AC_POWER_WATT || 330);
 
   constructor(
-    @InjectRepository(AcIotEvent)
-    private readonly acIotEventRepo: Repository<AcIotEvent>,
+    @InjectRepository(EnergyLog)
+    private readonly energyLogRepo: Repository<EnergyLog>,
   ) {}
+
+  async recordAcEvent(event: AcIotEvent) {
+    if (event.power === 'ON') {
+      await this.startEnergySession(event);
+      return;
+    }
+
+    await this.stopEnergySession(event);
+  }
 
   async getSummary(query: EnergyQuery) {
     const period = this.normalizePeriod(query.period);
     const range = this.getPeriodRange(period, query);
     const effectiveEnd = this.getEffectiveEnd(range.end);
-    const events = await this.acIotEventRepo.find({
-      where: {
-        eventTime: LessThanOrEqual(effectiveEnd),
-      },
-      order: {
-        roomName: 'ASC',
-        eventTime: 'ASC',
-        id: 'ASC',
-      },
-    });
-
-    const rooms = this.calculateRoomSummaries(
-      events,
-      range.start,
-      effectiveEnd,
-    );
+    const logs = await this.findLogsInRange(range.start, effectiveEnd);
+    const rooms = this.calculateRoomSummaries(logs, range.start, effectiveEnd);
     const totalEnergy = this.roundEnergy(
       rooms.reduce((total, room) => total + room.total_energy_kwh, 0),
     );
@@ -75,48 +71,114 @@ export class EnergyService {
     const range = this.getPeriodRange(period, query);
     const effectiveEnd = this.getEffectiveEnd(range.end);
 
-    return this.acIotEventRepo.find({
+    return this.findLogsInRange(range.start, effectiveEnd);
+  }
+
+  private async startEnergySession(event: AcIotEvent) {
+    const runningSession = await this.findRunningSession(event.roomName);
+
+    if (runningSession) {
+      runningSession.temperature = event.temperature;
+      runningSession.fanSpeed = event.fanSpeed;
+      await this.energyLogRepo.save(runningSession);
+      return;
+    }
+
+    const energyLog = this.energyLogRepo.create({
+      roomName: event.roomName,
+      startTime: event.eventTime,
+      endTime: null,
+      durationMinutes: null,
+      powerWatt: this.defaultPowerWatt,
+      energyKwh: null,
+      startTrigger: this.getTrigger(event),
+      stopTrigger: null,
+      temperature: event.temperature,
+      fanSpeed: event.fanSpeed,
+      status: 'RUNNING',
+    });
+
+    await this.energyLogRepo.save(energyLog);
+  }
+
+  private async stopEnergySession(event: AcIotEvent) {
+    const runningSession = await this.findRunningSession(event.roomName);
+
+    if (!runningSession) {
+      return;
+    }
+
+    const durationMinutes = this.calculateDurationMinutes(
+      runningSession.startTime,
+      event.eventTime,
+    );
+
+    runningSession.endTime = event.eventTime;
+    runningSession.durationMinutes = durationMinutes;
+    runningSession.energyKwh = this.calculateEnergyKwh(
+      runningSession.powerWatt,
+      durationMinutes,
+    );
+    runningSession.stopTrigger = this.getTrigger(event);
+    runningSession.status = 'COMPLETED';
+
+    await this.energyLogRepo.save(runningSession);
+  }
+
+  private async findRunningSession(roomName: string) {
+    return this.energyLogRepo.findOne({
       where: {
-        eventTime: Between(range.start, effectiveEnd),
+        roomName,
+        status: 'RUNNING',
       },
       order: {
-        roomName: 'ASC',
-        eventTime: 'ASC',
-        id: 'ASC',
+        startTime: 'DESC',
+        id: 'DESC',
       },
     });
   }
 
+  private async findLogsInRange(start: Date, end: Date) {
+    return this.energyLogRepo
+      .createQueryBuilder('log')
+      .where('log.start_time <= :end', { end })
+      .andWhere('(log.end_time IS NULL OR log.end_time >= :start)', { start })
+      .orderBy('log.room_name', 'ASC')
+      .addOrderBy('log.start_time', 'ASC')
+      .addOrderBy('log.id', 'ASC')
+      .getMany();
+  }
+
   private calculateRoomSummaries(
-    events: AcIotEvent[],
+    logs: EnergyLog[],
     start: Date,
     end: Date,
   ): EnergyRoomSummary[] {
-    const groupedEvents = events.reduce<Record<string, AcIotEvent[]>>(
-      (result, event) => {
-        if (!result[event.roomName]) {
-          result[event.roomName] = [];
+    const groupedLogs = logs.reduce<Record<string, EnergyLog[]>>(
+      (result, log) => {
+        if (!result[log.roomName]) {
+          result[log.roomName] = [];
         }
 
-        result[event.roomName].push(event);
+        result[log.roomName].push(log);
         return result;
       },
       {},
     );
 
-    return Object.entries(groupedEvents)
-      .map(([roomName, roomEvents]) => {
-        const durationMinutes = this.calculateOnDurationMinutes(
-          roomEvents,
-          start,
-          end,
+    return Object.entries(groupedLogs)
+      .map(([roomName, roomLogs]) => {
+        const durationMinutes = roomLogs.reduce(
+          (total, log) => total + this.calculateOverlapMinutes(log, start, end),
+          0,
         );
 
         return {
           room_name: roomName,
           total_duration_minutes: durationMinutes,
-          total_energy_kwh: this.roundEnergy(
-            (this.defaultPowerWatt * (durationMinutes / 60)) / 1000,
+          total_energy_kwh: this.calculateEnergyKwh(
+            this.defaultPowerWatt,
+            durationMinutes,
           ),
           power_watt: this.defaultPowerWatt,
         };
@@ -124,52 +186,28 @@ export class EnergyService {
       .filter((room) => room.total_duration_minutes > 0);
   }
 
-  private calculateOnDurationMinutes(
-    events: AcIotEvent[],
-    start: Date,
-    end: Date,
-  ) {
-    let currentPower: 'ON' | 'OFF' = 'OFF';
-    let activeStart: Date | null = null;
-    let durationMs = 0;
+  private calculateOverlapMinutes(log: EnergyLog, start: Date, end: Date) {
+    const sessionStart =
+      log.startTime.getTime() < start.getTime() ? start : log.startTime;
+    const sessionEnd = this.getEffectiveEnd(log.endTime ?? end);
+    const overlapEnd =
+      sessionEnd.getTime() > end.getTime() ? end : sessionEnd;
 
-    for (const event of events) {
-      const eventTime = new Date(event.eventTime);
+    return this.calculateDurationMinutes(sessionStart, overlapEnd);
+  }
 
-      if (eventTime < start) {
-        currentPower = event.power;
-        activeStart = currentPower === 'ON' ? start : null;
-        continue;
-      }
-
-      if (eventTime > end) {
-        break;
-      }
-
-      if (event.power === 'ON') {
-        if (currentPower !== 'ON') {
-          activeStart = eventTime < start ? start : eventTime;
-        }
-
-        currentPower = 'ON';
-        continue;
-      }
-
-      if (event.power === 'OFF') {
-        if (currentPower === 'ON' && activeStart) {
-          durationMs += eventTime.getTime() - activeStart.getTime();
-        }
-
-        currentPower = 'OFF';
-        activeStart = null;
-      }
-    }
-
-    if (currentPower === 'ON' && activeStart) {
-      durationMs += end.getTime() - activeStart.getTime();
-    }
+  private calculateDurationMinutes(start: Date, end: Date) {
+    const durationMs = end.getTime() - start.getTime();
 
     return Math.max(0, Math.round(durationMs / 60000));
+  }
+
+  private calculateEnergyKwh(powerWatt: number, durationMinutes: number) {
+    return this.roundEnergy((powerWatt * (durationMinutes / 60)) / 1000);
+  }
+
+  private getTrigger(event: AcIotEvent) {
+    return event.eventType || event.source || 'esp32';
   }
 
   private getPeriodRange(period: EnergyPeriod, query: EnergyQuery) {
