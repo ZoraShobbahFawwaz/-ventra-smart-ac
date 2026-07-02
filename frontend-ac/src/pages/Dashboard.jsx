@@ -17,6 +17,7 @@ function Dashboard() {
   const [selectedEnergyMonth, setSelectedEnergyMonth] = useState(
     new Date().getMonth(),
   );
+  const [selectedEnergyWeek, setSelectedEnergyWeek] = useState(1);
   const DATA_FRESH_MS = 30 * 1000;
   const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
   const monthNames = [
@@ -449,18 +450,24 @@ function Dashboard() {
   const getWeeklyEnergyValue = (roomName) => {
     const seed = getRoomSeed(roomName);
     const base = dummyRoomData[roomName];
+    const weekFactor = selectedEnergyWeek * 3;
 
     if (roomName === IMPLEMENTED_ROOM) {
-      return 68 + selectedEnergyMonth * 1.2 + (seed % 8);
+      return 62 + selectedEnergyMonth * 1.2 + weekFactor + (seed % 8);
     }
 
     if (!base) return 0;
 
     if (base.status === "OFF") {
-      return 4 + ((seed + selectedEnergyMonth) % 6);
+      return 4 + ((seed + selectedEnergyMonth + selectedEnergyWeek) % 6);
     }
 
-    return 42 + (base.occ * 1.1) + ((seed + selectedEnergyMonth * 5) % 12);
+    return (
+      38 +
+      base.occ * 1.1 +
+      weekFactor +
+      ((seed + selectedEnergyMonth * 5 + selectedEnergyWeek) % 12)
+    );
   };
 
   const energyPeriodData = rooms.map((room) => {
@@ -490,7 +497,7 @@ function Dashboard() {
   );
   const selectedPeriodLabel =
     selectedEnergyPeriod === "week"
-      ? `Minggu Ini - ${monthNames[selectedEnergyMonth]}`
+      ? `Minggu ${selectedEnergyWeek} - ${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`
       : `${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`;
 
   return (
@@ -696,6 +703,25 @@ function Dashboard() {
                     ))}
                   </select>
                 </label>
+
+                {selectedEnergyPeriod === "week" && (
+                  <label style={selectLabel}>
+                    Minggu Ke-
+                    <select
+                      style={monthSelect}
+                      value={selectedEnergyWeek}
+                      onChange={(e) =>
+                        setSelectedEnergyWeek(Number(e.target.value))
+                      }
+                    >
+                      {[1, 2, 3, 4].map((week) => (
+                        <option key={week} value={week}>
+                          Minggu {week}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
 
                 <div style={energySummaryGrid}>
                   <div style={energySummaryCard}>
@@ -1008,7 +1034,7 @@ const modalCloseButton = {
 
 const energyToolbar = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 2fr",
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
   gap: 14,
   marginBottom: 16,
 };
