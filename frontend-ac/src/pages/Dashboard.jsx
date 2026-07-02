@@ -11,8 +11,26 @@ function Dashboard() {
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
   const [dummyTick, setDummyTick] = useState(0);
+  const [energyModalOpen, setEnergyModalOpen] = useState(false);
+  const [selectedEnergyMonth, setSelectedEnergyMonth] = useState(
+    new Date().getMonth(),
+  );
   const DATA_FRESH_MS = 30 * 1000;
   const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
 
   const dummyRoomData = {
     "Ruang Kelas 2.01": {
@@ -409,6 +427,45 @@ function Dashboard() {
     fetchSensorData();
   };
 
+  const getMonthlyEnergyValue = (roomName) => {
+    const seed = getRoomSeed(roomName);
+    const base = dummyRoomData[roomName];
+
+    if (roomName === IMPLEMENTED_ROOM) {
+      return 285 + selectedEnergyMonth * 4 + (seed % 18);
+    }
+
+    if (!base) return 0;
+
+    if (base.status === "OFF") {
+      return 18 + ((seed + selectedEnergyMonth) % 18);
+    }
+
+    return 185 + (base.occ * 4.6) + ((seed + selectedEnergyMonth * 7) % 42);
+  };
+
+  const monthlyEnergyData = rooms.map((room) => {
+    const usage = Number(getMonthlyEnergyValue(room.name).toFixed(1));
+
+    return {
+      ...room,
+      usage,
+      hours: Math.round(usage / 2.4),
+    };
+  });
+  const totalMonthlyEnergy = monthlyEnergyData.reduce(
+    (total, room) => total + room.usage,
+    0,
+  );
+  const averageMonthlyEnergy =
+    monthlyEnergyData.length > 0
+      ? totalMonthlyEnergy / monthlyEnergyData.length
+      : 0;
+  const maxMonthlyEnergy = Math.max(
+    ...monthlyEnergyData.map((room) => room.usage),
+    1,
+  );
+
   return (
     <div className="app-shell" style={layoutStyle}>
       <Sidebar />
@@ -427,7 +484,9 @@ function Dashboard() {
           <Card
             title="USED ENERGY"
             value="15.2 kWh"
-            subtitle="Energi Terpakai"
+            subtitle="Energi Terpakai Hari Ini"
+            hint="Klik untuk melihat periode bulanan"
+            onClick={() => setEnergyModalOpen(true)}
           />
         </div>
 
@@ -523,16 +582,124 @@ function Dashboard() {
             <div style={emptyRow}>Tidak ada ruangan ditemukan</div>
           )}
         </div>
+
+        {energyModalOpen && (
+          <div style={modalOverlay}>
+            <div style={energyModal}>
+              <div style={energyModalHeader}>
+                <div>
+                  <div style={modalEyebrow}>Used Energy Period</div>
+                  <h2 style={modalTitle}>Penggunaan Energi Bulanan</h2>
+                  <p style={modalSubtitle}>
+                    Ringkasan penggunaan AC berdasarkan ruangan pada periode
+                    bulan terpilih.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  style={modalCloseButton}
+                  onClick={() => setEnergyModalOpen(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={energyToolbar}>
+                <label style={selectLabel}>
+                  Periode Bulan
+                  <select
+                    style={monthSelect}
+                    value={selectedEnergyMonth}
+                    onChange={(e) =>
+                      setSelectedEnergyMonth(Number(e.target.value))
+                    }
+                  >
+                    {monthNames.map((month, index) => (
+                      <option key={month} value={index}>
+                        {month} {new Date().getFullYear()}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div style={energySummaryGrid}>
+                  <div style={energySummaryCard}>
+                    <span>Total Energi</span>
+                    <b>{totalMonthlyEnergy.toFixed(1)} kWh</b>
+                  </div>
+                  <div style={energySummaryCard}>
+                    <span>Rata-rata Ruangan</span>
+                    <b>{averageMonthlyEnergy.toFixed(1)} kWh</b>
+                  </div>
+                </div>
+              </div>
+
+              <div style={chartCard}>
+                <div style={chartTitle}>Grafik Penggunaan Energi per Ruangan</div>
+                <div style={barChart}>
+                  {monthlyEnergyData.map((room) => (
+                    <div key={room.id} style={barItem}>
+                      <div style={barLabel}>{room.name.replace("Ruang Kelas ", "")}</div>
+                      <div style={barTrack}>
+                        <div
+                          style={{
+                            ...barFill,
+                            width: `${Math.max(
+                              (room.usage / maxMonthlyEnergy) * 100,
+                              5,
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                      <div style={barValue}>{room.usage.toFixed(1)} kWh</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={energyTableWrapper}>
+                <div style={energyTableHeader}>
+                  <div>Room</div>
+                  <div>Jam Operasi</div>
+                  <div>Energi</div>
+                </div>
+
+                {monthlyEnergyData.map((room) => (
+                  <div key={room.id} style={energyTableRow}>
+                    <div>{room.name}</div>
+                    <div>{room.hours} Jam</div>
+                    <div>{room.usage.toFixed(1)} kWh</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </MainLayout>
     </div>
   );
 }
 
-const Card = ({ title, value, subtitle }) => (
-  <div style={cardStyle}>
+const Card = ({ title, value, subtitle, hint, onClick }) => (
+  <div
+    style={{
+      ...cardStyle,
+      cursor: onClick ? "pointer" : "default",
+    }}
+    onClick={onClick}
+    role={onClick ? "button" : undefined}
+    tabIndex={onClick ? 0 : undefined}
+    onKeyDown={(e) => {
+      if (onClick && (e.key === "Enter" || e.key === " ")) {
+        onClick();
+      }
+    }}
+  >
     <div style={cardTitle}>{title}</div>
     <h2 style={cardValue}>{value}</h2>
     <div style={cardSubtitle}>{subtitle}</div>
+    {hint && <div style={cardHint}>{hint}</div>}
   </div>
 );
 
@@ -574,6 +741,13 @@ const cardValue = {
 const cardSubtitle = {
   fontSize: 12,
   color: "var(--text-muted)",
+};
+
+const cardHint = {
+  marginTop: 10,
+  fontSize: 12,
+  color: "#60a5fa",
+  fontWeight: 600,
 };
 
 const searchWrapper = {
@@ -643,6 +817,189 @@ const emptyRow = {
   padding: 15,
   color: "var(--text-muted)",
   fontSize: 14,
+};
+
+const modalOverlay = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(2, 8, 23, 0.78)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 999,
+  backdropFilter: "blur(8px)",
+};
+
+const energyModal = {
+  width: "980px",
+  maxWidth: "92vw",
+  maxHeight: "90vh",
+  overflowY: "auto",
+  background:
+    "linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
+  color: "#f8fafc",
+  borderRadius: 18,
+  padding: 24,
+  boxShadow: "0 30px 90px rgba(0,0,0,0.48)",
+  border: "1px solid rgba(96, 165, 250, 0.22)",
+};
+
+const energyModalHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: 20,
+  alignItems: "flex-start",
+  marginBottom: 18,
+};
+
+const modalEyebrow = {
+  color: "#93c5fd",
+  fontSize: 11,
+  fontWeight: 800,
+  letterSpacing: 0.6,
+  textTransform: "uppercase",
+  marginBottom: 6,
+};
+
+const modalTitle = {
+  margin: 0,
+  fontSize: 22,
+  fontWeight: 800,
+};
+
+const modalSubtitle = {
+  margin: "6px 0 0",
+  color: "#cbd5e1",
+  fontSize: 13,
+};
+
+const modalCloseButton = {
+  width: 34,
+  height: 34,
+  borderRadius: 10,
+  border: "1px solid rgba(148, 163, 184, 0.28)",
+  background: "rgba(15, 23, 42, 0.5)",
+  color: "#f8fafc",
+  fontSize: 22,
+  cursor: "pointer",
+};
+
+const energyToolbar = {
+  display: "grid",
+  gridTemplateColumns: "1fr 2fr",
+  gap: 14,
+  marginBottom: 16,
+};
+
+const selectLabel = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+  color: "#cbd5e1",
+  fontSize: 12,
+  fontWeight: 700,
+};
+
+const monthSelect = {
+  background: "rgba(15, 23, 42, 0.55)",
+  color: "#f8fafc",
+  border: "1px solid rgba(148, 163, 184, 0.22)",
+  borderRadius: 12,
+  padding: "11px 12px",
+  outline: "none",
+};
+
+const energySummaryGrid = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 12,
+};
+
+const energySummaryCard = {
+  background: "rgba(45, 140, 255, 0.11)",
+  border: "1px solid rgba(96, 165, 250, 0.22)",
+  borderRadius: 14,
+  padding: 14,
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+};
+
+const chartCard = {
+  background: "rgba(30, 43, 66, 0.98)",
+  border: "1px solid rgba(148, 163, 184, 0.18)",
+  borderRadius: 16,
+  padding: 16,
+  marginBottom: 16,
+};
+
+const chartTitle = {
+  fontWeight: 800,
+  marginBottom: 14,
+};
+
+const barChart = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+};
+
+const barItem = {
+  display: "grid",
+  gridTemplateColumns: "72px 1fr 92px",
+  gap: 10,
+  alignItems: "center",
+  fontSize: 12,
+};
+
+const barLabel = {
+  color: "#cbd5e1",
+  fontWeight: 700,
+};
+
+const barTrack = {
+  height: 12,
+  borderRadius: 999,
+  background: "rgba(15, 23, 42, 0.65)",
+  overflow: "hidden",
+  border: "1px solid rgba(148, 163, 184, 0.12)",
+};
+
+const barFill = {
+  height: "100%",
+  borderRadius: 999,
+  background: "linear-gradient(90deg, #2d8cff, #22c55e)",
+};
+
+const barValue = {
+  color: "#f8fafc",
+  fontWeight: 700,
+  textAlign: "right",
+};
+
+const energyTableWrapper = {
+  border: "1px solid rgba(148, 163, 184, 0.18)",
+  borderRadius: 14,
+  overflow: "hidden",
+};
+
+const energyTableHeader = {
+  display: "grid",
+  gridTemplateColumns: "2fr 1fr 1fr",
+  padding: "12px 14px",
+  background: "linear-gradient(90deg, #2d8cff, #1a6ed8)",
+  color: "#fff",
+  fontWeight: 800,
+  fontSize: 13,
+};
+
+const energyTableRow = {
+  display: "grid",
+  gridTemplateColumns: "2fr 1fr 1fr",
+  padding: "12px 14px",
+  borderBottom: "1px solid rgba(148, 163, 184, 0.14)",
+  color: "#e2e8f0",
+  fontSize: 13,
 };
 
 export default Dashboard;
