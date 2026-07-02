@@ -15,6 +15,13 @@ function Dashboard() {
   const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
 
   const dummyRoomData = {
+    "Ruang Kelas 2.01": {
+      temp: 25.2,
+      humidity: 60.8,
+      fan: "Low",
+      occ: 9,
+      status: "ON",
+    },
     "Ruang Kelas 2.02": {
       temp: 24.8,
       humidity: 61.5,
@@ -171,8 +178,8 @@ function Dashboard() {
       {
         lantai: "Sayap Kanan",
         rooms: [
+          { name: "Ruang Kelas 2.01" },
           { name: "Ruang Kelas 2.02" },
-          { name: "Ruang Kelas 2.03" },
           { name: "Ruang Kelas 2.03" },
           { name: "Ruang Kelas 2.04" },
         ],

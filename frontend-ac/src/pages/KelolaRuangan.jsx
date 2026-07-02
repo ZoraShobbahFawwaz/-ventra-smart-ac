@@ -42,6 +42,7 @@ export default function KelolaRuangan() {
   const [roomStatus, setRoomStatus] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
+  const [dummyTick, setDummyTick] = useState(0);
   const [controlLoading, setControlLoading] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -54,6 +55,57 @@ export default function KelolaRuangan() {
     ? sensorData[selectedRoom.name]
     : null;
   const DATA_FRESH_MS = 30 * 1000;
+  const IMPLEMENTED_ROOM = "Ruang Kelas 2.04";
+
+  const dummyRoomData = {
+    "Ruang Kelas 2.01": { temp: 25.2, humidity: 60.8, fan: "Low", occ: 9, status: "ON" },
+    "Ruang Kelas 2.02": { temp: 24.8, humidity: 61.5, fan: "Low", occ: 12, status: "ON" },
+    "Ruang Kelas 2.03": { temp: 25.1, humidity: 59.8, fan: "Low", occ: 8, status: "ON" },
+    "Ruang Kelas 2.05": { temp: 26.0, humidity: 63.2, fan: "OFF", occ: 0, status: "OFF" },
+    "Ruang Kelas 2.06": { temp: 24.5, humidity: 60.1, fan: "Medium", occ: 17, status: "ON" },
+    "Ruang Kelas 2.07": { temp: 25.7, humidity: 62.4, fan: "Low", occ: 6, status: "ON" },
+    "Ruang Kelas 2.08": { temp: 26.4, humidity: 64.0, fan: "OFF", occ: 0, status: "OFF" },
+    "Ruang Kelas 2.09": { temp: 24.2, humidity: 58.7, fan: "Medium", occ: 21, status: "ON" },
+    "Ruang Kelas 2.23": { temp: 25.9, humidity: 62.9, fan: "Low", occ: 9, status: "ON" },
+    "Ruang Kelas 2.24": { temp: 26.2, humidity: 65.1, fan: "OFF", occ: 0, status: "OFF" },
+    "Ruang Kelas 2.25": { temp: 24.0, humidity: 59.3, fan: "Medium", occ: 18, status: "ON" },
+    "Ruang Kelas 2.15": { temp: 25.4, humidity: 61.0, fan: "Low", occ: 7, status: "ON" },
+    "Ruang Kelas 2.16": { temp: 26.1, humidity: 63.8, fan: "OFF", occ: 0, status: "OFF" },
+    "Ruang Kelas 2.17": { temp: 24.7, humidity: 60.5, fan: "Low", occ: 10, status: "ON" },
+    "Ruang Kelas 2.18": { temp: 23.9, humidity: 58.9, fan: "Medium", occ: 24, status: "ON" },
+    "Ruang Kelas 2.19": { temp: 25.8, humidity: 62.7, fan: "Low", occ: 5, status: "ON" },
+    "Ruang Kelas 2.20": { temp: 26.5, humidity: 64.5, fan: "OFF", occ: 0, status: "OFF" },
+    "Ruang Kelas 2.35": { temp: 24.3, humidity: 59.6, fan: "Medium", occ: 16, status: "ON" },
+    "Ruang Kelas 2.36": { temp: 25.0, humidity: 61.9, fan: "Low", occ: 11, status: "ON" },
+  };
+
+  const getRoomSeed = (roomName) =>
+    roomName.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
+
+  const getAnimatedDummyData = (roomName) => {
+    const base = dummyRoomData[roomName];
+
+    if (!base) return null;
+
+    const seed = getRoomSeed(roomName);
+    const tempDelta = ((dummyTick + seed) % 5 - 2) * 0.1;
+    const humidityDelta = ((dummyTick * 2 + seed) % 7 - 3) * 0.2;
+    const occupancyDelta =
+      base.status === "ON" ? ((dummyTick + seed) % 5) - 2 : 0;
+    const occupancy = Math.max(0, base.occ + occupancyDelta);
+
+    return {
+      ...base,
+      temp: base.temp + tempDelta,
+      humidity: base.humidity + humidityDelta,
+      occ: occupancy,
+    };
+  };
+
+  const selectedDummyData =
+    selectedRoom && selectedRoom.name !== IMPLEMENTED_ROOM
+      ? getAnimatedDummyData(selectedRoom.name)
+      : null;
 
   const isFreshData = (data) => {
     if (!data?.updated_at) return false;
@@ -66,6 +118,14 @@ export default function KelolaRuangan() {
   };
 
   function getEffectiveRoomStatus(roomName) {
+    if (roomName !== IMPLEMENTED_ROOM) {
+      const dummyData = getAnimatedDummyData(roomName);
+
+      if (dummyData?.status) {
+        return dummyData.status;
+      }
+    }
+
     if (roomStatus[roomName]) {
       return roomStatus[roomName];
     }
@@ -86,6 +146,14 @@ export default function KelolaRuangan() {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDummyTick((prev) => prev + 1);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const formatDateRealtime = (date) => {
@@ -214,7 +282,7 @@ export default function KelolaRuangan() {
       return "OFF";
     }
 
-    return `${value}°C`;
+    return `${value}\u00B0C`;
   };
 
   const formatActualTemperature = (value) => {
@@ -224,7 +292,7 @@ export default function KelolaRuangan() {
 
     if (isNaN(numberValue)) return "-";
 
-    return `${numberValue.toFixed(1)}°C`;
+    return `${numberValue.toFixed(1)}\u00B0C`;
   };
 
   const formatHumidity = (value) => {
@@ -264,30 +332,48 @@ export default function KelolaRuangan() {
   const hasFreshSensorData = selectedRoomIsOn && isFreshData(selectedSensorData);
   const hasYoloData = Boolean(selectedYoloData);
 
-  const actualTemperatureDisplay = hasFreshSensorData
-    ? formatActualTemperature(selectedSensorData?.temperature)
-    : "-";
-  const actualHumidityDisplay = hasFreshSensorData
-    ? formatHumidity(selectedSensorData?.humidity)
-    : "-";
-  const actualOccupancyDisplay = selectedRoomIsOn && hasYoloData
-    ? formatOccupancy(selectedYoloData?.occupancy)
-    : "-";
-  const actualFanSpeedDisplay = selectedRoomIsOn && hasYoloData
-    ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
-    : "-";
-  const yoloTemperatureDisplay = selectedRoomIsOn && hasYoloData
-    ? formatTemperature(selectedYoloData?.temperature)
-    : "-";
-  const yoloOccupancyDisplay = selectedRoomIsOn && hasYoloData
-    ? formatOccupancy(selectedYoloData?.occupancy)
-    : "-";
-  const yoloFanSpeedDisplay = selectedRoomIsOn && hasYoloData
-    ? formatFanSpeed(selectedYoloData?.fan_speed)
-    : "-";
+  const actualTemperatureDisplay = selectedDummyData
+    ? formatActualTemperature(selectedDummyData.temp)
+    : hasFreshSensorData
+      ? formatActualTemperature(selectedSensorData?.temperature)
+      : "-";
+  const actualHumidityDisplay = selectedDummyData
+    ? formatHumidity(selectedDummyData.humidity)
+    : hasFreshSensorData
+      ? formatHumidity(selectedSensorData?.humidity)
+      : "-";
+  const actualOccupancyDisplay = selectedDummyData
+    ? formatOccupancy(selectedDummyData.occ)
+    : selectedRoomIsOn && hasYoloData
+      ? formatOccupancy(selectedYoloData?.occupancy)
+      : "-";
+  const actualFanSpeedDisplay = selectedDummyData
+    ? formatFanSpeed(selectedDummyData.fan)
+    : selectedRoomIsOn && hasYoloData
+      ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
+      : "-";
+  const yoloTemperatureDisplay = selectedDummyData
+    ? formatActualTemperature(selectedDummyData.temp)
+    : selectedRoomIsOn && hasYoloData
+      ? formatTemperature(selectedYoloData?.temperature)
+      : "-";
+  const yoloOccupancyDisplay = selectedDummyData
+    ? formatOccupancy(selectedDummyData.occ)
+    : selectedRoomIsOn && hasYoloData
+      ? formatOccupancy(selectedYoloData?.occupancy)
+      : "-";
+  const yoloFanSpeedDisplay = selectedDummyData
+    ? formatFanSpeed(selectedDummyData.fan)
+    : selectedRoomIsOn && hasYoloData
+      ? formatFanSpeed(selectedYoloData?.fan_speed)
+      : "-";
   const selectedLastUpdated =
-    selectedYoloData?.updated_at || selectedSensorData?.updated_at;
-  const hasSelectedRoomDetail = Boolean(selectedYoloData || selectedSensorData);
+    selectedDummyData
+      ? currentDateTime.toISOString()
+      : selectedYoloData?.updated_at || selectedSensorData?.updated_at;
+  const hasSelectedRoomDetail = Boolean(
+    selectedDummyData || selectedYoloData || selectedSensorData,
+  );
 
   // =========================
   // DATA RUANGAN STATIC
@@ -1267,3 +1353,4 @@ const reasonSubmitBtn = {
   fontWeight: 700,
   cursor: "pointer",
 };
+
