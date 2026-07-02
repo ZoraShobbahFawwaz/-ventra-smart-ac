@@ -12,6 +12,7 @@ function Dashboard() {
   const [sensorData, setSensorData] = useState({});
   const [dummyTick, setDummyTick] = useState(0);
   const [energyModalOpen, setEnergyModalOpen] = useState(false);
+  const [selectedEnergyPeriod, setSelectedEnergyPeriod] = useState("month");
   const [selectedEnergyMonth, setSelectedEnergyMonth] = useState(
     new Date().getMonth(),
   );
@@ -444,8 +445,29 @@ function Dashboard() {
     return 185 + (base.occ * 4.6) + ((seed + selectedEnergyMonth * 7) % 42);
   };
 
-  const monthlyEnergyData = rooms.map((room) => {
-    const usage = Number(getMonthlyEnergyValue(room.name).toFixed(1));
+  const getWeeklyEnergyValue = (roomName) => {
+    const seed = getRoomSeed(roomName);
+    const base = dummyRoomData[roomName];
+
+    if (roomName === IMPLEMENTED_ROOM) {
+      return 68 + selectedEnergyMonth * 1.2 + (seed % 8);
+    }
+
+    if (!base) return 0;
+
+    if (base.status === "OFF") {
+      return 4 + ((seed + selectedEnergyMonth) % 6);
+    }
+
+    return 42 + (base.occ * 1.1) + ((seed + selectedEnergyMonth * 5) % 12);
+  };
+
+  const energyPeriodData = rooms.map((room) => {
+    const usageSource =
+      selectedEnergyPeriod === "week"
+        ? getWeeklyEnergyValue(room.name)
+        : getMonthlyEnergyValue(room.name);
+    const usage = Number(usageSource.toFixed(1));
 
     return {
       ...room,
@@ -453,18 +475,22 @@ function Dashboard() {
       hours: Math.round(usage / 2.4),
     };
   });
-  const totalMonthlyEnergy = monthlyEnergyData.reduce(
+  const totalPeriodEnergy = energyPeriodData.reduce(
     (total, room) => total + room.usage,
     0,
   );
-  const averageMonthlyEnergy =
-    monthlyEnergyData.length > 0
-      ? totalMonthlyEnergy / monthlyEnergyData.length
+  const averagePeriodEnergy =
+    energyPeriodData.length > 0
+      ? totalPeriodEnergy / energyPeriodData.length
       : 0;
-  const maxMonthlyEnergy = Math.max(
-    ...monthlyEnergyData.map((room) => room.usage),
+  const maxPeriodEnergy = Math.max(
+    ...energyPeriodData.map((room) => room.usage),
     1,
   );
+  const selectedPeriodLabel =
+    selectedEnergyPeriod === "week"
+      ? `Minggu Ini - ${monthNames[selectedEnergyMonth]}`
+      : `${monthNames[selectedEnergyMonth]} ${new Date().getFullYear()}`;
 
   return (
     <div className="app-shell" style={layoutStyle}>
@@ -488,8 +514,8 @@ function Dashboard() {
           />
           <Card
             title="USED ENERGY PERIOD"
-            value={`${totalMonthlyEnergy.toFixed(1)} kWh`}
-            subtitle={`Periode ${monthNames[selectedEnergyMonth]}`}
+            value={`${totalPeriodEnergy.toFixed(1)} kWh`}
+            subtitle={`Periode ${selectedPeriodLabel}`}
             actionLabel="Lihat Detail Periode"
             onAction={() => setEnergyModalOpen(true)}
           />
@@ -594,10 +620,10 @@ function Dashboard() {
               <div style={energyModalHeader}>
                 <div>
                   <div style={modalEyebrow}>Used Energy Period</div>
-                  <h2 style={modalTitle}>Penggunaan Energi Bulanan</h2>
+                  <h2 style={modalTitle}>Penggunaan Energi Periode</h2>
                   <p style={modalSubtitle}>
                     Ringkasan penggunaan AC berdasarkan ruangan pada periode
-                    bulan terpilih.
+                    minggu atau bulan terpilih.
                   </p>
                 </div>
 
@@ -612,7 +638,35 @@ function Dashboard() {
 
               <div style={energyToolbar}>
                 <label style={selectLabel}>
-                  Periode Bulan
+                  Periode
+                  <div style={periodToggle}>
+                    <button
+                      type="button"
+                      style={
+                        selectedEnergyPeriod === "week"
+                          ? periodToggleActive
+                          : periodToggleButton
+                      }
+                      onClick={() => setSelectedEnergyPeriod("week")}
+                    >
+                      Minggu
+                    </button>
+                    <button
+                      type="button"
+                      style={
+                        selectedEnergyPeriod === "month"
+                          ? periodToggleActive
+                          : periodToggleButton
+                      }
+                      onClick={() => setSelectedEnergyPeriod("month")}
+                    >
+                      Bulan
+                    </button>
+                  </div>
+                </label>
+
+                <label style={selectLabel}>
+                  Bulan Acuan
                   <select
                     style={monthSelect}
                     value={selectedEnergyMonth}
@@ -631,19 +685,21 @@ function Dashboard() {
                 <div style={energySummaryGrid}>
                   <div style={energySummaryCard}>
                     <span>Total Energi</span>
-                    <b>{totalMonthlyEnergy.toFixed(1)} kWh</b>
+                    <b>{totalPeriodEnergy.toFixed(1)} kWh</b>
                   </div>
                   <div style={energySummaryCard}>
                     <span>Rata-rata Ruangan</span>
-                    <b>{averageMonthlyEnergy.toFixed(1)} kWh</b>
+                    <b>{averagePeriodEnergy.toFixed(1)} kWh</b>
                   </div>
                 </div>
               </div>
 
               <div style={chartCard}>
-                <div style={chartTitle}>Grafik Penggunaan Energi per Ruangan</div>
+                <div style={chartTitle}>
+                  Grafik Penggunaan Energi per Ruangan ({selectedPeriodLabel})
+                </div>
                 <div style={barChart}>
-                  {monthlyEnergyData.map((room) => (
+                  {energyPeriodData.map((room) => (
                     <div key={room.id} style={barItem}>
                       <div style={barLabel}>{room.name.replace("Ruang Kelas ", "")}</div>
                       <div style={barTrack}>
@@ -651,7 +707,7 @@ function Dashboard() {
                           style={{
                             ...barFill,
                             width: `${Math.max(
-                              (room.usage / maxMonthlyEnergy) * 100,
+                              (room.usage / maxPeriodEnergy) * 100,
                               5,
                             )}%`,
                           }}
@@ -670,7 +726,7 @@ function Dashboard() {
                   <div>Energi</div>
                 </div>
 
-                {monthlyEnergyData.map((room) => (
+                {energyPeriodData.map((room) => (
                   <div key={room.id} style={energyTableRow}>
                     <div>{room.name}</div>
                     <div>{room.hours} Jam</div>
@@ -937,7 +993,7 @@ const modalCloseButton = {
 
 const energyToolbar = {
   display: "grid",
-  gridTemplateColumns: "1fr 2fr",
+  gridTemplateColumns: "1fr 1fr 2fr",
   gap: 14,
   marginBottom: 16,
 };
@@ -958,6 +1014,31 @@ const monthSelect = {
   borderRadius: 12,
   padding: "11px 12px",
   outline: "none",
+};
+
+const periodToggle = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 8,
+};
+
+const periodToggleButton = {
+  background: "rgba(15, 23, 42, 0.55)",
+  color: "#e2e8f0",
+  border: "1px solid rgba(148, 163, 184, 0.22)",
+  borderRadius: 12,
+  padding: "11px 12px",
+  fontSize: 12,
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const periodToggleActive = {
+  ...periodToggleButton,
+  background: "#2d8cff",
+  color: "#fff",
+  border: "1px solid #2d8cff",
+  boxShadow: "0 10px 18px rgba(45, 140, 255, 0.16)",
 };
 
 const energySummaryGrid = {
