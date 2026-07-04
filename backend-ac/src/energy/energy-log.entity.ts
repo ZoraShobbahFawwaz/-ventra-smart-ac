@@ -22,7 +22,7 @@ export class EnergyLog {
   @Column({ name: 'duration_minutes', type: 'int', nullable: true })
   durationMinutes!: number | null;
 
-  @Column({ name: 'powerwatt', type: 'int', default: 330 })
+  @Column({ name: 'power_watt', type: 'int', default: 330 })
   powerWatt!: number;
 
   @Column({ name: 'energy_kwh', type: 'decimal', precision: 10, scale: 3, nullable: true })
