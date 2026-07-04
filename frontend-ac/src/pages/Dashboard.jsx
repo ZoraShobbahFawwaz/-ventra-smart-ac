@@ -14,6 +14,7 @@ function Dashboard() {
   const [schedules, setSchedules] = useState([]);
   const [scheduleModalRoom, setScheduleModalRoom] = useState(null);
   const [hoveredScheduleRoom, setHoveredScheduleRoom] = useState("");
+  const [hoveredCloseButton, setHoveredCloseButton] = useState("");
   const [todayEnergySummary, setTodayEnergySummary] = useState(null);
   const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
   const [dummyTick, setDummyTick] = useState(0);
@@ -890,10 +891,17 @@ function Dashboard() {
 
                 <button
                   type="button"
-                  style={modalCloseButton}
+                  style={{
+                    ...modalCloseButton,
+                    ...(hoveredCloseButton === "schedule"
+                      ? modalCloseButtonHover
+                      : {}),
+                  }}
+                  onMouseEnter={() => setHoveredCloseButton("schedule")}
+                  onMouseLeave={() => setHoveredCloseButton("")}
                   onClick={() => setScheduleModalRoom(null)}
                 >
-                  Ã—
+                  <span style={modalCloseButtonText}>X</span>
                 </button>
               </div>
 
@@ -942,10 +950,17 @@ function Dashboard() {
 
                 <button
                   type="button"
-                  style={modalCloseButton}
+                  style={{
+                    ...modalCloseButton,
+                    ...(hoveredCloseButton === "energy"
+                      ? modalCloseButtonHover
+                      : {}),
+                  }}
+                  onMouseEnter={() => setHoveredCloseButton("energy")}
+                  onMouseLeave={() => setHoveredCloseButton("")}
                   onClick={() => setEnergyModalOpen(false)}
                 >
-                  ×
+                  <span style={modalCloseButtonText}>X</span>
                 </button>
               </div>
 
@@ -1376,8 +1391,26 @@ const modalCloseButton = {
   border: "1px solid rgba(148, 163, 184, 0.28)",
   background: "rgba(15, 23, 42, 0.5)",
   color: "#f8fafc",
-  fontSize: 22,
+  fontSize: 0,
   cursor: "pointer",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transition: "0.18s ease",
+};
+
+const modalCloseButtonText = {
+  fontSize: 18,
+  lineHeight: 1,
+  fontWeight: 900,
+};
+
+const modalCloseButtonHover = {
+  background: "rgba(239, 68, 68, 0.16)",
+  color: "#fecaca",
+  border: "1px solid rgba(248, 113, 113, 0.55)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 10px 22px rgba(239, 68, 68, 0.16)",
 };
 
 const scheduleButton = {
