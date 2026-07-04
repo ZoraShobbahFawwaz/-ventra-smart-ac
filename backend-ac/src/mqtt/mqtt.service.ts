@@ -1,9 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as mqtt from 'mqtt';
 import { Repository } from 'typeorm';
 import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
 import { EnergyService } from '../energy/energy.service';
+import { RoomsService } from '../rooms/rooms.service';
 
 type SensorData = {
   room: string;
@@ -42,6 +43,8 @@ export class MqttService implements OnModuleInit {
     @InjectRepository(AcIotEvent)
     private readonly acIotEventRepo: Repository<AcIotEvent>,
     private readonly energyService: EnergyService,
+    @Inject(forwardRef(() => RoomsService))
+    private readonly roomsService: RoomsService,
   ) {}
 
   onModuleInit() {
@@ -228,6 +231,7 @@ export class MqttService implements OnModuleInit {
 
       const savedEvent = await this.acIotEventRepo.save(event);
       await this.energyService.recordAcEvent(savedEvent);
+      this.syncRoomStatusFromAcFeedback(savedEvent);
 
       console.log(
         `AC event saved: ${roomName} | ${eventType} | ${power} | ${temperature ?? 'NULL'} | ${fanSpeed ?? 'NULL'} | ${event.source}`,
@@ -279,6 +283,13 @@ export class MqttService implements OnModuleInit {
     }
 
     return eventTime;
+  }
+
+  private syncRoomStatusFromAcFeedback(event: AcIotEvent) {
+    const source =
+      event.source?.trim().toLowerCase() === 'http' ? 'manual' : 'schedule';
+
+    this.roomsService.updateRoomStatus(event.roomName, event.power, source);
   }
 
   getLatestSensorData() {
