@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
 import { EnergyLog } from './energy-log.entity';
+import { EnergySummary } from './energy-summary.entity';
 
 type EnergyPeriod = 'day' | 'week' | 'month';
 
@@ -21,13 +22,23 @@ type EnergyRoomSummary = {
   power_watt: number;
 };
 
+type SummaryPeriodType = 'DAY' | 'WEEK' | 'MONTH';
+
+type SummaryPeriodRange = {
+  type: SummaryPeriodType;
+  start: Date;
+  end: Date;
+};
+
 @Injectable()
 export class EnergyService {
-  private readonly defaultPowerWatt = Number(process.env.AC_POWER_WATT || 330);
+  private readonly defaultPowerWatt = Number(process.env.AC_POWER_WATT || 3330);
 
   constructor(
     @InjectRepository(EnergyLog)
     private readonly energyLogRepo: Repository<EnergyLog>,
+    @InjectRepository(EnergySummary)
+    private readonly energySummaryRepo: Repository<EnergySummary>,
   ) {}
 
   async recordAcEvent(event: AcIotEvent) {
@@ -72,6 +83,21 @@ export class EnergyService {
     const effectiveEnd = this.getEffectiveEnd(range.end);
 
     return this.findLogsInRange(range.start, effectiveEnd);
+  }
+
+  async getStoredSummaries(query: EnergyQuery) {
+    const period = this.normalizePeriod(query.period);
+    const range = this.getPeriodRange(period, query);
+
+    return this.energySummaryRepo.find({
+      where: {
+        periodType: period.toUpperCase() as SummaryPeriodType,
+        periodStart: range.start,
+      },
+      order: {
+        roomName: 'ASC',
+      },
+    });
   }
 
   private async startEnergySession(event: AcIotEvent) {
@@ -122,7 +148,8 @@ export class EnergyService {
     runningSession.stopTrigger = this.getTrigger(event);
     runningSession.status = 'COMPLETED';
 
-    await this.energyLogRepo.save(runningSession);
+    const completedSession = await this.energyLogRepo.save(runningSession);
+    await this.refreshStoredSummaries(completedSession);
   }
 
   private async findRunningSession(roomName: string) {
@@ -147,6 +174,61 @@ export class EnergyService {
       .addOrderBy('log.start_time', 'ASC')
       .addOrderBy('log.id', 'ASC')
       .getMany();
+  }
+
+  private async findRoomLogsInRange(roomName: string, start: Date, end: Date) {
+    return this.energyLogRepo
+      .createQueryBuilder('log')
+      .where('log.room_name = :roomName', { roomName })
+      .andWhere('log.start_time <= :end', { end })
+      .andWhere('(log.end_time IS NULL OR log.end_time >= :start)', { start })
+      .orderBy('log.start_time', 'ASC')
+      .addOrderBy('log.id', 'ASC')
+      .getMany();
+  }
+
+  private async refreshStoredSummaries(log: EnergyLog) {
+    const ranges = this.getTouchedSummaryRanges(log);
+
+    for (const range of ranges) {
+      await this.refreshStoredSummaryForRange(log.roomName, range);
+    }
+  }
+
+  private async refreshStoredSummaryForRange(
+    roomName: string,
+    range: SummaryPeriodRange,
+  ) {
+    const logs = await this.findRoomLogsInRange(roomName, range.start, range.end);
+    const durationMinutes = logs.reduce(
+      (total, log) => total + this.calculateOverlapMinutes(log, range.start, range.end),
+      0,
+    );
+    const energyKwh = this.calculateEnergyKwh(
+      this.defaultPowerWatt,
+      durationMinutes,
+    );
+    const existingSummary = await this.energySummaryRepo.findOne({
+      where: {
+        roomName,
+        periodType: range.type,
+        periodStart: range.start,
+      },
+    });
+    const summary =
+      existingSummary ??
+      this.energySummaryRepo.create({
+        roomName,
+        periodType: range.type,
+        periodStart: range.start,
+      });
+
+    summary.periodEnd = range.end;
+    summary.totalDurationMinutes = durationMinutes;
+    summary.totalEnergyKwh = energyKwh;
+    summary.powerWatt = this.defaultPowerWatt;
+
+    await this.energySummaryRepo.save(summary);
   }
 
   private calculateRoomSummaries(
@@ -184,6 +266,80 @@ export class EnergyService {
         };
       })
       .filter((room) => room.total_duration_minutes > 0);
+  }
+
+  private getTouchedSummaryRanges(log: EnergyLog): SummaryPeriodRange[] {
+    const endTime = log.endTime ?? new Date();
+    const ranges: SummaryPeriodRange[] = [
+      ...this.getTouchedDayRanges(log.startTime, endTime),
+      this.getWeekRangeFromDate(log.startTime),
+      this.getWeekRangeFromDate(endTime),
+      this.getMonthRangeFromDate(log.startTime),
+      this.getMonthRangeFromDate(endTime),
+    ];
+    const uniqueRanges = new Map<string, SummaryPeriodRange>();
+
+    ranges.forEach((range) => {
+      const key = `${range.type}-${range.start.toISOString()}`;
+      uniqueRanges.set(key, range);
+    });
+
+    return Array.from(uniqueRanges.values());
+  }
+
+  private getTouchedDayRanges(start: Date, end: Date): SummaryPeriodRange[] {
+    const ranges: SummaryPeriodRange[] = [];
+    const cursor = new Date(start);
+    cursor.setHours(0, 0, 0, 0);
+
+    const lastDay = new Date(end);
+    lastDay.setHours(0, 0, 0, 0);
+
+    while (cursor.getTime() <= lastDay.getTime()) {
+      const periodStart = new Date(cursor);
+      const periodEnd = new Date(cursor);
+      periodEnd.setHours(23, 59, 59, 999);
+
+      ranges.push({
+        type: 'DAY',
+        start: periodStart,
+        end: periodEnd,
+      });
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return ranges;
+  }
+
+  private getWeekRangeFromDate(date: Date): SummaryPeriodRange {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const week = Math.min(Math.ceil(date.getDate() / 7), 4);
+    const range = this.getPeriodRange('week', {
+      year: String(year),
+      month: String(month),
+      week: String(week),
+    });
+
+    return {
+      type: 'WEEK',
+      start: range.start,
+      end: range.end,
+    };
+  }
+
+  private getMonthRangeFromDate(date: Date): SummaryPeriodRange {
+    const range = this.getPeriodRange('month', {
+      year: String(date.getFullYear()),
+      month: String(date.getMonth() + 1),
+    });
+
+    return {
+      type: 'MONTH',
+      start: range.start,
+      end: range.end,
+    };
   }
 
   private calculateOverlapMinutes(log: EnergyLog, start: Date, end: Date) {
