@@ -18,6 +18,7 @@ import { Schedule } from './rooms/schedule.entity';
 import { AcIotEvent } from './ac-events/ac-iot-event.entity';
 import { AuditLog } from './audit/audit.entity';
 import { EnergyLog } from './energy/energy-log.entity';
+import { EnergySummary } from './energy/energy-summary.entity';
 
 import { SchedulerService } from './scheduler/scheduler.service';
 
@@ -36,7 +37,7 @@ import { SchedulerService } from './scheduler/scheduler.service';
               rejectUnauthorized: false,
             }
           : undefined,
-      entities: [User, Schedule, AcIotEvent, AuditLog, EnergyLog],
+      entities: [User, Schedule, AcIotEvent, AuditLog, EnergyLog, EnergySummary],
       synchronize: false,
     }),
 
