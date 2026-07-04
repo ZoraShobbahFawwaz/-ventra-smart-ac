@@ -40,6 +40,7 @@ export default function KelolaRuangan() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [activeTab, setActiveTab] = useState("hari");
   const [roomStatus, setRoomStatus] = useState({});
+  const [roomRuntime, setRoomRuntime] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
   const [todayEnergySummary, setTodayEnergySummary] = useState(null);
@@ -136,6 +137,10 @@ export default function KelolaRuangan() {
     return undefined;
   }
 
+  const getRuntimeFanSpeed = (roomName) => {
+    return roomRuntime?.[roomName]?.last_command?.fan ?? null;
+  };
+
   const selectedRoomIsOn = selectedRoom
     ? getEffectiveRoomStatus(selectedRoom.name) === "ON"
     : false;
@@ -213,6 +218,36 @@ export default function KelolaRuangan() {
     fetchStatus();
 
     const interval = setInterval(fetchStatus, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchRuntime = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(apiUrl("/rooms/runtime"), {
+          headers: apiHeaders({
+            Authorization: `Bearer ${token}`,
+          }),
+        });
+
+        if (!res.ok) {
+          console.error("Gagal ambil runtime ruangan:", res.status);
+          return;
+        }
+
+        const data = await res.json();
+        setRoomRuntime(data);
+      } catch (err) {
+        console.error("Gagal ambil runtime ruangan:", err);
+      }
+    };
+
+    fetchRuntime();
+
+    const interval = setInterval(fetchRuntime, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -449,6 +484,9 @@ export default function KelolaRuangan() {
 
   const hasFreshSensorData = isFreshData(selectedSensorData);
   const hasYoloData = Boolean(selectedYoloData);
+  const selectedRuntimeFanSpeed = selectedRoom
+    ? getRuntimeFanSpeed(selectedRoom.name)
+    : null;
 
   const actualTemperatureDisplay = selectedDummyData
     ? formatActualTemperature(selectedDummyData.temp)
@@ -467,7 +505,12 @@ export default function KelolaRuangan() {
       : "-";
   const actualFanSpeedDisplay = selectedDummyData
     ? formatFanSpeed(selectedDummyData.fan)
-    : formatAppliedFanSpeed(selectedYoloData?.applied_fan_speed, selectedRoomIsOn);
+    : formatAppliedFanSpeed(
+        selectedRuntimeFanSpeed ||
+          selectedYoloData?.applied_fan_speed ||
+          selectedYoloData?.fan_speed,
+        selectedRoomIsOn,
+      );
   const yoloTemperatureDisplay = selectedDummyData
     ? formatActualTemperature(selectedDummyData.temp)
     : hasYoloData
@@ -480,7 +523,12 @@ export default function KelolaRuangan() {
       : "-";
   const yoloFanSpeedDisplay = selectedDummyData
     ? formatFanSpeed(selectedDummyData.fan)
-    : formatAppliedFanSpeed(selectedYoloData?.fan_speed, selectedRoomIsOn);
+    : formatAppliedFanSpeed(
+        selectedRuntimeFanSpeed ||
+          selectedYoloData?.applied_fan_speed ||
+          selectedYoloData?.fan_speed,
+        selectedRoomIsOn,
+      );
   const selectedLastUpdated =
     selectedDummyData
       ? currentDateTime.toISOString()
@@ -602,6 +650,13 @@ export default function KelolaRuangan() {
         ...prev,
         [selectedRoom.name]: pendingCommand,
       }));
+
+      if (result?.runtime_state) {
+        setRoomRuntime((prev) => ({
+          ...prev,
+          [selectedRoom.name]: result.runtime_state,
+        }));
+      }
 
       setReasonModalOpen(false);
       setPendingCommand("");

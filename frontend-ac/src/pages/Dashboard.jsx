@@ -8,6 +8,7 @@ function Dashboard() {
   const [rooms, setRooms] = useState([]);
   const [search, setSearch] = useState("");
   const [roomStatus, setRoomStatus] = useState({});
+  const [roomRuntime, setRoomRuntime] = useState({});
   const [yoloData, setYoloData] = useState({});
   const [sensorData, setSensorData] = useState({});
   const [schedules, setSchedules] = useState([]);
@@ -323,6 +324,28 @@ function Dashboard() {
     }
   };
 
+  const fetchRuntime = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(apiUrl("/rooms/runtime"), {
+        headers: apiHeaders({
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Gagal ambil runtime ruangan:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      setRoomRuntime(data);
+    } catch (err) {
+      console.error("Gagal ambil runtime ruangan:", err);
+    }
+  };
+
   // =========================
   // FETCH DATA YOLO REALTIME
   // =========================
@@ -412,8 +435,12 @@ function Dashboard() {
 
   useEffect(() => {
     fetchStatus();
+    fetchRuntime();
 
-    const interval = setInterval(fetchStatus, 5000);
+    const interval = setInterval(() => {
+      fetchStatus();
+      fetchRuntime();
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -568,6 +595,7 @@ function Dashboard() {
     setRooms(data);
     setSearch("");
     fetchStatus();
+    fetchRuntime();
     fetchYoloData();
     fetchSensorData();
     fetchSchedules();
@@ -768,6 +796,7 @@ function Dashboard() {
             const dummyData = getAnimatedDummyData(r.name);
             const useDummyData = r.name !== IMPLEMENTED_ROOM && dummyData;
             const latestYolo = yoloData?.[r.name];
+            const runtime = roomRuntime?.[r.name];
             const status =
               useDummyData
                 ? dummyData.status
@@ -792,8 +821,11 @@ function Dashboard() {
             const fanSpeed = useDummyData
               ? dummyData.fan
               : formatAppliedFanSpeed(
-                  hasYoloData ? latestYolo?.applied_fan_speed || r.fan : null,
-                  isOn && hasYoloData,
+                  runtime?.last_command?.fan ||
+                    latestYolo?.applied_fan_speed ||
+                    latestYolo?.fan_speed ||
+                    r.fan,
+                  isOn,
                 );
             const occupancy = useDummyData
               ? dummyData.occ

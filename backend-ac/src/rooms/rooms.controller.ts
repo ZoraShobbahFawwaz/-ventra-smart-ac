@@ -117,6 +117,12 @@ export class RoomsController {
     return result;
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Get('runtime')
+  getRoomRuntimeStatus() {
+    return this.roomsService.getRoomRuntimeStatus();
+  }
+
   // =========================
   // CONTROL ROOM MANUAL
   // =========================
