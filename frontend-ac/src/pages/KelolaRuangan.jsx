@@ -391,7 +391,7 @@ export default function KelolaRuangan() {
   };
 
   const formatAppliedFanSpeed = (value, isOn) => {
-    if (!isOn) return "-";
+    if (!isOn) return "OFF";
 
     return formatFanSpeed(value);
   };
@@ -447,7 +447,7 @@ export default function KelolaRuangan() {
   const currentPowerValue =
     todayEnergyRoom?.power_watt ?? periodEnergyRoom?.power_watt ?? 330;
 
-  const hasFreshSensorData = selectedRoomIsOn && isFreshData(selectedSensorData);
+  const hasFreshSensorData = isFreshData(selectedSensorData);
   const hasYoloData = Boolean(selectedYoloData);
 
   const actualTemperatureDisplay = selectedDummyData
@@ -462,29 +462,25 @@ export default function KelolaRuangan() {
       : "-";
   const actualOccupancyDisplay = selectedDummyData
     ? formatOccupancy(selectedDummyData.occ)
-    : selectedRoomIsOn && hasYoloData
+    : hasYoloData
       ? formatOccupancy(selectedYoloData?.occupancy)
       : "-";
   const actualFanSpeedDisplay = selectedDummyData
     ? formatFanSpeed(selectedDummyData.fan)
-    : selectedRoomIsOn && hasYoloData
-      ? formatFanSpeed(selectedYoloData?.applied_fan_speed)
-      : "-";
+    : formatAppliedFanSpeed(selectedYoloData?.applied_fan_speed, selectedRoomIsOn);
   const yoloTemperatureDisplay = selectedDummyData
     ? formatActualTemperature(selectedDummyData.temp)
-    : selectedRoomIsOn && hasYoloData
+    : hasYoloData
       ? formatTemperature(selectedYoloData?.temperature)
       : "-";
   const yoloOccupancyDisplay = selectedDummyData
     ? formatOccupancy(selectedDummyData.occ)
-    : selectedRoomIsOn && hasYoloData
+    : hasYoloData
       ? formatOccupancy(selectedYoloData?.occupancy)
       : "-";
   const yoloFanSpeedDisplay = selectedDummyData
     ? formatFanSpeed(selectedDummyData.fan)
-    : selectedRoomIsOn && hasYoloData
-      ? formatFanSpeed(selectedYoloData?.fan_speed)
-      : "-";
+    : formatAppliedFanSpeed(selectedYoloData?.fan_speed, selectedRoomIsOn);
   const selectedLastUpdated =
     selectedDummyData
       ? currentDateTime.toISOString()

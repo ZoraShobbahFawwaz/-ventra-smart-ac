@@ -776,7 +776,7 @@ function Dashboard() {
             const isOn = status === "ON";
 
             const latestSensor = sensorData?.[r.name];
-            const hasFreshSensorData = isOn && isFreshData(latestSensor);
+            const hasFreshSensorData = isFreshData(latestSensor);
             const hasYoloData = Boolean(latestYolo);
 
             const temperature = useDummyData
@@ -797,7 +797,7 @@ function Dashboard() {
                 );
             const occupancy = useDummyData
               ? dummyData.occ
-              : isOn && hasYoloData
+              : hasYoloData
                 ? formatOccupancy(latestYolo?.occupancy, r.occ)
                 : "-";
 
