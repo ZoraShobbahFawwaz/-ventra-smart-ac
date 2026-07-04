@@ -14,6 +14,7 @@ function Dashboard() {
   const [schedules, setSchedules] = useState([]);
   const [scheduleModalRoom, setScheduleModalRoom] = useState(null);
   const [hoveredScheduleRoom, setHoveredScheduleRoom] = useState("");
+  const [hoveredScheduleDay, setHoveredScheduleDay] = useState("");
   const [hoveredCloseButton, setHoveredCloseButton] = useState("");
   const [todayEnergySummary, setTodayEnergySummary] = useState(null);
   const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
@@ -558,6 +559,25 @@ function Dashboard() {
       });
   };
 
+  const getGroupedRoomSchedules = (roomName) => {
+    return getRoomSchedules(roomName).reduce((groups, schedule) => {
+      const dayKey = String(schedule.day || "").toLowerCase();
+      const existingGroup = groups.find((group) => group.dayKey === dayKey);
+
+      if (existingGroup) {
+        existingGroup.items.push(schedule);
+      } else {
+        groups.push({
+          dayKey,
+          dayLabel: dayNames[dayKey] || schedule.day,
+          items: [schedule],
+        });
+      }
+
+      return groups;
+    }, []);
+  };
+
   const getScheduleSummary = (roomName) => {
     const roomSchedules = getRoomSchedules(roomName);
 
@@ -906,25 +926,33 @@ function Dashboard() {
               </div>
 
               <div style={scheduleList}>
-                {getRoomSchedules(scheduleModalRoom).length > 0 ? (
-                  getRoomSchedules(scheduleModalRoom).map((schedule) => {
-                    const day = String(schedule.day || "").toLowerCase();
-
-                    return (
-                      <div key={schedule.id} style={scheduleItem}>
-                        <div>
-                          <div style={scheduleDay}>
-                            {dayNames[day] || schedule.day}
-                          </div>
-                          <div style={scheduleTime}>
-                            {formatTime(schedule.start_time)} -{" "}
-                            {formatTime(schedule.end_time)}
-                          </div>
+                {getGroupedRoomSchedules(scheduleModalRoom).length > 0 ? (
+                  getGroupedRoomSchedules(scheduleModalRoom).map((group) => (
+                    <div
+                      key={group.dayKey}
+                      style={{
+                        ...scheduleItem,
+                        ...(hoveredScheduleDay === group.dayKey
+                          ? scheduleItemHover
+                          : {}),
+                      }}
+                      onMouseEnter={() => setHoveredScheduleDay(group.dayKey)}
+                      onMouseLeave={() => setHoveredScheduleDay("")}
+                    >
+                      <div>
+                        <div style={scheduleDay}>{group.dayLabel}</div>
+                        <div style={scheduleTimeList}>
+                          {group.items.map((schedule) => (
+                            <span key={schedule.id} style={scheduleTimePill}>
+                              {formatTime(schedule.start_time)} -{" "}
+                              {formatTime(schedule.end_time)}
+                            </span>
+                          ))}
                         </div>
-                        <span style={scheduleBadge}>Aktif Terjadwal</span>
                       </div>
-                    );
-                  })
+                      <span style={scheduleBadge}>Aktif Terjadwal</span>
+                    </div>
+                  ))
                 ) : (
                   <div style={emptySchedule}>
                     Belum ada jadwal untuk ruangan ini.
@@ -1463,6 +1491,15 @@ const scheduleItem = {
   border: "1px solid rgba(148, 163, 184, 0.18)",
   borderRadius: 14,
   padding: "13px 14px",
+  cursor: "pointer",
+  transition: "0.18s ease",
+};
+
+const scheduleItemHover = {
+  background: "rgba(37, 99, 235, 0.18)",
+  border: "1px solid rgba(96, 165, 250, 0.5)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 12px 26px rgba(37, 99, 235, 0.16)",
 };
 
 const scheduleDay = {
@@ -1475,6 +1512,23 @@ const scheduleTime = {
   marginTop: 4,
   fontSize: 13,
   color: "#cbd5e1",
+};
+
+const scheduleTimeList = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 8,
+  marginTop: 8,
+};
+
+const scheduleTimePill = {
+  background: "rgba(15, 23, 42, 0.45)",
+  border: "1px solid rgba(148, 163, 184, 0.16)",
+  borderRadius: 999,
+  color: "#dbeafe",
+  fontSize: 12,
+  fontWeight: 700,
+  padding: "5px 9px",
 };
 
 const scheduleBadge = {
