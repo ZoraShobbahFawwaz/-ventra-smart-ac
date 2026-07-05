@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 export default function MainLayout({ children, title, subtitle }) {
   const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
+    localStorage.getItem("theme") !== "light"
   );
 
   const savedUser = localStorage.getItem("user");
