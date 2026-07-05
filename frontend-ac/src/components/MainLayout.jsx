@@ -15,8 +15,8 @@ export default function MainLayout({ children, title, subtitle }) {
   const formattedRole =
     displayRole === "Admin"
       ? "Admin"
-      : displayRole === "laboran"
-      ? "Laboran"
+      : displayRole === "dosen"
+      ? "Dosen"
       : displayRole;
 
   useEffect(() => {

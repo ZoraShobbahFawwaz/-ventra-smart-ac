@@ -134,7 +134,7 @@ function User() {
   const pendingUsers = users.filter((u) => u.status === "pending");
   const totalUser = activeUsers.length;
   const totalAdmin = activeUsers.filter((u) => u.role === "Admin").length;
-  const totalLaboran = activeUsers.filter((u) => u.role === "laboran").length;
+  const totalDosen = activeUsers.filter((u) => u.role === "dosen").length;
   const totalPending = pendingUsers.length;
 
   return (
@@ -159,9 +159,9 @@ function User() {
             subtitle="User dengan akses penuh"
           />
           <Card
-            title="LABORAN"
-            value={totalLaboran}
-            subtitle="User operasional lab"
+            title="DOSEN"
+            value={totalDosen}
+            subtitle="User pengelola ruang kelas"
           />
           <Card
             title="PENDING"

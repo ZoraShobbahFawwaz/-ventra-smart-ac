@@ -30,7 +30,7 @@ function Register() {
           name,
           email,
           password,
-          role: "laboran",
+          role: "dosen",
         }),
       });
 

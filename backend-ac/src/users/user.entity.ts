@@ -17,7 +17,7 @@ export class User {
   @Column()
   role!: string;
 
-  @Column({ type: 'varchar', length: 20, default: 'active' })
+  @Column({ type: 'varchar', length: 20, default: 'pending' })
   status!: string;
 
   @Column({ type: 'varchar', nullable: true })

@@ -44,7 +44,7 @@ export async function register(name, email, password) {
       name,
       email,
       password,
-      role: "laboran",
+      role: "dosen",
     }),
   });
 

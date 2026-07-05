@@ -166,7 +166,7 @@ export class AuthService {
       name,
       email,
       password: hashedPassword,
-      role: 'laboran',
+      role: 'dosen',
       status: 'pending',
     });
 
