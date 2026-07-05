@@ -40,12 +40,14 @@ type HttpControlPayload =
       power: 'on';
       temperature: number;
       fan: string;
+      source: 'manual';
       method: 'HTTP';
       reason: string;
     }
   | {
       room: string;
       power: 'off';
+      source: 'manual';
       method: 'HTTP';
       reason: string;
     };
@@ -126,15 +128,6 @@ export class RoomsService {
 
   async getAllSchedules(req?: ReqUser): Promise<Schedule[]> {
     const data = await this.scheduleRepo.find();
-
-    if (req?.user) {
-      await this.auditService.createLog({
-        user: req.user.email || req.user.name || 'Unknown',
-        action: 'Read',
-        module: 'Room',
-        subject: 'Melihat semua jadwal ruangan',
-      });
-    }
 
     return data;
   }
@@ -231,6 +224,7 @@ export class RoomsService {
         power: 'on',
         temperature: 24,
         fan: 'medium',
+        source: 'manual',
         method: 'HTTP',
         reason,
       };
@@ -244,6 +238,7 @@ export class RoomsService {
       payload = {
         room: roomName,
         power: 'off',
+        source: 'manual',
         method: 'HTTP',
         reason,
       };
