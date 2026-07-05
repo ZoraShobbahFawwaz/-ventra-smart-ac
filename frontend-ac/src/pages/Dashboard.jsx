@@ -1186,6 +1186,7 @@ const Card = ({ title, value, subtitle, hint, onClick, actionLabel, onAction }) 
 
   return (
     <div
+      className="dashboard-summary-card"
       style={{
         ...cardStyle,
         cursor: onClick ? "pointer" : "default",

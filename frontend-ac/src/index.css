@@ -391,6 +391,43 @@ select {
   background: var(--header-action-hover-bg) !important;
 }
 
+.dashboard-summary-card {
+  transform: translateY(0);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.dashboard-summary-card:hover,
+.dashboard-summary-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  background:
+    radial-gradient(circle at top left, rgba(45, 140, 255, 0.14), transparent 38%),
+    var(--bg-card) !important;
+  box-shadow:
+    0 16px 34px rgba(2, 8, 23, 0.28),
+    0 0 0 1px rgba(96, 165, 250, 0.08) !important;
+  outline: none;
+}
+
+.dashboard-table-grid.table-data-row {
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.dashboard-table-grid.table-data-row:hover {
+  background: rgba(45, 140, 255, 0.09);
+  border-bottom-color: rgba(96, 165, 250, 0.35) !important;
+  box-shadow: inset 3px 0 0 rgba(45, 140, 255, 0.86);
+  transform: translateX(2px);
+}
+
 .table-scroll {
   width: 100%;
 }
