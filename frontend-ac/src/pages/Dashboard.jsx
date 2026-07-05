@@ -898,13 +898,13 @@ function Dashboard() {
         </div>
 
         {scheduleModalRoom && (
-          <div style={modalOverlay}>
-            <div style={scheduleModal}>
-              <div style={energyModalHeader}>
+          <div className="dashboard-modal-overlay" style={modalOverlay}>
+            <div className="dashboard-schedule-modal" style={scheduleModal}>
+              <div className="dashboard-modal-header" style={energyModalHeader}>
                 <div>
-                  <div style={modalEyebrow}>Schedule Room</div>
-                  <h2 style={modalTitle}>{scheduleModalRoom}</h2>
-                  <p style={modalSubtitle}>
+                  <div className="dashboard-modal-eyebrow" style={modalEyebrow}>Schedule Room</div>
+                  <h2 className="dashboard-modal-title" style={modalTitle}>{scheduleModalRoom}</h2>
+                  <p className="dashboard-modal-subtitle" style={modalSubtitle}>
                     Daftar jadwal penggunaan ruang yang tersimpan pada database.
                   </p>
                 </div>
@@ -921,7 +921,7 @@ function Dashboard() {
                   onMouseLeave={() => setHoveredCloseButton("")}
                   onClick={() => setScheduleModalRoom(null)}
                 >
-                  <span style={modalCloseButtonText}>X</span>
+                  <span className="dashboard-modal-close-text" style={modalCloseButtonText}>X</span>
                 </button>
               </div>
 
@@ -929,6 +929,7 @@ function Dashboard() {
                 {getGroupedRoomSchedules(scheduleModalRoom).length > 0 ? (
                   getGroupedRoomSchedules(scheduleModalRoom).map((group) => (
                     <div
+                      className="dashboard-schedule-item"
                       key={group.dayKey}
                       style={{
                         ...scheduleItem,
@@ -943,14 +944,20 @@ function Dashboard() {
                         <div style={scheduleDay}>{group.dayLabel}</div>
                         <div style={scheduleTimeList}>
                           {group.items.map((schedule) => (
-                            <span key={schedule.id} style={scheduleTimePill}>
+                            <span
+                              className="dashboard-schedule-time"
+                              key={schedule.id}
+                              style={scheduleTimePill}
+                            >
                               {formatTime(schedule.start_time)} -{" "}
                               {formatTime(schedule.end_time)}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <span style={scheduleBadge}>Aktif Terjadwal</span>
+                      <span className="dashboard-schedule-badge" style={scheduleBadge}>
+                        Aktif Terjadwal
+                      </span>
                     </div>
                   ))
                 ) : (
@@ -964,13 +971,13 @@ function Dashboard() {
         )}
 
         {energyModalOpen && (
-          <div style={modalOverlay}>
-            <div style={energyModal}>
-              <div style={energyModalHeader}>
+          <div className="dashboard-modal-overlay" style={modalOverlay}>
+            <div className="dashboard-energy-modal" style={energyModal}>
+              <div className="dashboard-modal-header" style={energyModalHeader}>
                 <div>
-                  <div style={modalEyebrow}>Used Energy Period</div>
-                  <h2 style={modalTitle}>Penggunaan Energi Periode</h2>
-                  <p style={modalSubtitle}>
+                  <div className="dashboard-modal-eyebrow" style={modalEyebrow}>Used Energy Period</div>
+                  <h2 className="dashboard-modal-title" style={modalTitle}>Penggunaan Energi Periode</h2>
+                  <p className="dashboard-modal-subtitle" style={modalSubtitle}>
                     Ringkasan penggunaan AC berdasarkan ruangan pada periode
                     minggu atau bulan terpilih.
                   </p>
@@ -988,7 +995,7 @@ function Dashboard() {
                   onMouseLeave={() => setHoveredCloseButton("")}
                   onClick={() => setEnergyModalOpen(false)}
                 >
-                  <span style={modalCloseButtonText}>X</span>
+                  <span className="dashboard-modal-close-text" style={modalCloseButtonText}>X</span>
                 </button>
               </div>
 

@@ -43,25 +43,25 @@ export default function MainLayout({ children, title, subtitle }) {
       root.style.setProperty("--profile-border", "transparent");
       root.style.setProperty("--profile-shadow", "none");
     } else {
-      root.style.setProperty("--bg-main", "linear-gradient(180deg, #f7faff 0%, #eef3f8 100%)");
-      root.style.setProperty("--bg-sidebar", "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)");
-      root.style.setProperty("--bg-card", "#ffffff");
-      root.style.setProperty("--bg-card-soft", "#f8fafc");
-      root.style.setProperty("--text-main", "#0f172a");
-      root.style.setProperty("--text-muted", "#64748b");
-      root.style.setProperty("--border-color", "#dbe3ee");
-      root.style.setProperty("--input-bg", "#ffffff");
-      root.style.setProperty("--shadow-color", "rgba(15,23,42,0.08)");
-      root.style.setProperty("--header-action-bg", "#ffffff");
-      root.style.setProperty("--header-action-border", "#dbe3ee");
-      root.style.setProperty("--header-action-hover-bg", "#eef6ff");
-      root.style.setProperty("--header-action-hover-border", "#b8d5ff");
-      root.style.setProperty("--profile-bg", "rgba(255,255,255,0.72)");
-      root.style.setProperty("--profile-border", "#dbe3ee");
-      root.style.setProperty("--profile-shadow", "0 10px 24px rgba(15,23,42,0.06)");
+      root.style.setProperty("--bg-main", "linear-gradient(180deg, #e8eef7 0%, #dfe8f3 100%)");
+      root.style.setProperty("--bg-sidebar", "linear-gradient(180deg, #f8fbff 0%, #edf4fb 100%)");
+      root.style.setProperty("--bg-card", "#f8fbff");
+      root.style.setProperty("--bg-card-soft", "#edf4fb");
+      root.style.setProperty("--text-main", "#102033");
+      root.style.setProperty("--text-muted", "#52667f");
+      root.style.setProperty("--border-color", "#c8d6e6");
+      root.style.setProperty("--input-bg", "#f8fbff");
+      root.style.setProperty("--shadow-color", "rgba(30, 64, 105, 0.09)");
+      root.style.setProperty("--header-action-bg", "#f8fbff");
+      root.style.setProperty("--header-action-border", "#c8d6e6");
+      root.style.setProperty("--header-action-hover-bg", "#e6f0fb");
+      root.style.setProperty("--header-action-hover-border", "#93c5fd");
+      root.style.setProperty("--profile-bg", "rgba(248,251,255,0.82)");
+      root.style.setProperty("--profile-border", "#c8d6e6");
+      root.style.setProperty("--profile-shadow", "0 10px 24px rgba(30,64,105,0.08)");
     }
 
-    document.body.style.background = darkMode ? "#0f172a" : "#eef3f8";
+    document.body.style.background = darkMode ? "#0f172a" : "#dfe8f3";
   }, [darkMode]);
 
   return (
