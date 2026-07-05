@@ -1,4 +1,4 @@
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaUserCircle } from "react-icons/fa";
 import { useEffect } from "react";
 
 export default function MainLayout({ children, title, subtitle }) {
@@ -57,11 +57,9 @@ export default function MainLayout({ children, title, subtitle }) {
           </span>
 
           <div className="header-profile" style={profile}>
-            <img
-              src={`https://i.pravatar.cc/40?u=${displayName}`}
-              style={avatar}
-              alt="profile"
-            />
+            <div style={avatar} aria-label="Default profile avatar" role="img">
+              <FaUserCircle />
+            </div>
 
             <div style={profileText}>
               <div style={profileName}>{displayName}</div>
@@ -126,10 +124,15 @@ const avatar = {
   width: 42,
   height: 42,
   borderRadius: "50%",
-  display: "block",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexShrink: 0,
-  objectFit: "cover",
+  background: "linear-gradient(145deg, rgba(45, 140, 255, 0.22), rgba(15, 23, 42, 0.45))",
   border: "1px solid var(--border-color)",
+  color: "#93c5fd",
+  fontSize: 34,
+  overflow: "hidden",
 };
 
 const profileText = {
