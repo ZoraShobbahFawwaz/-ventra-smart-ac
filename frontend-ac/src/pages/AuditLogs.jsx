@@ -365,7 +365,7 @@ function AuditLogs() {
 }
 
 const Card = ({ title, value, subtitle }) => (
-  <div style={cardStyle}>
+  <div className="audit-summary-card" style={cardStyle}>
     <div style={cardTitle}>{title}</div>
     <h2 style={cardValue}>{value}</h2>
     <div style={cardSubtitle}>{subtitle}</div>
