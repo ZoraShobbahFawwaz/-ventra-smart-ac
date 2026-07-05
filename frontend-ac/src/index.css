@@ -391,6 +391,22 @@ select {
   background: var(--header-action-hover-bg) !important;
 }
 
+.profile-logout-button:hover,
+.profile-logout-button:focus-visible {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  color: #fee2e2 !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 22px rgba(239, 68, 68, 0.18),
+    0 0 0 3px rgba(239, 68, 68, 0.1);
+  outline: none;
+}
+
+.profile-logout-button:active {
+  transform: translateY(0);
+}
+
 .dashboard-summary-card {
   transform: translateY(0);
   transition:
