@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -29,6 +30,16 @@ export class UsersController {
   @Post()
   create(@Body() body: any, @Req() req: Request & { user?: any }) {
     return this.usersService.create(body, req.user);
+  }
+
+  // ================= APPROVE USER =================
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':id/approve')
+  approve(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { user?: any },
+  ) {
+    return this.usersService.approve(id, req.user);
   }
 
   // ================= DELETE USER =================

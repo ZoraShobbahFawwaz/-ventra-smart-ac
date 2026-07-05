@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  FaCheck,
   FaSearch,
   FaTrash,
 } from "react-icons/fa";
@@ -38,7 +39,15 @@ function User() {
       }
 
       const data = await res.json();
-      setUsers(data);
+      setUsers(
+        data.sort((a, b) => {
+          const statusA = a.status || "active";
+          const statusB = b.status || "active";
+
+          if (statusA === statusB) return b.id - a.id;
+          return statusA === "pending" ? -1 : 1;
+        })
+      );
     } catch (err) {
       console.error("Gagal ambil data users:", err);
     }
@@ -80,16 +89,53 @@ function User() {
     }
   };
 
+  const handleApprove = async (id) => {
+    if (!window.confirm("Setujui akun user ini?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(apiUrl(`/users/${id}/approve`), {
+        method: "PATCH",
+        headers: apiHeaders({
+          Authorization: `Bearer ${token}`,
+        }),
+      });
+
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("user");
+        navigate("/");
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.message || "Gagal menyetujui user");
+        return;
+      }
+
+      fetchUsers();
+    } catch (err) {
+      console.error("Gagal approve user:", err);
+    }
+  };
+
   const filteredUsers = users.filter(
     (u) =>
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.role.toLowerCase().includes(search.toLowerCase())
+      u.role.toLowerCase().includes(search.toLowerCase()) ||
+      (u.status || "active").toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalUser = users.length;
-  const totalAdmin = users.filter((u) => u.role === "Admin").length;
-  const totalLaboran = users.filter((u) => u.role === "laboran").length;
+  const activeUsers = users.filter((u) => (u.status || "active") === "active");
+  const pendingUsers = users.filter((u) => u.status === "pending");
+  const totalUser = activeUsers.length;
+  const totalAdmin = activeUsers.filter((u) => u.role === "Admin").length;
+  const totalLaboran = activeUsers.filter((u) => u.role === "laboran").length;
+  const totalPending = pendingUsers.length;
 
   return (
     <div className="app-shell" style={layoutStyle}>
@@ -117,6 +163,11 @@ function User() {
             value={totalLaboran}
             subtitle="User operasional lab"
           />
+          <Card
+            title="PENDING"
+            value={totalPending}
+            subtitle="Menunggu approval admin"
+          />
         </div>
 
         {/* SEARCH */}
@@ -138,6 +189,7 @@ function User() {
             <div>Nama</div>
             <div>Email</div>
             <div>Role</div>
+            <div>Status</div>
             <div>Actions</div>
           </div>
 
@@ -146,8 +198,31 @@ function User() {
               <div>{u.name}</div>
               <div>{u.email}</div>
               <div>{u.role}</div>
+              <div>
+                <span
+                  style={
+                    (u.status || "active") === "pending"
+                      ? pendingBadge
+                      : activeBadge
+                  }
+                >
+                  {(u.status || "active") === "pending"
+                    ? "Pending"
+                    : "Active"}
+                </span>
+              </div>
 
               <div style={actions}>
+                {(u.status || "active") === "pending" && (
+                  <button
+                    className="icon-action-button"
+                    style={approveBtn}
+                    onClick={() => handleApprove(u.id)}
+                    title="Approve user"
+                  >
+                    <FaCheck />
+                  </button>
+                )}
                 <button
                   className="icon-action-button icon-action-danger"
                   style={iconBtn}
@@ -255,7 +330,7 @@ const tableContainer = {
 
 const tableHeader = {
   display: "grid",
-  gridTemplateColumns: "2fr 2fr 1fr 1fr",
+  gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr",
   padding: 15,
   background: "linear-gradient(90deg, #2d8cff, #1a6ed8)",
   color: "#fff",
@@ -264,7 +339,7 @@ const tableHeader = {
 
 const tableRow = {
   display: "grid",
-  gridTemplateColumns: "2fr 2fr 1fr 1fr",
+  gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr",
   padding: 15,
   borderBottom: "1px solid var(--border-color, #eee)",
   color: "var(--text-main, #111)",
@@ -283,6 +358,33 @@ const iconBtn = {
   color: "var(--text-main, #111)",
   cursor: "pointer",
   transition: "0.2s ease",
+};
+
+const approveBtn = {
+  ...iconBtn,
+  color: "#22c55e",
+  border: "1px solid rgba(34, 197, 94, 0.35)",
+  background: "rgba(34, 197, 94, 0.12)",
+};
+
+const activeBadge = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: 999,
+  padding: "6px 12px",
+  color: "#22c55e",
+  background: "rgba(34, 197, 94, 0.12)",
+  border: "1px solid rgba(34, 197, 94, 0.28)",
+  fontSize: 12,
+  fontWeight: 700,
+};
+
+const pendingBadge = {
+  ...activeBadge,
+  color: "#facc15",
+  background: "rgba(250, 204, 21, 0.12)",
+  border: "1px solid rgba(250, 204, 21, 0.28)",
 };
 
 const emptyRow = {

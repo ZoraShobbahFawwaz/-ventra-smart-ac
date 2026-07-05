@@ -17,6 +17,9 @@ export class User {
   @Column()
   role!: string;
 
+  @Column({ type: 'varchar', length: 20, default: 'active' })
+  status!: string;
+
   @Column({ type: 'varchar', nullable: true })
   resetToken?: string;
 

@@ -16,12 +16,12 @@ function Register() {
 
   const handleRegister = async () => {
     if (password !== confirm) {
-      alert("Password tidak sama ❌");
+      alert("Password tidak sama");
       return;
     }
 
     try {
-      await fetch(apiUrl("/auth/register"), {
+      const res = await fetch(apiUrl("/auth/register"), {
         method: "POST",
         headers: apiHeaders({
           "Content-Type": "application/json",
@@ -34,10 +34,17 @@ function Register() {
         }),
       });
 
-      alert("Register berhasil ✅");
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        alert(data.message || "Register gagal");
+        return;
+      }
+
+      alert(data.message || "Register berhasil. Akun menunggu approval admin.");
       navigate("/");
     } catch {
-      alert("Register gagal ❌");
+      alert("Register gagal");
     }
   };
 
@@ -187,3 +194,4 @@ const loginLink = {
 };
 
 export default Register;
+

@@ -19,6 +19,7 @@ export interface LoginResponse {
     name: string;
     email: string;
     role: string;
+    status: string;
   };
 }
 
@@ -29,6 +30,7 @@ export interface RegisterResponse {
     name: string;
     email: string;
     role: string;
+    status: string;
   };
 }
 
@@ -85,11 +87,26 @@ export class AuthService {
       throw new UnauthorizedException('Email atau password salah');
     }
 
+    if ((user.status || 'active') !== 'active') {
+      await this.auditService.createLog({
+        user: user.email,
+        action: 'Login',
+        module: 'Auth',
+        subject: 'Login gagal - akun belum disetujui admin',
+        status: 'failed',
+      });
+
+      throw new UnauthorizedException(
+        'Akun belum disetujui admin. Silakan menunggu approval.',
+      );
+    }
+
     const token = this.jwtService.sign({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
+      status: user.status || 'active',
     });
 
     await this.auditService.createLog({
@@ -108,6 +125,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        status: user.status || 'active',
       },
     };
   }
@@ -148,7 +166,8 @@ export class AuthService {
       name,
       email,
       password: hashedPassword,
-      role,
+      role: 'laboran',
+      status: 'pending',
     });
 
     const savedUser = await this.userRepository.save(newUser);
@@ -163,17 +182,19 @@ export class AuthService {
         name: savedUser.name,
         email: savedUser.email,
         role: savedUser.role,
+        status: savedUser.status,
       },
       status: 'success',
     });
 
     return {
-      message: 'Register berhasil',
+      message: 'Register berhasil. Akun menunggu approval admin.',
       user: {
         id: savedUser.id,
         name: savedUser.name,
         email: savedUser.email,
         role: savedUser.role,
+        status: savedUser.status,
       },
     };
   }

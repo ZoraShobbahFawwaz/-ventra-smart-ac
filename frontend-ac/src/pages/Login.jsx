@@ -14,7 +14,7 @@ function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError("Email dan password wajib diisi ⚠️");
+      setError("Email dan password wajib diisi");
       return;
     }
 
@@ -28,8 +28,8 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       navigate("/dashboard");
-    } catch {
-      setError("Email atau password salah ❌");
+    } catch (err) {
+      setError(err.message || "Email atau password salah");
     }
   };
 
@@ -173,3 +173,4 @@ const buttonStyle = {
 };
 
 export default Login;
+
