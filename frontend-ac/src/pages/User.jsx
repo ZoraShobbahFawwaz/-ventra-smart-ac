@@ -215,7 +215,7 @@ function User() {
               <div style={actions}>
                 {(u.status || "active") === "pending" && (
                   <button
-                    className="icon-action-button"
+                    className="icon-action-button icon-action-approve"
                     style={approveBtn}
                     onClick={() => handleApprove(u.id)}
                     title="Approve user"

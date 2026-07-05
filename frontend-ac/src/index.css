@@ -305,6 +305,16 @@ select {
     0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
+.icon-action-approve:hover,
+.icon-action-approve:focus-visible {
+  color: #fff !important;
+  border-color: rgba(74, 222, 128, 0.58) !important;
+  background: #22c55e !important;
+  box-shadow:
+    0 10px 20px rgba(34, 197, 94, 0.24),
+    0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
 .action-button:active,
 .icon-action-button:active {
   transform: translateY(0);
