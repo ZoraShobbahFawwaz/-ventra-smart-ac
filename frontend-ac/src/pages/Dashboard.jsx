@@ -1109,24 +1109,24 @@ function Dashboard() {
                 )}
 
                 <div style={energySummaryGrid}>
-                  <div style={energySummaryCard}>
+                  <div className="energy-period-card" style={energySummaryCard}>
                     <span>Total Energi</span>
                     <b>{totalPeriodEnergy.toFixed(1)} kWh</b>
                   </div>
-                  <div style={energySummaryCard}>
+                  <div className="energy-period-card" style={energySummaryCard}>
                     <span>Rata-rata Ruangan</span>
                     <b>{averagePeriodEnergy.toFixed(1)} kWh</b>
                   </div>
                 </div>
               </div>
 
-              <div style={chartCard}>
+              <div className="energy-chart-card" style={chartCard}>
                 <div style={chartTitle}>
                   Grafik Penggunaan Energi per Ruangan ({selectedPeriodLabel})
                 </div>
                 <div style={barChart}>
                   {energyPeriodData.map((room) => (
-                    <div key={room.id} style={barItem}>
+                    <div key={room.id} className="energy-bar-item" style={barItem}>
                       <div style={barLabel}>{room.name.replace("Ruang Kelas ", "")}</div>
                       <div style={barTrack}>
                         <div
@@ -1160,7 +1160,7 @@ function Dashboard() {
                 </div>
 
                 {energyPeriodData.map((room) => (
-                  <div key={room.id} style={energyTableRow}>
+                  <div key={room.id} className="energy-table-row" style={energyTableRow}>
                     <div>{room.name}</div>
                     <div>
                       {typeof room.hours === "number" ? `${room.hours} Jam` : "-"}
