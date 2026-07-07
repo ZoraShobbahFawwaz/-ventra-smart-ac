@@ -483,7 +483,7 @@ export default function KelolaRuangan() {
     todayEnergyRoom?.power_watt ?? periodEnergyRoom?.power_watt ?? 3320;
 
   const hasFreshSensorData = isFreshData(selectedSensorData);
-  const hasYoloData = Boolean(selectedYoloData);
+  const hasFreshYoloData = isFreshData(selectedYoloData);
   const selectedRuntimeFanSpeed = selectedRoom
     ? getRuntimeFanSpeed(selectedRoom.name)
     : null;
@@ -500,7 +500,7 @@ export default function KelolaRuangan() {
       : "-";
   const actualOccupancyDisplay = selectedDummyData
     ? formatOccupancy(selectedDummyData.occ)
-    : hasYoloData
+    : hasFreshYoloData
       ? formatOccupancy(selectedYoloData?.occupancy)
       : "-";
   const actualFanSpeedDisplay = selectedDummyData
@@ -513,12 +513,12 @@ export default function KelolaRuangan() {
       );
   const yoloTemperatureDisplay = selectedDummyData
     ? formatActualTemperature(selectedDummyData.temp)
-    : hasYoloData
+    : hasFreshYoloData
       ? formatTemperature(selectedYoloData?.temperature)
       : "-";
   const yoloOccupancyDisplay = selectedDummyData
     ? formatOccupancy(selectedDummyData.occ)
-    : hasYoloData
+    : hasFreshYoloData
       ? formatOccupancy(selectedYoloData?.occupancy)
       : "-";
   const yoloFanSpeedDisplay = selectedDummyData
