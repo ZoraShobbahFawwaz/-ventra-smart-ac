@@ -42,41 +42,44 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg-main: #eaf1f8;
-  --bg-sidebar: #f5f8fc;
-  --bg-card: #f7fafe;
-  --bg-card-soft: #e8f0f8;
-  --bg-elevated: #f2f6fb;
-  --input-bg: #f2f6fb;
-  --text-main: #172033;
-  --text-muted: #526174;
-  --text-soft: #6b7a90;
-  --border-color: #cfdbe8;
-  --shadow-color: rgba(38, 56, 82, 0.08);
-  --modal-overlay-bg: rgba(15, 23, 42, 0.34);
-  --modal-bg: linear-gradient(145deg, rgba(247, 250, 254, 0.98), rgba(231, 240, 250, 0.98));
-  --modal-panel-bg: linear-gradient(145deg, rgba(245, 249, 253, 0.98), rgba(231, 240, 249, 0.98));
-  --modal-header-bg: linear-gradient(145deg, rgba(232, 241, 251, 0.98), rgba(215, 229, 245, 0.98));
-  --subtle-panel-bg: rgba(218, 231, 245, 0.72);
-  --subtle-panel-strong-bg: rgba(226, 237, 249, 0.88);
-  --modal-border-color: rgba(105, 151, 205, 0.26);
-  --card-hover-bg: radial-gradient(circle at top left, rgba(45, 140, 255, 0.08), transparent 40%), #f9fbfe;
-  --row-hover-bg: rgba(45, 140, 255, 0.055);
-  --room-card-bg: linear-gradient(145deg, rgba(247, 250, 254, 0.98), rgba(229, 238, 249, 0.98));
-  --room-card-hover-bg: linear-gradient(145deg, rgba(250, 252, 255, 1), rgba(218, 232, 248, 1));
-  --room-card-on-bg: linear-gradient(145deg, rgba(230, 249, 241, 0.98), rgba(208, 240, 225, 0.98));
-  --room-card-on-hover-bg: linear-gradient(145deg, rgba(221, 246, 235, 1), rgba(195, 233, 214, 1));
-  --header-action-bg: rgba(245, 248, 252, 0.82);
-  --header-action-border: rgba(203, 216, 231, 0.95);
-  --header-action-hover-bg: rgba(226, 237, 249, 0.9);
-  --header-action-hover-border: rgba(88, 145, 209, 0.38);
-  --profile-bg: rgba(245, 248, 252, 0.82);
-  --profile-border: rgba(203, 216, 231, 0.95);
-  --profile-shadow: 0 8px 22px rgba(38, 56, 82, 0.07);
-  --dropdown-bg: linear-gradient(145deg, rgba(247, 250, 254, 0.98), rgba(231, 240, 250, 0.98));
-  --dropdown-border: rgba(88, 145, 209, 0.24);
-  --avatar-bg: linear-gradient(145deg, rgba(215, 229, 245, 0.96), rgba(236, 242, 250, 0.96));
-  --avatar-color: #2458a6;
+  --bg-main: #e9eff6;
+  --bg-sidebar: #f3f6fa;
+  --bg-card: #f8fafc;
+  --bg-card-soft: #e7eef7;
+  --bg-elevated: #f1f5f9;
+  --input-bg: #f4f7fb;
+  --text-main: #1d2738;
+  --text-muted: #536274;
+  --text-soft: #718093;
+  --border-color: #c9d5e3;
+  --shadow-color: rgba(39, 56, 78, 0.07);
+  --brand-gradient: linear-gradient(90deg, #5d8fcb, #426fa8);
+  --brand-primary: #4f7fb9;
+  --brand-primary-hover: #3f6fa6;
+  --modal-overlay-bg: rgba(25, 36, 52, 0.3);
+  --modal-bg: linear-gradient(145deg, rgba(248, 250, 252, 0.98), rgba(230, 238, 248, 0.98));
+  --modal-panel-bg: linear-gradient(145deg, rgba(246, 249, 252, 0.98), rgba(229, 238, 248, 0.98));
+  --modal-header-bg: linear-gradient(145deg, rgba(229, 238, 248, 0.98), rgba(211, 225, 241, 0.98));
+  --subtle-panel-bg: rgba(214, 226, 240, 0.68);
+  --subtle-panel-strong-bg: rgba(225, 235, 247, 0.86);
+  --modal-border-color: rgba(96, 129, 169, 0.24);
+  --card-hover-bg: radial-gradient(circle at top left, rgba(79, 127, 185, 0.07), transparent 42%), #fbfcfe;
+  --row-hover-bg: rgba(79, 127, 185, 0.055);
+  --room-card-bg: linear-gradient(145deg, rgba(248, 250, 252, 0.98), rgba(226, 235, 247, 0.98));
+  --room-card-hover-bg: linear-gradient(145deg, rgba(251, 253, 255, 1), rgba(216, 229, 244, 1));
+  --room-card-on-bg: linear-gradient(145deg, rgba(231, 246, 239, 0.98), rgba(210, 234, 222, 0.98));
+  --room-card-on-hover-bg: linear-gradient(145deg, rgba(224, 243, 235, 1), rgba(198, 226, 211, 1));
+  --header-action-bg: rgba(244, 247, 251, 0.86);
+  --header-action-border: rgba(199, 211, 226, 0.95);
+  --header-action-hover-bg: rgba(224, 234, 247, 0.9);
+  --header-action-hover-border: rgba(79, 127, 185, 0.34);
+  --profile-bg: rgba(244, 247, 251, 0.86);
+  --profile-border: rgba(199, 211, 226, 0.95);
+  --profile-shadow: 0 8px 22px rgba(39, 56, 78, 0.065);
+  --dropdown-bg: linear-gradient(145deg, rgba(248, 250, 252, 0.98), rgba(230, 238, 248, 0.98));
+  --dropdown-border: rgba(79, 127, 185, 0.22);
+  --avatar-bg: linear-gradient(145deg, rgba(210, 225, 242, 0.96), rgba(235, 241, 249, 0.96));
+  --avatar-color: #426fa8;
 }
 
 * {
@@ -93,6 +96,12 @@ body {
   font-family: 'Poppins', sans-serif;
   background: var(--bg-main);
   color: var(--text-main);
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(189, 211, 235, 0.32), transparent 30%),
+    linear-gradient(180deg, #eef3f8 0%, var(--bg-main) 42%, #e5edf5 100%);
 }
 
 img,
@@ -614,9 +623,80 @@ select {
   text-shadow: none;
 }
 
+:root[data-theme="light"] .table-header-row {
+  background: linear-gradient(90deg, #5d8fcb, #426fa8) !important;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme="light"] .table-data-row {
+  border-bottom-color: #d6e0ec !important;
+}
+
+:root[data-theme="light"] .room-card {
+  border-color: rgba(139, 160, 183, 0.34);
+  box-shadow: 0 10px 22px rgba(39, 56, 78, 0.08);
+}
+
+:root[data-theme="light"] .room-card::before {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(130, 166, 207, 0.13), transparent 44%),
+    radial-gradient(circle at 92% 90%, rgba(165, 181, 200, 0.16), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 60%);
+}
+
+:root[data-theme="light"] .room-card-on {
+  border-color: rgba(65, 150, 105, 0.34);
+  box-shadow: 0 10px 22px rgba(56, 130, 92, 0.08);
+}
+
+:root[data-theme="light"] .room-card-on .room-card-status,
+:root[data-theme="light"] .room-status-on {
+  color: #2f8b5b !important;
+  background: rgba(47, 139, 91, 0.11) !important;
+  border-color: rgba(47, 139, 91, 0.24) !important;
+}
+
+:root[data-theme="light"] .room-status-off {
+  color: #65758a !important;
+  background: rgba(101, 117, 138, 0.1) !important;
+  border-color: rgba(101, 117, 138, 0.22) !important;
+}
+
+:root[data-theme="light"] .room-card-dot {
+  background: #7b899c;
+  box-shadow: 0 0 0 3px rgba(123, 137, 156, 0.1);
+}
+
+:root[data-theme="light"] .room-card-on .room-card-dot {
+  background: #2f8b5b;
+  box-shadow:
+    0 0 0 3px rgba(47, 139, 91, 0.1),
+    0 0 14px rgba(47, 139, 91, 0.18);
+}
+
+:root[data-theme="light"] .room-card-detail {
+  color: #426fa8;
+  background: rgba(79, 127, 185, 0.08);
+  border-color: rgba(79, 127, 185, 0.24);
+}
+
+:root[data-theme="light"] .room-card-detail:hover,
+:root[data-theme="light"] .room-card-detail:focus-visible {
+  color: #315f93;
+  background: rgba(79, 127, 185, 0.13);
+  border-color: rgba(79, 127, 185, 0.38);
+}
+
+:root[data-theme="light"] .modal-close-button:hover,
+:root[data-theme="light"] .modal-close-button:focus-visible {
+  color: #315f93 !important;
+  background: rgba(79, 127, 185, 0.12) !important;
+  border-color: rgba(79, 127, 185, 0.36) !important;
+}
+
 :root[data-theme="light"] .room-card:hover,
 :root[data-theme="light"] .room-card-on:hover {
-  box-shadow: 0 14px 28px rgba(38, 56, 82, 0.12);
+  box-shadow: 0 14px 28px rgba(39, 56, 78, 0.11);
 }
 
 :root[data-theme="light"] .dashboard-summary-card:hover,
@@ -630,16 +710,48 @@ select {
 :root[data-theme="light"] .energy-chart-card:hover,
 :root[data-theme="light"] .energy-chart-card:focus-visible {
   box-shadow:
-    0 14px 28px rgba(38, 56, 82, 0.12),
-    0 0 0 1px rgba(88, 145, 209, 0.08) !important;
+    0 14px 28px rgba(39, 56, 78, 0.11),
+    0 0 0 1px rgba(79, 127, 185, 0.08) !important;
 }
 
 :root[data-theme="light"] .dashboard-table-grid.table-data-row:hover,
 :root[data-theme="light"] .audit-table-grid.table-data-row:hover,
 :root[data-theme="light"] .user-table-grid.table-data-row:hover,
 :root[data-theme="light"] .energy-table-row:hover {
-  border-bottom-color: rgba(88, 145, 209, 0.28) !important;
-  box-shadow: inset 3px 0 0 rgba(45, 140, 255, 0.58);
+  border-bottom-color: rgba(79, 127, 185, 0.26) !important;
+  box-shadow: inset 3px 0 0 rgba(79, 127, 185, 0.46);
+}
+
+:root[data-theme="light"] .action-button-primary:hover,
+:root[data-theme="light"] .action-button-primary:focus-visible,
+:root[data-theme="light"] .reason-button-submit:not(:disabled):hover,
+:root[data-theme="light"] .reason-button-submit:not(:disabled):focus-visible {
+  box-shadow:
+    0 12px 22px rgba(79, 127, 185, 0.18),
+    0 0 0 3px rgba(79, 127, 185, 0.08);
+}
+
+:root[data-theme="light"] .action-button-view:hover,
+:root[data-theme="light"] .action-button-view:focus-visible {
+  box-shadow: 0 10px 18px rgba(79, 127, 185, 0.15);
+}
+
+:root[data-theme="light"] .manual-control-on:hover,
+:root[data-theme="light"] .manual-control-on:focus-visible,
+:root[data-theme="light"] .icon-action-approve:hover,
+:root[data-theme="light"] .icon-action-approve:focus-visible {
+  box-shadow:
+    0 14px 24px rgba(47, 139, 91, 0.16),
+    0 0 0 3px rgba(47, 139, 91, 0.08) !important;
+}
+
+:root[data-theme="light"] .manual-control-off:hover,
+:root[data-theme="light"] .manual-control-off:focus-visible,
+:root[data-theme="light"] .icon-action-danger:hover,
+:root[data-theme="light"] .icon-action-danger:focus-visible {
+  box-shadow:
+    0 14px 24px rgba(188, 74, 74, 0.15),
+    0 0 0 3px rgba(188, 74, 74, 0.08) !important;
 }
 
 .table-scroll {
