@@ -571,6 +571,38 @@ select {
   transform: translateX(2px);
 }
 
+.dashboard-table-grid.table-data-row.dashboard-row-implemented {
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(127, 86, 28, 0.18), rgba(30, 64, 105, 0.18)),
+    var(--row-bg, rgba(15, 23, 42, 0.96)) !important;
+  border-bottom-color: rgba(217, 164, 67, 0.28) !important;
+  box-shadow:
+    inset 4px 0 0 rgba(217, 164, 67, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.dashboard-table-grid.table-data-row.dashboard-row-implemented:hover {
+  background:
+    linear-gradient(90deg, rgba(145, 101, 35, 0.26), rgba(37, 99, 160, 0.22)),
+    var(--row-hover-bg) !important;
+  border-bottom-color: rgba(217, 164, 67, 0.42) !important;
+  box-shadow:
+    inset 4px 0 0 rgba(217, 164, 67, 0.95),
+    0 10px 24px rgba(2, 8, 23, 0.2);
+}
+
+.dashboard-status-implemented {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 5px 12px;
+  border: 1px solid rgba(217, 164, 67, 0.32);
+  border-radius: 999px;
+  background: rgba(217, 164, 67, 0.1);
+}
+
 .audit-summary-card,
 .user-summary-card {
   transform: translateY(0);
@@ -774,6 +806,31 @@ select {
 :root[data-theme="light"] .energy-table-row:hover {
   border-bottom-color: rgba(79, 127, 185, 0.26) !important;
   box-shadow: inset 3px 0 0 rgba(79, 127, 185, 0.46);
+}
+
+:root[data-theme="light"] .dashboard-table-grid.table-data-row.dashboard-row-implemented {
+  background:
+    linear-gradient(90deg, rgba(255, 247, 224, 0.95), rgba(226, 236, 248, 0.95)),
+    var(--row-bg, #f8fbff) !important;
+  border-bottom-color: rgba(181, 127, 45, 0.26) !important;
+  box-shadow:
+    inset 4px 0 0 rgba(181, 127, 45, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+:root[data-theme="light"] .dashboard-table-grid.table-data-row.dashboard-row-implemented:hover {
+  background:
+    linear-gradient(90deg, rgba(255, 242, 211, 1), rgba(216, 230, 246, 1)),
+    var(--row-hover-bg) !important;
+  border-bottom-color: rgba(181, 127, 45, 0.38) !important;
+  box-shadow:
+    inset 4px 0 0 rgba(181, 127, 45, 0.78),
+    0 10px 22px rgba(127, 86, 28, 0.08);
+}
+
+:root[data-theme="light"] .dashboard-status-implemented {
+  border-color: rgba(181, 127, 45, 0.28);
+  background: rgba(181, 127, 45, 0.09);
 }
 
 :root[data-theme="light"] .action-button-primary:hover,

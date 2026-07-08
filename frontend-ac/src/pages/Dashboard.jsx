@@ -814,8 +814,9 @@ function Dashboard() {
           </div>
 
           {filteredRooms.map((r) => {
+            const isImplementedRoom = r.name === IMPLEMENTED_ROOM;
             const dummyData = getAnimatedDummyData(r.name);
-            const useDummyData = r.name !== IMPLEMENTED_ROOM && dummyData;
+            const useDummyData = !isImplementedRoom && dummyData;
             const latestYolo = yoloData?.[r.name];
             const runtime = roomRuntime?.[r.name];
             const status =
@@ -855,7 +856,13 @@ function Dashboard() {
                 : "-";
 
             return (
-              <div key={r.id} className="table-grid dashboard-table-grid table-data-row" style={tableRow}>
+              <div
+                key={r.id}
+                className={`table-grid dashboard-table-grid table-data-row ${
+                  isImplementedRoom ? "dashboard-row-implemented" : ""
+                }`}
+                style={tableRow}
+              >
                 <div>{r.name}</div>
                 <div>{temperature}</div>
                 <div>{humidity}</div>
@@ -863,6 +870,7 @@ function Dashboard() {
                 <div>{occupancy}</div>
                 <div>
                   <span
+                    className={isImplementedRoom ? "dashboard-status-implemented" : ""}
                     style={{
                       color: isOn ? "#22c55e" : "var(--text-muted)",
                       fontWeight: 600,
