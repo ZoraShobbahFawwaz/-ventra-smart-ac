@@ -853,9 +853,16 @@ function Dashboard() {
               : hasFreshYoloData
                 ? formatOccupancy(latestYolo?.occupancy, r.occ)
                 : "-";
+            const isImplementedRoom = r.name === IMPLEMENTED_ROOM;
 
             return (
-              <div key={r.id} className="table-grid dashboard-table-grid table-data-row" style={tableRow}>
+              <div
+                key={r.id}
+                className={`table-grid dashboard-table-grid table-data-row ${
+                  isImplementedRoom ? "implemented-room-row" : ""
+                }`}
+                style={tableRow}
+              >
                 <div>{r.name}</div>
                 <div>{temperature}</div>
                 <div>{humidity}</div>
