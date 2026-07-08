@@ -180,6 +180,33 @@ select {
   box-shadow: 0 14px 30px rgba(34, 197, 94, 0.16);
 }
 
+.room-card-implemented {
+  border-color: rgba(245, 158, 11, 0.5);
+  background:
+    linear-gradient(145deg, rgba(61, 55, 84, 0.98), rgba(28, 40, 67, 0.98)),
+    var(--bg-card-soft, #172033);
+  box-shadow:
+    0 12px 28px rgba(245, 158, 11, 0.1),
+    0 0 0 1px rgba(245, 158, 11, 0.08);
+}
+
+.room-card-implemented::before {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(245, 158, 11, 0.18), transparent 42%),
+    radial-gradient(circle at 92% 90%, rgba(96, 165, 250, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 58%);
+}
+
+.room-card-implemented:hover {
+  border-color: rgba(251, 191, 36, 0.74);
+  background:
+    linear-gradient(145deg, rgba(69, 62, 92, 0.98), rgba(31, 45, 74, 0.98)),
+    var(--bg-card-soft, #172033);
+  box-shadow:
+    0 16px 34px rgba(245, 158, 11, 0.16),
+    0 0 0 1px rgba(251, 191, 36, 0.12);
+}
+
 .room-card-title {
   max-width: 100%;
   margin-bottom: 11px;
@@ -647,6 +674,33 @@ select {
 :root[data-theme="light"] .room-card-on {
   border-color: rgba(65, 150, 105, 0.34);
   box-shadow: 0 10px 22px rgba(56, 130, 92, 0.08);
+}
+
+:root[data-theme="light"] .room-card-implemented {
+  border-color: rgba(181, 127, 45, 0.4);
+  background:
+    linear-gradient(145deg, rgba(255, 250, 235, 0.98), rgba(229, 238, 249, 0.98)),
+    var(--bg-card-soft, #f4f8fc);
+  box-shadow:
+    0 12px 26px rgba(127, 86, 28, 0.09),
+    0 0 0 1px rgba(181, 127, 45, 0.07);
+}
+
+:root[data-theme="light"] .room-card-implemented::before {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(217, 164, 67, 0.16), transparent 44%),
+    radial-gradient(circle at 92% 90%, rgba(79, 127, 185, 0.14), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 60%);
+}
+
+:root[data-theme="light"] .room-card-implemented:hover {
+  border-color: rgba(181, 127, 45, 0.55);
+  background:
+    linear-gradient(145deg, rgba(255, 247, 224, 1), rgba(219, 232, 247, 1)),
+    var(--bg-card-soft, #f4f8fc);
+  box-shadow:
+    0 15px 30px rgba(127, 86, 28, 0.12),
+    0 0 0 1px rgba(181, 127, 45, 0.1);
 }
 
 :root[data-theme="light"] .room-card-on .room-card-status,

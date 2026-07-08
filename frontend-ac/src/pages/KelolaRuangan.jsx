@@ -9,9 +9,13 @@ import Sidebar from "../components/Sidebar";
 import { apiHeaders, apiUrl } from "../services/api";
 
 function RoomCard({ room, isOn, onOpen }) {
+  const isImplementedRoom = room.name === "Ruang Kelas 2.04";
+
   return (
     <div
-      className={`room-card ${isOn ? "room-card-on" : "room-card-off"}`}
+      className={`room-card ${isOn ? "room-card-on" : "room-card-off"} ${
+        isImplementedRoom ? "room-card-implemented" : ""
+      }`}
       style={{
         height: 120,
         padding: 15,
