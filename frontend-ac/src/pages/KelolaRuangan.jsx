@@ -8,12 +8,10 @@ import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
 import { apiHeaders, apiUrl } from "../services/api";
 
-function RoomCard({ room, isOn, isImplemented, onOpen }) {
+function RoomCard({ room, isOn, onOpen }) {
   return (
     <div
-      className={`room-card ${isOn ? "room-card-on" : "room-card-off"} ${
-        isImplemented ? "room-card-implemented" : ""
-      }`}
+      className={`room-card ${isOn ? "room-card-on" : "room-card-off"}`}
       style={{
         height: 120,
         padding: 15,
@@ -704,7 +702,6 @@ export default function KelolaRuangan() {
                       key={idx}
                       room={room}
                       isOn={getEffectiveRoomStatus(room.name) === "ON"}
-                      isImplemented={room.name === IMPLEMENTED_ROOM}
                       onOpen={() => setSelectedRoom(room)}
                     />
                   ))}
