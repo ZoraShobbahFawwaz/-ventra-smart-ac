@@ -1,3 +1,84 @@
+:root {
+  color-scheme: dark;
+  --bg-main: #0f172a;
+  --bg-sidebar: #111827;
+  --bg-card: #1e293b;
+  --bg-card-soft: #273449;
+  --bg-elevated: #162137;
+  --input-bg: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-soft: #94a3b8;
+  --border-color: #334155;
+  --shadow-color: rgba(0, 0, 0, 0.25);
+  --brand-gradient: linear-gradient(90deg, #2d8cff, #1a6ed8);
+  --brand-primary: #2d8cff;
+  --brand-primary-hover: #60a5fa;
+  --modal-overlay-bg: rgba(2, 8, 23, 0.78);
+  --modal-bg: linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99));
+  --modal-panel-bg: linear-gradient(145deg, rgba(43, 60, 90, 0.98), rgba(30, 43, 66, 0.98));
+  --modal-header-bg: linear-gradient(145deg, rgba(28, 47, 77, 0.96), rgba(16, 31, 56, 0.98));
+  --subtle-panel-bg: rgba(15, 23, 42, 0.3);
+  --subtle-panel-strong-bg: rgba(15, 23, 42, 0.55);
+  --modal-border-color: rgba(96, 165, 250, 0.22);
+  --card-hover-bg: radial-gradient(circle at top left, rgba(45, 140, 255, 0.14), transparent 38%), var(--bg-card);
+  --row-hover-bg: rgba(45, 140, 255, 0.09);
+  --room-card-bg: linear-gradient(145deg, rgba(40, 58, 87, 0.98), rgba(19, 32, 54, 0.98));
+  --room-card-hover-bg: linear-gradient(145deg, rgba(45, 64, 94, 0.98), rgba(21, 36, 60, 0.98));
+  --room-card-on-bg: linear-gradient(145deg, rgba(23, 75, 68, 0.98), rgba(18, 52, 54, 0.98));
+  --room-card-on-hover-bg: linear-gradient(145deg, rgba(25, 82, 73, 0.98), rgba(19, 58, 58, 0.98));
+  --header-action-bg: transparent;
+  --header-action-border: transparent;
+  --header-action-hover-bg: rgba(45, 140, 255, 0.12);
+  --header-action-hover-border: rgba(96, 165, 250, 0.28);
+  --profile-bg: transparent;
+  --profile-border: transparent;
+  --profile-shadow: none;
+  --dropdown-bg: linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+  --dropdown-border: rgba(96, 165, 250, 0.24);
+  --avatar-bg: linear-gradient(145deg, rgba(45, 140, 255, 0.22), rgba(15, 23, 42, 0.45));
+  --avatar-color: #93c5fd;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-main: #f3f7fc;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-soft: #eef4fb;
+  --bg-elevated: #f8fbff;
+  --input-bg: #f8fbff;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-soft: #64748b;
+  --border-color: #d8e2ef;
+  --shadow-color: rgba(15, 23, 42, 0.08);
+  --modal-overlay-bg: rgba(15, 23, 42, 0.42);
+  --modal-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.98));
+  --modal-panel-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(241, 247, 255, 0.98));
+  --modal-header-bg: linear-gradient(145deg, rgba(239, 246, 255, 0.98), rgba(219, 234, 254, 0.98));
+  --subtle-panel-bg: rgba(226, 238, 252, 0.72);
+  --subtle-panel-strong-bg: rgba(239, 246, 255, 0.9);
+  --modal-border-color: rgba(96, 165, 250, 0.32);
+  --card-hover-bg: radial-gradient(circle at top left, rgba(45, 140, 255, 0.11), transparent 38%), #ffffff;
+  --row-hover-bg: rgba(45, 140, 255, 0.07);
+  --room-card-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(237, 246, 255, 0.98));
+  --room-card-hover-bg: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(225, 239, 255, 1));
+  --room-card-on-bg: linear-gradient(145deg, rgba(236, 253, 245, 0.98), rgba(220, 252, 231, 0.98));
+  --room-card-on-hover-bg: linear-gradient(145deg, rgba(225, 251, 241, 1), rgba(202, 248, 219, 1));
+  --header-action-bg: rgba(255, 255, 255, 0.78);
+  --header-action-border: rgba(216, 226, 239, 0.95);
+  --header-action-hover-bg: rgba(219, 234, 254, 0.85);
+  --header-action-hover-border: rgba(96, 165, 250, 0.44);
+  --profile-bg: rgba(255, 255, 255, 0.78);
+  --profile-border: rgba(216, 226, 239, 0.95);
+  --profile-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+  --dropdown-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(241, 247, 255, 0.98));
+  --dropdown-border: rgba(96, 165, 250, 0.28);
+  --avatar-bg: linear-gradient(145deg, rgba(219, 234, 254, 0.96), rgba(239, 246, 255, 0.96));
+  --avatar-color: #1d4ed8;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,6 +91,8 @@ html, body, #root {
 
 body {
   font-family: 'Poppins', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
 }
 
 img,
@@ -33,7 +116,7 @@ select {
   color: var(--text-main, #f8fafc);
   border: 1px solid rgba(116, 139, 163, 0.38);
   background:
-    linear-gradient(145deg, rgba(40, 58, 87, 0.98), rgba(19, 32, 54, 0.98)),
+    var(--room-card-bg),
     var(--bg-card-soft, #172033);
   box-shadow: 0 10px 24px rgba(2, 8, 23, 0.18);
   isolation: isolate;
@@ -60,7 +143,7 @@ select {
 .room-card-on {
   border-color: rgba(74, 222, 128, 0.44);
   background:
-    linear-gradient(145deg, rgba(23, 75, 68, 0.98), rgba(18, 52, 54, 0.98)),
+    var(--room-card-on-bg),
     var(--bg-card-soft, #172033);
   box-shadow: 0 10px 26px rgba(34, 197, 94, 0.1);
 }
@@ -75,7 +158,7 @@ select {
 .room-card:hover {
   border-color: rgba(125, 178, 255, 0.72);
   background:
-    linear-gradient(145deg, rgba(45, 64, 94, 0.98), rgba(21, 36, 60, 0.98)),
+    var(--room-card-hover-bg),
     var(--bg-card-soft, #172033);
   box-shadow: 0 14px 30px rgba(2, 8, 23, 0.28);
 }
@@ -83,7 +166,7 @@ select {
 .room-card-on:hover {
   border-color: rgba(74, 222, 128, 0.68);
   background:
-    linear-gradient(145deg, rgba(25, 82, 73, 0.98), rgba(19, 58, 58, 0.98)),
+    var(--room-card-on-hover-bg),
     var(--bg-card-soft, #172033);
   box-shadow: 0 14px 30px rgba(34, 197, 94, 0.16);
 }
@@ -92,7 +175,7 @@ select {
   max-width: 100%;
   margin-bottom: 11px;
   padding: 0 8px;
-  color: #f8fafc;
+  color: var(--text-main);
   font-size: 13px;
   font-weight: 700;
   line-height: 1.35;
@@ -107,8 +190,8 @@ select {
   min-height: 28px;
   padding: 6px 12px;
   border-radius: 999px;
-  color: #cbd5e1;
-  background: rgba(15, 23, 42, 0.28);
+  color: var(--text-muted);
+  background: var(--subtle-panel-bg);
   border: 1px solid rgba(148, 163, 184, 0.28);
   font-size: 12.5px;
   font-weight: 800;
@@ -149,7 +232,7 @@ select {
   padding: 5px 10px;
   border-radius: 999px;
   border: 1px solid rgba(96, 165, 250, 0.34);
-  background: rgba(15, 23, 42, 0.18);
+  background: var(--subtle-panel-bg);
   pointer-events: auto;
   color: #60a5fa;
   font-size: 11.5px;
@@ -420,9 +503,7 @@ select {
 .dashboard-summary-card:focus-visible {
   transform: translateY(-3px);
   border-color: rgba(96, 165, 250, 0.55) !important;
-  background:
-    radial-gradient(circle at top left, rgba(45, 140, 255, 0.14), transparent 38%),
-    var(--bg-card) !important;
+  background: var(--card-hover-bg) !important;
   box-shadow:
     0 16px 34px rgba(2, 8, 23, 0.28),
     0 0 0 1px rgba(96, 165, 250, 0.08) !important;
@@ -438,7 +519,7 @@ select {
 }
 
 .dashboard-table-grid.table-data-row:hover {
-  background: rgba(45, 140, 255, 0.09);
+  background: var(--row-hover-bg);
   border-bottom-color: rgba(96, 165, 250, 0.35) !important;
   box-shadow: inset 3px 0 0 rgba(45, 140, 255, 0.86);
   transform: translateX(2px);
@@ -460,9 +541,7 @@ select {
 .user-summary-card:focus-visible {
   transform: translateY(-3px);
   border-color: rgba(96, 165, 250, 0.55) !important;
-  background:
-    radial-gradient(circle at top left, rgba(45, 140, 255, 0.14), transparent 38%),
-    var(--bg-card) !important;
+  background: var(--card-hover-bg) !important;
   box-shadow:
     0 16px 34px rgba(2, 8, 23, 0.28),
     0 0 0 1px rgba(96, 165, 250, 0.08) !important;
@@ -480,7 +559,7 @@ select {
 
 .audit-table-grid.table-data-row:hover,
 .user-table-grid.table-data-row:hover {
-  background: rgba(45, 140, 255, 0.09);
+  background: var(--row-hover-bg);
   border-bottom-color: rgba(96, 165, 250, 0.35) !important;
   box-shadow: inset 3px 0 0 rgba(45, 140, 255, 0.86);
   transform: translateX(2px);
@@ -503,22 +582,20 @@ select {
 .energy-chart-card:focus-visible {
   transform: translateY(-3px);
   border-color: rgba(96, 165, 250, 0.55) !important;
-  background:
-    radial-gradient(circle at top left, rgba(45, 140, 255, 0.14), transparent 38%),
-    var(--bg-card) !important;
+  background: var(--card-hover-bg) !important;
   box-shadow:
     0 16px 34px rgba(2, 8, 23, 0.28),
     0 0 0 1px rgba(96, 165, 250, 0.08) !important;
 }
 
 .energy-bar-item:hover {
-  background: rgba(45, 140, 255, 0.08);
+  background: var(--row-hover-bg);
   border-radius: 10px;
   transform: translateX(3px);
 }
 
 .energy-table-row:hover {
-  background: rgba(45, 140, 255, 0.09) !important;
+  background: var(--row-hover-bg) !important;
   box-shadow: inset 3px 0 0 rgba(45, 140, 255, 0.86);
   transform: translateX(2px);
 }

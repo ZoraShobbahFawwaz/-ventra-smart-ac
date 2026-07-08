@@ -1,12 +1,14 @@
-import { FaBell, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaBell, FaMoon, FaSignOutAlt, FaSun, FaUserCircle } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiHeaders, apiUrl } from "../services/api";
+import { useTheme } from "../context/ThemeContext";
 
 export default function MainLayout({ children, title, subtitle }) {
   const navigate = useNavigate();
   const profileRef = useRef(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const savedUser = localStorage.getItem("user");
   const user = savedUser ? JSON.parse(savedUser) : null;
 
@@ -46,29 +48,6 @@ export default function MainLayout({ children, title, subtitle }) {
   };
 
   useEffect(() => {
-    const root = document.documentElement;
-    localStorage.removeItem("theme");
-    root.dataset.theme = "dark";
-    root.style.setProperty("--bg-main", "#0f172a");
-    root.style.setProperty("--bg-sidebar", "#111827");
-    root.style.setProperty("--bg-card", "#1e293b");
-    root.style.setProperty("--bg-card-soft", "#273449");
-    root.style.setProperty("--text-main", "#f8fafc");
-    root.style.setProperty("--text-muted", "#cbd5e1");
-    root.style.setProperty("--border-color", "#334155");
-    root.style.setProperty("--input-bg", "#1e293b");
-    root.style.setProperty("--shadow-color", "rgba(0,0,0,0.25)");
-    root.style.setProperty("--header-action-bg", "transparent");
-    root.style.setProperty("--header-action-border", "transparent");
-    root.style.setProperty("--header-action-hover-bg", "rgba(45,140,255,0.12)");
-    root.style.setProperty("--header-action-hover-border", "rgba(96,165,250,0.28)");
-    root.style.setProperty("--profile-bg", "transparent");
-    root.style.setProperty("--profile-border", "transparent");
-    root.style.setProperty("--profile-shadow", "none");
-    document.body.style.background = "#0f172a";
-  }, []);
-
-  useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
@@ -88,6 +67,17 @@ export default function MainLayout({ children, title, subtitle }) {
         </div>
 
         <div className="main-header-actions" style={headerRight}>
+          <button
+            type="button"
+            className="header-icon-button"
+            style={iconButton}
+            aria-label={isDarkMode ? "Aktifkan light mode" : "Aktifkan dark mode"}
+            title={isDarkMode ? "Light Mode" : "Dark Mode"}
+            onClick={toggleTheme}
+          >
+            {isDarkMode ? <FaSun /> : <FaMoon />}
+          </button>
+
           <span
             className="header-icon-button"
             style={iconButton}
@@ -222,9 +212,9 @@ const avatar = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  background: "linear-gradient(145deg, rgba(45, 140, 255, 0.22), rgba(15, 23, 42, 0.45))",
+  background: "var(--avatar-bg)",
   border: "1px solid var(--border-color)",
-  color: "#93c5fd",
+  color: "var(--avatar-color)",
   fontSize: 34,
   overflow: "hidden",
 };
@@ -257,10 +247,10 @@ const profileDropdown = {
   right: 0,
   top: "calc(100% + 12px)",
   width: 290,
-  background: "linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98))",
-  border: "1px solid rgba(96, 165, 250, 0.24)",
+  background: "var(--dropdown-bg)",
+  border: "1px solid var(--dropdown-border)",
   borderRadius: 16,
-  boxShadow: "0 22px 60px rgba(2, 8, 23, 0.42)",
+  boxShadow: "0 22px 60px var(--shadow-color)",
   padding: 14,
   zIndex: 50,
 };
@@ -279,14 +269,14 @@ const dropdownAvatar = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  background: "rgba(45, 140, 255, 0.16)",
-  border: "1px solid rgba(96, 165, 250, 0.28)",
-  color: "#93c5fd",
+  background: "var(--avatar-bg)",
+  border: "1px solid var(--dropdown-border)",
+  color: "var(--avatar-color)",
   fontSize: 36,
 };
 
 const dropdownName = {
-  color: "#f8fafc",
+  color: "var(--text-main)",
   fontWeight: 800,
   fontSize: 15,
   overflow: "hidden",
@@ -295,7 +285,7 @@ const dropdownName = {
 };
 
 const dropdownEmail = {
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   fontSize: 12,
   marginTop: 3,
   overflow: "hidden",
@@ -305,7 +295,7 @@ const dropdownEmail = {
 
 const dropdownDivider = {
   height: 1,
-  background: "rgba(148, 163, 184, 0.18)",
+  background: "var(--border-color)",
   margin: "12px 0",
 };
 
@@ -318,13 +308,13 @@ const infoRow = {
 };
 
 const infoLabel = {
-  color: "#94a3b8",
+  color: "var(--text-muted)",
   fontSize: 12,
   fontWeight: 700,
 };
 
 const infoValue = {
-  color: "#f8fafc",
+  color: "var(--text-main)",
   fontSize: 12,
   fontWeight: 700,
   textAlign: "right",

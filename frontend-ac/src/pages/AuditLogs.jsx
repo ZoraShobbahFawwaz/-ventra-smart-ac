@@ -540,7 +540,7 @@ const statusBadge = {
 const overlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(15,23,42,0.55)",
+  background: "var(--modal-overlay-bg)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

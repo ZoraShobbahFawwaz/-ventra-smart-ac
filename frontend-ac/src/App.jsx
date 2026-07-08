@@ -9,54 +9,57 @@ import KelolaRuangan from "./pages/KelolaRuangan";
 import AuditLogs from "./pages/AuditLogs";
 import User from "./pages/User";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
+    <ThemeProvider>
+      <Routes>
+        <Route path="/" element={<Login />} />
 
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/kelola-ruangan"
-        element={
-          <ProtectedRoute>
-            <KelolaRuangan />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/kelola-ruangan"
+          element={
+            <ProtectedRoute>
+              <KelolaRuangan />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/audit-logs"
-        element={
-          <ProtectedRoute allowedRoles={["Admin"]}>
-            <AuditLogs />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/audit-logs"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AuditLogs />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/user"
-        element={
-          <ProtectedRoute allowedRoles={["Admin"]}>
-            <User />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <User />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/register" element={<Register />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/new-password" element={<NewPassword />} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ThemeProvider>
   );
 }
 

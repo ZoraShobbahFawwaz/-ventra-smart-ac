@@ -41,7 +41,7 @@ function Login() {
             fontSize: 33,
             fontWeight: 800,
             marginBottom: 10,
-            color: "#111",
+            color: "var(--text-main)",
           }}
         >
           Welcome to Smart AC Management System
@@ -50,7 +50,7 @@ function Login() {
         <p
           style={{
             fontSize: 12,
-            color: "#666",
+            color: "var(--text-muted)",
             marginBottom: 30,
           }}
         >
@@ -66,7 +66,7 @@ function Login() {
           onChange={(e) => setEmail(e.target.value)}
           style={inputStyle}
           onFocus={(e) => (e.target.style.border = "1px solid #2d8cff")}
-          onBlur={(e) => (e.target.style.border = "1px solid #e0e0e0")}
+          onBlur={(e) => (e.target.style.border = "1px solid var(--border-color)")}
         />
 
         <label style={{ fontSize: 14, marginTop: 15, display: "block" }}>
@@ -81,13 +81,13 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
             onFocus={(e) => (e.target.style.border = "1px solid #2d8cff")}
-            onBlur={(e) => (e.target.style.border = "1px solid #e0e0e0")}
+            onBlur={(e) => (e.target.style.border = "1px solid var(--border-color)")}
           />
 
           <span
             onClick={() => setShowPassword(!showPassword)}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#2d8cff")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#888")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
             style={{
               position: "absolute",
               right: 12,
@@ -95,7 +95,7 @@ function Login() {
               transform: "translateY(-50%)",
               cursor: "pointer",
               fontSize: 18,
-              color: "#888",
+              color: "var(--text-muted)",
             }}
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -134,7 +134,7 @@ function Login() {
           Login
         </button>
 
-        <p style={{ textAlign: "center", marginTop: 20, fontSize: 12 }}>
+        <p style={{ textAlign: "center", marginTop: 20, fontSize: 12, color: "var(--text-muted)" }}>
           Don’t have an account?{" "}
           <span
             onClick={() => navigate("/register")}
@@ -153,7 +153,9 @@ const inputStyle = {
   padding: "14px 45px 14px 14px",
   marginTop: 8,
   borderRadius: 10,
-  border: "1px solid #e0e0e0",
+  border: "1px solid var(--border-color)",
+  background: "var(--input-bg)",
+  color: "var(--text-main)",
   outline: "none",
   fontSize: 14,
   transition: "0.2s",

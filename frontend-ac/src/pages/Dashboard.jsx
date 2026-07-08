@@ -1369,7 +1369,7 @@ const emptyRow = {
 const modalOverlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(2, 8, 23, 0.78)",
+  background: "var(--modal-overlay-bg)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -1382,13 +1382,12 @@ const energyModal = {
   maxWidth: "92vw",
   maxHeight: "90vh",
   overflowY: "auto",
-  background:
-    "linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
-  color: "#f8fafc",
+  background: "var(--modal-bg)",
+  color: "var(--text-main)",
   borderRadius: 18,
   padding: 24,
   boxShadow: "0 30px 90px rgba(0,0,0,0.48)",
-  border: "1px solid rgba(96, 165, 250, 0.22)",
+  border: "1px solid var(--modal-border-color)",
 };
 
 const energyModalHeader = {
@@ -1416,7 +1415,7 @@ const modalTitle = {
 
 const modalSubtitle = {
   margin: "6px 0 0",
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   fontSize: 13,
 };
 
@@ -1424,9 +1423,9 @@ const modalCloseButton = {
   width: 34,
   height: 34,
   borderRadius: 10,
-  border: "1px solid rgba(148, 163, 184, 0.28)",
-  background: "rgba(15, 23, 42, 0.5)",
-  color: "#f8fafc",
+  border: "1px solid var(--border-color)",
+  background: "var(--subtle-panel-strong-bg)",
+  color: "var(--text-main)",
   fontSize: 0,
   cursor: "pointer",
   display: "inline-flex",
@@ -1475,13 +1474,12 @@ const scheduleButtonHover = {
 const scheduleModal = {
   width: "520px",
   maxWidth: "92vw",
-  background:
-    "linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
-  color: "#f8fafc",
+  background: "var(--modal-bg)",
+  color: "var(--text-main)",
   borderRadius: 18,
   padding: 24,
   boxShadow: "0 30px 90px rgba(0,0,0,0.48)",
-  border: "1px solid rgba(96, 165, 250, 0.22)",
+  border: "1px solid var(--modal-border-color)",
 };
 
 const scheduleList = {
@@ -1495,8 +1493,8 @@ const scheduleItem = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 14,
-  background: "rgba(30, 43, 66, 0.98)",
-  border: "1px solid rgba(148, 163, 184, 0.18)",
+  background: "var(--modal-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 14,
   padding: "13px 14px",
   cursor: "pointer",
@@ -1513,13 +1511,13 @@ const scheduleItemHover = {
 const scheduleDay = {
   fontSize: 14,
   fontWeight: 800,
-  color: "#f8fafc",
+  color: "var(--text-main)",
 };
 
 const scheduleTime = {
   marginTop: 4,
   fontSize: 13,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
 };
 
 const scheduleTimeList = {
@@ -1530,10 +1528,10 @@ const scheduleTimeList = {
 };
 
 const scheduleTimePill = {
-  background: "rgba(15, 23, 42, 0.45)",
-  border: "1px solid rgba(148, 163, 184, 0.16)",
+  background: "var(--subtle-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 999,
-  color: "#dbeafe",
+  color: "var(--text-main)",
   fontSize: 12,
   fontWeight: 700,
   padding: "5px 9px",
@@ -1551,11 +1549,11 @@ const scheduleBadge = {
 };
 
 const emptySchedule = {
-  background: "rgba(30, 43, 66, 0.98)",
-  border: "1px solid rgba(148, 163, 184, 0.18)",
+  background: "var(--modal-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 14,
   padding: 16,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   fontSize: 13,
 };
 
@@ -1570,15 +1568,15 @@ const selectLabel = {
   display: "flex",
   flexDirection: "column",
   gap: 8,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   fontSize: 12,
   fontWeight: 700,
 };
 
 const monthSelect = {
-  background: "rgba(15, 23, 42, 0.55)",
-  color: "#f8fafc",
-  border: "1px solid rgba(148, 163, 184, 0.22)",
+  background: "var(--input-bg)",
+  color: "var(--text-main)",
+  border: "1px solid var(--border-color)",
   borderRadius: 12,
   padding: "11px 12px",
   outline: "none",
@@ -1591,9 +1589,9 @@ const periodToggle = {
 };
 
 const periodToggleButton = {
-  background: "rgba(15, 23, 42, 0.55)",
-  color: "#e2e8f0",
-  border: "1px solid rgba(148, 163, 184, 0.22)",
+  background: "var(--subtle-panel-strong-bg)",
+  color: "var(--text-main)",
+  border: "1px solid var(--border-color)",
   borderRadius: 12,
   padding: "11px 12px",
   fontSize: 12,
@@ -1635,8 +1633,8 @@ const energySummaryCard = {
 };
 
 const chartCard = {
-  background: "rgba(30, 43, 66, 0.98)",
-  border: "1px solid rgba(148, 163, 184, 0.18)",
+  background: "var(--modal-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 16,
   padding: 16,
   marginBottom: 16,
@@ -1662,14 +1660,14 @@ const barItem = {
 };
 
 const barLabel = {
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   fontWeight: 700,
 };
 
 const barTrack = {
   height: 12,
   borderRadius: 999,
-  background: "rgba(15, 23, 42, 0.65)",
+  background: "var(--subtle-panel-bg)",
   overflow: "hidden",
   border: "1px solid rgba(148, 163, 184, 0.12)",
 };
@@ -1681,13 +1679,13 @@ const barFill = {
 };
 
 const barValue = {
-  color: "#f8fafc",
+  color: "var(--text-main)",
   fontWeight: 700,
   textAlign: "right",
 };
 
 const energyTableWrapper = {
-  border: "1px solid rgba(148, 163, 184, 0.18)",
+  border: "1px solid var(--border-color)",
   borderRadius: 14,
   overflow: "hidden",
 };
@@ -1706,8 +1704,8 @@ const energyTableRow = {
   display: "grid",
   gridTemplateColumns: "2fr 1fr 1fr",
   padding: "12px 14px",
-  borderBottom: "1px solid rgba(148, 163, 184, 0.14)",
-  color: "#e2e8f0",
+  borderBottom: "1px solid var(--border-color)",
+  color: "var(--text-main)",
   fontSize: 13,
 };
 

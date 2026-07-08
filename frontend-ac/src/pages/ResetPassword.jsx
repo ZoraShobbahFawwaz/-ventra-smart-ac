@@ -78,13 +78,13 @@ const titleStyle = {
   fontSize: 36,
   fontWeight: 800,
   marginBottom: 10,
-  color: "#111",
-  textShadow: "0px 4px 10px rgba(0,0,0,0.2)",
+  color: "var(--text-main)",
+  textShadow: "0px 4px 10px var(--shadow-color)",
 };
 
 const subtitleStyle = {
   fontSize: 13,
-  color: "#666",
+  color: "var(--text-muted)",
   marginBottom: 30,
 };
 
@@ -92,7 +92,7 @@ const labelStyle = {
   fontSize: 13,
   marginBottom: 5,
   display: "block",
-  color: "#555",
+  color: "var(--text-muted)",
 };
 
 const inputStyle = {
@@ -100,10 +100,12 @@ const inputStyle = {
   padding: "14px 16px",
   marginBottom: 20,
   borderRadius: 12,
-  border: "1px solid #ddd",
-  background: "#f9f9f9",
+  border: "1px solid var(--border-color)",
+  background: "var(--input-bg)",
+  color: "var(--text-main)",
   outline: "none",
   fontSize: 14,
+  transition: "0.2s ease",
 };
 
 const buttonStyle = {

@@ -1144,7 +1144,7 @@ const grid = {
 const overlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(2, 8, 23, 0.78)",
+  background: "var(--modal-overlay-bg)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -1157,14 +1157,13 @@ const modal = {
   maxWidth: "92vw",
   maxHeight: "92vh",
   overflowY: "auto",
-  background:
-    "radial-gradient(circle at top left, rgba(45, 140, 255, 0.13), transparent 34%), linear-gradient(145deg, rgba(17, 34, 58, 0.99), rgba(8, 17, 34, 0.99))",
-  color: "var(--text-main, #111)",
+  background: "var(--modal-bg)",
+  color: "var(--text-main)",
   borderRadius: 18,
   padding: 26,
   position: "relative",
   boxShadow: "0 30px 90px rgba(0,0,0,0.48)",
-  border: "1px solid rgba(96, 165, 250, 0.22)",
+  border: "1px solid var(--modal-border-color)",
   transition: "0.2s ease",
 };
 
@@ -1175,9 +1174,9 @@ const closeBtn = {
   width: 34,
   height: 34,
   borderRadius: 12,
-  border: "1px solid rgba(148, 163, 184, 0.28)",
-  background: "rgba(15, 23, 42, 0.5)",
-  color: "#f8fafc",
+  border: "1px solid var(--border-color)",
+  background: "var(--subtle-panel-strong-bg)",
+  color: "var(--text-main)",
   fontSize: 20,
   lineHeight: "24px",
   cursor: "pointer",
@@ -1192,10 +1191,9 @@ const modalTop = {
   marginBottom: 20,
   padding: "20px 22px",
   borderRadius: 16,
-  background:
-    "linear-gradient(145deg, rgba(28, 47, 77, 0.96), rgba(16, 31, 56, 0.98))",
-  color: "#fff",
-  border: "1px solid rgba(96, 165, 250, 0.28)",
+  background: "var(--modal-header-bg)",
+  color: "var(--text-main)",
+  border: "1px solid var(--modal-border-color)",
   boxShadow: "0 18px 42px rgba(2, 8, 23, 0.24)",
 };
 
@@ -1218,7 +1216,7 @@ const modalTitle = {
 const modalSubtitle = {
   margin: "4px 0 0",
   fontSize: 12,
-  color: "rgba(255,255,255,0.82)",
+  color: "var(--text-muted)",
 };
 
 const statusBadge = {
@@ -1239,7 +1237,7 @@ const detailMetaCard = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 12,
-  color: "var(--text-main, #f8fafc)",
+  color: "var(--text-main)",
   fontSize: 13,
 };
 
@@ -1251,9 +1249,8 @@ const modalGrid = {
 };
 
 const infoCard = {
-  background:
-    "linear-gradient(145deg, rgba(43, 60, 90, 0.98), rgba(30, 43, 66, 0.98))",
-  border: "1px solid rgba(148, 163, 184, 0.2)",
+  background: "var(--modal-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 16,
   padding: 18,
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
@@ -1263,7 +1260,7 @@ const sectionTitle = {
   fontSize: 14,
   fontWeight: 800,
   marginBottom: 14,
-  color: "#f8fafc",
+  color: "var(--text-main)",
 };
 
 const dataRow = {
@@ -1271,15 +1268,14 @@ const dataRow = {
   justifyContent: "space-between",
   alignItems: "center",
   padding: "9px 0",
-  borderBottom: "1px solid rgba(148, 163, 184, 0.14)",
+  borderBottom: "1px solid var(--border-color)",
   fontSize: 13,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
 };
 
 const energyCard = {
-  background:
-    "linear-gradient(145deg, rgba(43, 60, 90, 0.98), rgba(30, 43, 66, 0.98))",
-  border: "1px solid rgba(148, 163, 184, 0.2)",
+  background: "var(--modal-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 16,
   padding: 18,
   display: "flex",
@@ -1315,12 +1311,12 @@ const energyIconBox = {
 const energyCardTitle = {
   fontSize: 15,
   fontWeight: 800,
-  color: "#f8fafc",
+  color: "var(--text-main)",
 };
 
 const energyCardSubtitle = {
   fontSize: 12,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   marginTop: 2,
 };
 
@@ -1331,15 +1327,15 @@ const dateTimeWrapper = {
 };
 
 const dateTimeCard = {
-  background: "rgba(15, 23, 42, 0.28)",
-  border: "1px solid rgba(148, 163, 184, 0.14)",
+  background: "var(--subtle-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 12,
   padding: "12px 14px",
 };
 
 const dateTimeLabel = {
   fontSize: 12,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   display: "flex",
   alignItems: "center",
   marginBottom: 6,
@@ -1348,7 +1344,7 @@ const dateTimeLabel = {
 const dateTimeValue = {
   fontSize: 13,
   fontWeight: 700,
-  color: "#f8fafc",
+  color: "var(--text-main)",
 };
 
 const miniGrid = {
@@ -1358,8 +1354,8 @@ const miniGrid = {
 };
 
 const energyStatCard = {
-  background: "rgba(15, 23, 42, 0.3)",
-  border: "1px solid rgba(148, 163, 184, 0.14)",
+  background: "var(--subtle-panel-bg)",
+  border: "1px solid var(--border-color)",
   borderRadius: 14,
   padding: 14,
   display: "flex",
@@ -1369,18 +1365,18 @@ const energyStatCard = {
 
 const energyStatLabel = {
   fontSize: 12,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
 };
 
 const energyStatValue = {
   fontSize: 20,
   fontWeight: 800,
-  color: "#f8fafc",
+  color: "var(--text-main)",
 };
 
 const periodInfoBox = {
   fontSize: 12,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   background: "rgba(45, 140, 255, 0.08)",
   border: "1px solid rgba(45, 140, 255, 0.2)",
   padding: "10px 12px",
@@ -1394,9 +1390,9 @@ const tabContainer = {
 };
 
 const tab = {
-  border: "1px solid rgba(148, 163, 184, 0.16)",
-  background: "rgba(15, 23, 42, 0.3)",
-  color: "#e2e8f0",
+  border: "1px solid var(--border-color)",
+  background: "var(--subtle-panel-bg)",
+  color: "var(--text-main)",
   padding: 8,
   borderRadius: 10,
   cursor: "pointer",
@@ -1422,9 +1418,8 @@ const tabActive = {
 };
 
 const controlCard = {
-  background:
-    "linear-gradient(145deg, rgba(45, 64, 94, 0.98), rgba(28, 42, 66, 0.98))",
-  border: "1px solid rgba(96, 165, 250, 0.2)",
+  background: "var(--modal-panel-bg)",
+  border: "1px solid var(--modal-border-color)",
   borderRadius: 16,
   padding: 20,
   display: "flex",
@@ -1436,7 +1431,7 @@ const controlCard = {
 const controlText = {
   margin: 0,
   fontSize: 12,
-  color: "#cbd5e1",
+  color: "var(--text-muted)",
   maxWidth: 520,
 };
 
@@ -1468,7 +1463,7 @@ const btnOff = {
 const reasonOverlay = {
   position: "absolute",
   inset: 0,
-  background: "rgba(15, 23, 42, 0.75)",
+  background: "var(--modal-overlay-bg)",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
