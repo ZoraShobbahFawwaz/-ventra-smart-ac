@@ -60,11 +60,11 @@ export class MqttService implements OnModuleInit {
       this.isConnected = true;
       console.log(`✅ [MQTT] Connected to broker: ${this.brokerUrl}`);
 
-      this.client.subscribe('lab/sensor', (err) => {
+      this.client.subscribe('room/sensor', (err) => {
         if (err) {
-          console.log('❌ Gagal subscribe lab/sensor:', err.message);
+          console.log('❌ Gagal subscribe room/sensor:', err.message);
         } else {
-          console.log('📡 Subscribed to lab/sensor');
+          console.log('📡 Subscribed to room/sensor');
         }
       });
 
@@ -82,7 +82,7 @@ export class MqttService implements OnModuleInit {
 
       console.log(`📩 [MQTT RECEIVED] ${topic}: ${payload}`);
 
-      if (topic === 'lab/sensor') {
+      if (topic === 'room/sensor') {
         this.handleSensorData(payload);
       }
 
