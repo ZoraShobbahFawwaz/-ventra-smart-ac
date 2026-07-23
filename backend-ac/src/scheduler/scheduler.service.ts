@@ -61,24 +61,17 @@ export class SchedulerService implements OnModuleInit {
         const start = row.start_time.slice(0, 5);
         const end = row.end_time.slice(0, 5);
         const pre = this.getPreTime(start);
-        const yoloStart = this.addMinutes(start, 10);
 
         const keyPre = `${row.id}-${roomName}-${pre}-PRE`;
         const keyStart = `${row.id}-${roomName}-${start}-START`;
-        const keyYoloStart = `${row.id}-${roomName}-${yoloStart}-YOLO`;
         const keyEnd = `${row.id}-${roomName}-${end}-OFF`;
 
         const nowMin = this.toMinutes(jam);
         const preMin = this.toMinutes(pre);
         const startMin = this.toMinutes(start);
-        const yoloStartMin = this.toMinutes(yoloStart);
         const endMin = this.toMinutes(end);
-        const scheduleDurationMin =
-          (endMin - startMin + 24 * 60) % (24 * 60);
-        const hasYoloWindow = scheduleDurationMin > 10;
         const isPreTime = jam === pre;
         const isStartTime = jam === start;
-        const isYoloStartTime = hasYoloWindow && jam === yoloStart;
         const isEndTime = jam === end;
         const isPreWindow = this.isTimeInRangeBeforeEnd(
           nowMin,
@@ -90,9 +83,6 @@ export class SchedulerService implements OnModuleInit {
           startMin,
           endMin,
         );
-        const isYoloActiveWindow =
-          hasYoloWindow &&
-          this.isTimeInRangeBeforeEnd(nowMin, yoloStartMin, endMin);
         const manualOffOverrideActive = this.isManualOffOverrideActive(
           roomName,
           preMin,
@@ -145,29 +135,17 @@ export class SchedulerService implements OnModuleInit {
           !this.executedEvents.has(keyStart)
         ) {
           console.log(
-            `START SCHEDULE: ${roomName} AC tetap ON 24C, YOLO menunggu sampai ${yoloStart}`,
+            `START SCHEDULE: ${roomName} AC ON 24C, YOLO langsung aktif`,
           );
 
-          this.sendSchedulePreOn(roomName, 'scheduler-start-wait-yolo');
+          this.sendScheduleActiveOn(roomName, 'scheduler-start');
           this.executedEvents.add(keyStart);
         }
 
         if (
-          isYoloStartTime &&
+          isActiveSchedule &&
           !manualOffOverrideActive &&
-          !isEndTime &&
-          !this.executedEvents.has(keyYoloStart)
-        ) {
-          console.log(`YOLO ENABLED: ${roomName} setelah toleransi 30 menit`);
-
-          this.sendScheduleActiveOn(roomName, 'scheduler-yolo-start');
-          this.executedEvents.add(keyYoloStart);
-        }
-
-        if (
-          isYoloActiveWindow &&
-          !manualOffOverrideActive &&
-          !isYoloStartTime &&
+          !isStartTime &&
           !isEndTime
         ) {
           const runtimeStates = this.roomsService.getRoomRuntimeStatus();
@@ -175,7 +153,7 @@ export class SchedulerService implements OnModuleInit {
 
           if (!runtimeState?.yolo_enabled) {
             console.log(
-              `SYNC YOLO ACTIVE: ${roomName} masa toleransi selesai, YOLO diaktifkan`,
+              `SYNC SCHEDULE ACTIVE: ${roomName} jadwal aktif, YOLO diaktifkan`,
             );
 
             this.sendScheduleActiveOn(roomName, 'scheduler-yolo-sync');
