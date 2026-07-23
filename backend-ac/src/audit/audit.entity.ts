@@ -10,7 +10,7 @@ export class AuditLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'user_name', nullable: true })
+  @Column({ name: 'user_name', type: 'varchar', length: 100, nullable: true })
   userName!: string | null;
 
   @Column()
