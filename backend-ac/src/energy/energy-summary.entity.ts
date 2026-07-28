@@ -33,7 +33,7 @@ export class EnergySummary {
   })
   totalEnergyKwh!: number;
 
-  @Column({ name: 'powerwatt', type: 'int', default: 3320 })
+  @Column({ name: 'powerwatt', type: 'int', default: 3300 })
   powerWatt!: number;
 
   @UpdateDateColumn({ name: 'updated_at' })

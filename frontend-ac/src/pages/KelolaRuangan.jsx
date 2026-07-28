@@ -484,7 +484,7 @@ export default function KelolaRuangan() {
         ? periodEnergyValue / (activeTab === "minggu" ? 7 : 30)
         : null;
   const currentPowerValue =
-    todayEnergyRoom?.power_watt ?? periodEnergyRoom?.power_watt ?? 3320;
+    todayEnergyRoom?.power_watt ?? periodEnergyRoom?.power_watt ?? 3300;
 
   const hasFreshSensorData = isFreshData(selectedSensorData);
   const hasFreshYoloData = isFreshData(selectedYoloData);

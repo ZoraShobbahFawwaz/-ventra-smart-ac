@@ -32,7 +32,7 @@ type SummaryPeriodRange = {
 
 @Injectable()
 export class EnergyService {
-  private readonly defaultPowerWatt = Number(process.env.AC_POWER_WATT || 3320);
+  private readonly defaultPowerWatt = Number(process.env.AC_POWER_WATT || 3300);
 
   constructor(
     @InjectRepository(EnergyLog)
