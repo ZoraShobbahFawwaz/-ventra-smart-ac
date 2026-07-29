@@ -29,12 +29,46 @@ type AcLogPayload = {
   humidity?: number | string | null;
 };
 
+type TemperatureAlert = {
+  id: string;
+  room_name: string;
+  type: 'temperature_rising_while_on' | 'temperature_dropping_while_off';
+  severity: 'warning';
+  power: 'ON' | 'OFF';
+  title: string;
+  message: string;
+  set_temperature: number | null;
+  reference_temperature: number;
+  actual_temperature: number;
+  delta_temperature: number;
+  event_time: string;
+  source: string;
+};
+
+type TemperatureState = {
+  power: 'ON' | 'OFF';
+  referenceActualTemperature: number;
+  setTemperature: number | null;
+};
+
 @Injectable()
 export class MqttService implements OnModuleInit {
   private client!: mqtt.MqttClient;
   private isConnected = false;
 
   private readonly brokerUrl = process.env.MQTT_URL || 'mqtt://127.0.0.1:1883';
+  private readonly temperatureAlertLookbackHours = Number(
+    process.env.AC_TEMP_ALERT_LOOKBACK_HOURS || 2,
+  );
+  private readonly temperatureAlertDeltaThreshold = Number(
+    process.env.AC_TEMP_ALERT_DELTA_THRESHOLD || 1,
+  );
+  private readonly temperatureAlertSetpointTolerance = Number(
+    process.env.AC_TEMP_ALERT_SETPOINT_TOLERANCE || 1,
+  );
+  private readonly temperatureAlertLimit = Number(
+    process.env.AC_TEMP_ALERT_LIMIT || 5,
+  );
 
   private latestSensorData: Record<string, SensorData> = {};
 
@@ -239,6 +273,151 @@ export class MqttService implements OnModuleInit {
         console.log('Gagal simpan feedback AC:', error);
       }
     }
+  }
+
+  async getTemperatureAlerts() {
+    const since = new Date(
+      Date.now() - this.temperatureAlertLookbackHours * 60 * 60 * 1000,
+    );
+    const events = await this.acIotEventRepo
+      .createQueryBuilder('event')
+      .where('event.actual_temperature IS NOT NULL')
+      .andWhere('event.event_time >= :since', { since })
+      .orderBy('event.room_name', 'ASC')
+      .addOrderBy('event.event_time', 'ASC')
+      .addOrderBy('event.id', 'ASC')
+      .getMany();
+
+    const roomStates = new Map<string, TemperatureState>();
+    const latestAlertsByKey = new Map<string, TemperatureAlert>();
+
+    events.forEach((event) => {
+      if (event.actualTemperature === null) {
+        return;
+      }
+
+      const actualTemperature = this.roundTemperature(
+        event.actualTemperature,
+      );
+      const currentState = roomStates.get(event.roomName);
+
+      if (!currentState || currentState.power !== event.power) {
+        roomStates.set(event.roomName, {
+          power: event.power,
+          referenceActualTemperature: actualTemperature,
+          setTemperature: event.temperature,
+        });
+        return;
+      }
+
+      if (event.temperature !== null) {
+        currentState.setTemperature = event.temperature;
+      }
+
+      if (event.power === 'ON') {
+        if (actualTemperature < currentState.referenceActualTemperature) {
+          currentState.referenceActualTemperature = actualTemperature;
+          return;
+        }
+
+        const delta = this.roundTemperature(
+          actualTemperature - currentState.referenceActualTemperature,
+        );
+        const setTemperature = currentState.setTemperature;
+        const isAboveSetpoint =
+          setTemperature !== null &&
+          actualTemperature >
+            setTemperature + this.temperatureAlertSetpointTolerance;
+
+        if (delta >= this.temperatureAlertDeltaThreshold && isAboveSetpoint) {
+          const alert = this.createTemperatureAlert(
+            event,
+            'temperature_rising_while_on',
+            currentState.referenceActualTemperature,
+            actualTemperature,
+            delta,
+            setTemperature,
+          );
+
+          latestAlertsByKey.set(`${event.roomName}-${alert.type}`, alert);
+        }
+
+        return;
+      }
+
+      if (actualTemperature > currentState.referenceActualTemperature) {
+        currentState.referenceActualTemperature = actualTemperature;
+        return;
+      }
+
+      const delta = this.roundTemperature(
+        currentState.referenceActualTemperature - actualTemperature,
+      );
+
+      if (delta >= this.temperatureAlertDeltaThreshold) {
+        const alert = this.createTemperatureAlert(
+          event,
+          'temperature_dropping_while_off',
+          currentState.referenceActualTemperature,
+          actualTemperature,
+          delta,
+          null,
+        );
+
+        latestAlertsByKey.set(`${event.roomName}-${alert.type}`, alert);
+      }
+    });
+
+    const alerts = Array.from(latestAlertsByKey.values())
+      .sort(
+        (a, b) =>
+          new Date(b.event_time).getTime() - new Date(a.event_time).getTime(),
+      )
+      .slice(0, this.temperatureAlertLimit);
+
+    return {
+      generated_at: new Date().toISOString(),
+      lookback_hours: this.temperatureAlertLookbackHours,
+      delta_threshold_celsius: this.temperatureAlertDeltaThreshold,
+      alerts,
+    };
+  }
+
+  private createTemperatureAlert(
+    event: AcIotEvent,
+    type: TemperatureAlert['type'],
+    referenceTemperature: number,
+    actualTemperature: number,
+    deltaTemperature: number,
+    setTemperature: number | null,
+  ): TemperatureAlert {
+    const isOnAlert = type === 'temperature_rising_while_on';
+    const title = isOnAlert
+      ? 'Suhu aktual naik saat AC ON'
+      : 'Suhu aktual turun saat AC OFF';
+    const message = isOnAlert
+      ? `${event.roomName}: AC diset ${setTemperature}C, tetapi suhu aktual naik dari ${referenceTemperature}C ke ${actualTemperature}C.`
+      : `${event.roomName}: AC tercatat OFF, tetapi suhu aktual turun dari ${referenceTemperature}C ke ${actualTemperature}C.`;
+
+    return {
+      id: `${event.id}-${type}`,
+      room_name: event.roomName,
+      type,
+      severity: 'warning',
+      power: event.power,
+      title,
+      message,
+      set_temperature: setTemperature,
+      reference_temperature: referenceTemperature,
+      actual_temperature: actualTemperature,
+      delta_temperature: deltaTemperature,
+      event_time: event.eventTime.toISOString(),
+      source: event.source,
+    };
+  }
+
+  private roundTemperature(value: number) {
+    return Math.round(value * 10) / 10;
   }
 
   private normalizeFanSpeed(value: string | number | null | undefined) {

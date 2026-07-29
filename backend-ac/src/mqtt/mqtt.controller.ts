@@ -10,6 +10,11 @@ export class MqttController {
     return this.mqttService.getLatestSensorData();
   }
 
+  @Get('temperature-alerts')
+  getTemperatureAlerts() {
+    return this.mqttService.getTemperatureAlerts();
+  }
+
   @Get('sensor/:roomName')
   getSensorByRoom(@Param('roomName') roomName: string) {
     return this.mqttService.getSensorByRoom(roomName);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaExclamationTriangle, FaSearch } from "react-icons/fa";
 import MainLayout from "../components/MainLayout";
 import Sidebar from "../components/Sidebar";
 import { apiHeaders, apiUrl } from "../services/api";
@@ -18,6 +18,7 @@ function Dashboard() {
   const [hoveredCloseButton, setHoveredCloseButton] = useState("");
   const [todayEnergySummary, setTodayEnergySummary] = useState(null);
   const [periodEnergySummary, setPeriodEnergySummary] = useState(null);
+  const [temperatureAlerts, setTemperatureAlerts] = useState([]);
   const [dummyTick, setDummyTick] = useState(0);
   const [energyModalOpen, setEnergyModalOpen] = useState(false);
   const [selectedEnergyPeriod, setSelectedEnergyPeriod] = useState("month");
@@ -390,6 +391,24 @@ function Dashboard() {
     }
   };
 
+  const fetchTemperatureAlerts = async () => {
+    try {
+      const res = await fetch(apiUrl("/mqtt/temperature-alerts"), {
+        headers: apiHeaders(),
+      });
+
+      if (!res.ok) {
+        console.error("Gagal ambil notifikasi suhu:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      setTemperatureAlerts(Array.isArray(data?.alerts) ? data.alerts : []);
+    } catch (err) {
+      console.error("Gagal ambil notifikasi suhu:", err);
+    }
+  };
+
   const fetchSchedules = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -457,6 +476,13 @@ function Dashboard() {
     fetchSensorData();
 
     const interval = setInterval(fetchSensorData, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetchTemperatureAlerts();
+
+    const interval = setInterval(fetchTemperatureAlerts, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -619,6 +645,7 @@ function Dashboard() {
     fetchRuntime();
     fetchYoloData();
     fetchSensorData();
+    fetchTemperatureAlerts();
     fetchSchedules();
     fetchEnergySummary(
       {
@@ -753,6 +780,19 @@ function Dashboard() {
       ? `${todayEnergySummary.total_energy_kwh.toFixed(3)} kWh`
       : "0 kWh";
 
+  const formatAlertTime = (value) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) return "-";
+
+    return date.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div className="app-shell" style={layoutStyle}>
       <Sidebar />
@@ -781,6 +821,44 @@ function Dashboard() {
             onAction={() => setEnergyModalOpen(true)}
           />
         </div>
+
+        {temperatureAlerts.length > 0 && (
+          <div style={temperatureAlertPanel}>
+            <div style={temperatureAlertHeader}>
+              <div style={temperatureAlertTitleWrap}>
+                <span style={temperatureAlertIcon}>
+                  <FaExclamationTriangle />
+                </span>
+                <div>
+                  <div style={temperatureAlertTitle}>
+                    Notifikasi Ketidaksesuaian AC
+                  </div>
+                  <div style={temperatureAlertSubtitle}>
+                    Terdeteksi perubahan suhu aktual yang tidak sesuai dengan
+                    status AC.
+                  </div>
+                </div>
+              </div>
+              <span style={temperatureAlertCount}>
+                {temperatureAlerts.length} alert
+              </span>
+            </div>
+
+            <div style={temperatureAlertList}>
+              {temperatureAlerts.slice(0, 3).map((alert) => (
+                <div key={alert.id} style={temperatureAlertItem}>
+                  <div>
+                    <div style={temperatureAlertItemTitle}>{alert.title}</div>
+                    <div style={temperatureAlertMessage}>{alert.message}</div>
+                  </div>
+                  <div style={temperatureAlertMeta}>
+                    {formatAlertTime(alert.event_time)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="toolbar-row" style={searchWrapper}>
           <div style={searchStyle}>
@@ -1303,6 +1381,97 @@ const cardMiniActionHover = {
   color: "#bfdbfe",
   transform: "translateY(-1px)",
   boxShadow: "0 10px 20px rgba(45, 140, 255, 0.16)",
+};
+
+const temperatureAlertPanel = {
+  marginTop: 18,
+  background: "rgba(245, 158, 11, 0.1)",
+  border: "1px solid rgba(245, 158, 11, 0.34)",
+  borderRadius: 12,
+  padding: 16,
+  color: "var(--text-main)",
+};
+
+const temperatureAlertHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 14,
+  marginBottom: 12,
+};
+
+const temperatureAlertTitleWrap = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+};
+
+const temperatureAlertIcon = {
+  width: 36,
+  height: 36,
+  borderRadius: 10,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(245, 158, 11, 0.18)",
+  color: "#fbbf24",
+  border: "1px solid rgba(245, 158, 11, 0.32)",
+  flexShrink: 0,
+};
+
+const temperatureAlertTitle = {
+  fontWeight: 800,
+  fontSize: 14,
+};
+
+const temperatureAlertSubtitle = {
+  marginTop: 3,
+  color: "var(--text-muted)",
+  fontSize: 12,
+};
+
+const temperatureAlertCount = {
+  flexShrink: 0,
+  borderRadius: 999,
+  padding: "6px 10px",
+  background: "rgba(245, 158, 11, 0.16)",
+  color: "#fbbf24",
+  border: "1px solid rgba(245, 158, 11, 0.32)",
+  fontSize: 12,
+  fontWeight: 800,
+};
+
+const temperatureAlertList = {
+  display: "grid",
+  gap: 8,
+};
+
+const temperatureAlertItem = {
+  display: "grid",
+  gridTemplateColumns: "1fr auto",
+  gap: 12,
+  alignItems: "center",
+  background: "rgba(15, 23, 42, 0.22)",
+  border: "1px solid rgba(245, 158, 11, 0.18)",
+  borderRadius: 10,
+  padding: "10px 12px",
+};
+
+const temperatureAlertItemTitle = {
+  fontWeight: 800,
+  fontSize: 13,
+};
+
+const temperatureAlertMessage = {
+  marginTop: 4,
+  color: "var(--text-muted)",
+  fontSize: 12,
+};
+
+const temperatureAlertMeta = {
+  color: "#fbbf24",
+  fontSize: 12,
+  fontWeight: 800,
 };
 
 const searchWrapper = {
