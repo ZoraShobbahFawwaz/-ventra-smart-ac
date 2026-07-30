@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as mqtt from 'mqtt';
 import { Repository } from 'typeorm';
 import { AcIotEvent } from '../ac-events/ac-iot-event.entity';
+import { AuditService } from '../audit/audit.service';
 import { EnergyService } from '../energy/energy.service';
 
 type SensorData = {
@@ -75,6 +76,7 @@ export class MqttService implements OnModuleInit {
   constructor(
     @InjectRepository(AcIotEvent)
     private readonly acIotEventRepo: Repository<AcIotEvent>,
+    private readonly auditService: AuditService,
     private readonly energyService: EnergyService,
   ) {}
 
@@ -262,6 +264,7 @@ export class MqttService implements OnModuleInit {
 
       const savedEvent = await this.acIotEventRepo.save(event);
       await this.energyService.recordAcEvent(savedEvent);
+      await this.recordTemperatureAlertAudit(savedEvent);
 
       console.log(
         `AC event saved: ${roomName} | ${eventType} | ${power} | ${temperature ?? 'NULL'} | ${fanSpeed ?? 'NULL'} | ${event.source}`,
@@ -288,6 +291,67 @@ export class MqttService implements OnModuleInit {
       .addOrderBy('event.id', 'ASC')
       .getMany();
 
+    const alerts = this.buildTemperatureAlerts(events)
+      .sort(
+        (a, b) =>
+          new Date(b.event_time).getTime() - new Date(a.event_time).getTime(),
+      )
+      .slice(0, this.temperatureAlertLimit);
+
+    return {
+      generated_at: new Date().toISOString(),
+      lookback_hours: this.temperatureAlertLookbackHours,
+      delta_threshold_celsius: this.temperatureAlertDeltaThreshold,
+      alerts,
+    };
+  }
+
+  private async recordTemperatureAlertAudit(event: AcIotEvent) {
+    if (event.actualTemperature === null) {
+      return;
+    }
+
+    const since = new Date(
+      Date.now() - this.temperatureAlertLookbackHours * 60 * 60 * 1000,
+    );
+    const events = await this.acIotEventRepo
+      .createQueryBuilder('event')
+      .where('event.room_name = :roomName', { roomName: event.roomName })
+      .andWhere('event.actual_temperature IS NOT NULL')
+      .andWhere('event.event_time >= :since', { since })
+      .orderBy('event.event_time', 'ASC')
+      .addOrderBy('event.id', 'ASC')
+      .getMany();
+    const alert = this.buildTemperatureAlerts(events).find((item) =>
+      item.id.startsWith(`${event.id}-`),
+    );
+
+    if (!alert) {
+      return;
+    }
+
+    await this.auditService.createLog({
+      user: 'System',
+      action: 'Notify',
+      module: 'AC Monitoring',
+      subject: `${alert.title} (${alert.room_name})`,
+      oldValue: {
+        power: alert.power,
+        reference_temperature: alert.reference_temperature,
+        set_temperature: alert.set_temperature,
+      },
+      newValue: {
+        actual_temperature: alert.actual_temperature,
+        delta_temperature: alert.delta_temperature,
+        source: alert.source,
+        event_time: alert.event_time,
+        message: alert.message,
+      },
+      status: 'success',
+    });
+  }
+
+  private buildTemperatureAlerts(events: AcIotEvent[]) {
     const roomStates = new Map<string, TemperatureState>();
     const latestAlertsByKey = new Map<string, TemperatureAlert>();
 
@@ -368,19 +432,7 @@ export class MqttService implements OnModuleInit {
       }
     });
 
-    const alerts = Array.from(latestAlertsByKey.values())
-      .sort(
-        (a, b) =>
-          new Date(b.event_time).getTime() - new Date(a.event_time).getTime(),
-      )
-      .slice(0, this.temperatureAlertLimit);
-
-    return {
-      generated_at: new Date().toISOString(),
-      lookback_hours: this.temperatureAlertLookbackHours,
-      delta_threshold_celsius: this.temperatureAlertDeltaThreshold,
-      alerts,
-    };
+    return Array.from(latestAlertsByKey.values());
   }
 
   private createTemperatureAlert(
