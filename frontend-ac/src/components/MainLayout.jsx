@@ -7,7 +7,10 @@ import { useTheme } from "../context/ThemeContext";
 export default function MainLayout({ children, title, subtitle }) {
   const navigate = useNavigate();
   const profileRef = useRef(null);
+  const notificationRef = useRef(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [temperatureAlerts, setTemperatureAlerts] = useState([]);
   const { isDarkMode, toggleTheme } = useTheme();
   const savedUser = localStorage.getItem("user");
   const user = savedUser ? JSON.parse(savedUser) : null;
@@ -47,15 +50,60 @@ export default function MainLayout({ children, title, subtitle }) {
     }
   };
 
+  const fetchTemperatureAlerts = async () => {
+    try {
+      const res = await fetch(apiUrl("/mqtt/temperature-alerts"), {
+        headers: apiHeaders(),
+      });
+
+      if (!res.ok) {
+        console.error("Gagal ambil notifikasi suhu:", res.status);
+        return;
+      }
+
+      const data = await res.json();
+      setTemperatureAlerts(Array.isArray(data?.alerts) ? data.alerts : []);
+    } catch (err) {
+      console.error("Gagal ambil notifikasi suhu:", err);
+    }
+  };
+
+  const formatAlertTime = (value) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) return "-";
+
+    return date.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
       }
+
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setIsNotificationOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    fetchTemperatureAlerts();
+
+    const interval = setInterval(fetchTemperatureAlerts, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -78,14 +126,61 @@ export default function MainLayout({ children, title, subtitle }) {
             {isDarkMode ? <FaSun /> : <FaMoon />}
           </button>
 
-          <span
-            className="header-icon-button"
-            style={iconButton}
-            aria-label="Notifikasi"
-            role="img"
-          >
-            <FaBell />
-          </span>
+          <div ref={notificationRef} style={notificationWrapper}>
+            <button
+              type="button"
+              className="header-icon-button"
+              style={iconButton}
+              aria-label="Notifikasi"
+              aria-expanded={isNotificationOpen}
+              aria-haspopup="menu"
+              title="Notifikasi"
+              onClick={() => setIsNotificationOpen((prev) => !prev)}
+            >
+              <FaBell />
+              {temperatureAlerts.length > 0 && (
+                <span style={notificationBadge}>
+                  {temperatureAlerts.length > 9 ? "9+" : temperatureAlerts.length}
+                </span>
+              )}
+            </button>
+
+            {isNotificationOpen && (
+              <div style={notificationDropdown} role="menu">
+                <div style={notificationHeader}>
+                  <div>
+                    <div style={notificationTitle}>Notifikasi</div>
+                    <div style={notificationSubtitle}>
+                      Ketidaksesuaian suhu AC
+                    </div>
+                  </div>
+                  <span style={notificationCount}>
+                    {temperatureAlerts.length}
+                  </span>
+                </div>
+
+                <div style={dropdownDivider} />
+
+                {temperatureAlerts.length > 0 ? (
+                  <div style={notificationList}>
+                    {temperatureAlerts.slice(0, 5).map((alert) => (
+                      <div key={alert.id} style={notificationItem}>
+                        <div style={notificationItemTitle}>{alert.title}</div>
+                        <div style={notificationItemMessage}>
+                          {alert.message}
+                        </div>
+                        <div style={notificationItemMeta}>
+                          {formatAlertTime(alert.event_time)} | {alert.source}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={notificationEmpty}>Tidak ada notifikasi</div>
+                )}
+              </div>
+            )}
+          </div>
 
           <div ref={profileRef} style={profileWrapper}>
             <button
@@ -183,6 +278,118 @@ const headerRight = {
   alignItems: "center",
   gap: 10,
   minHeight: 44,
+};
+
+const notificationWrapper = {
+  position: "relative",
+};
+
+const notificationBadge = {
+  position: "absolute",
+  top: -6,
+  right: -6,
+  minWidth: 17,
+  height: 17,
+  padding: "0 5px",
+  borderRadius: 999,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "#ef4444",
+  color: "#fff",
+  border: "2px solid var(--bg-main)",
+  fontSize: 10,
+  fontWeight: 900,
+  lineHeight: 1,
+};
+
+const notificationDropdown = {
+  position: "absolute",
+  right: 0,
+  top: "calc(100% + 12px)",
+  width: 360,
+  maxWidth: "82vw",
+  background: "var(--dropdown-bg)",
+  border: "1px solid var(--dropdown-border)",
+  borderRadius: 16,
+  boxShadow: "0 22px 60px var(--shadow-color)",
+  padding: 14,
+  zIndex: 60,
+};
+
+const notificationHeader = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+};
+
+const notificationTitle = {
+  color: "var(--text-main)",
+  fontWeight: 900,
+  fontSize: 15,
+};
+
+const notificationSubtitle = {
+  marginTop: 3,
+  color: "var(--text-muted)",
+  fontSize: 12,
+};
+
+const notificationCount = {
+  flexShrink: 0,
+  minWidth: 26,
+  height: 26,
+  borderRadius: 999,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(245, 158, 11, 0.16)",
+  color: "#fbbf24",
+  border: "1px solid rgba(245, 158, 11, 0.32)",
+  fontSize: 12,
+  fontWeight: 900,
+};
+
+const notificationList = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+  maxHeight: 320,
+  overflowY: "auto",
+};
+
+const notificationItem = {
+  background: "rgba(245, 158, 11, 0.08)",
+  border: "1px solid rgba(245, 158, 11, 0.22)",
+  borderRadius: 12,
+  padding: "10px 11px",
+};
+
+const notificationItemTitle = {
+  color: "var(--text-main)",
+  fontWeight: 800,
+  fontSize: 13,
+};
+
+const notificationItemMessage = {
+  marginTop: 4,
+  color: "var(--text-muted)",
+  fontSize: 12,
+  lineHeight: 1.35,
+};
+
+const notificationItemMeta = {
+  marginTop: 6,
+  color: "#fbbf24",
+  fontSize: 11,
+  fontWeight: 800,
+};
+
+const notificationEmpty = {
+  color: "var(--text-muted)",
+  fontSize: 13,
+  padding: "8px 0",
 };
 
 const profileWrapper = {
@@ -349,6 +556,7 @@ const logoutButton = {
 };
 
 const iconButton = {
+  position: "relative",
   width: 34,
   height: 34,
   border: "1px solid var(--header-action-border)",
